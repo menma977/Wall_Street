@@ -33,7 +33,7 @@ class UpgradeList extends Command
     try {
       $get = Http::get("https://indodax.com/api/summaries");
       if ($get->ok() || $get->status() === 200 || str_contains($get->body(), 'ticker')) {
-        $ticker = $get->json()['ticker'];
+        $ticker = $get->json()['tickers'];
         $upgradeList = \App\Models\UpgradeList::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
