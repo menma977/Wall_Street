@@ -4,40 +4,84 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
+/**
+ * Class User
+ * @package App\Models
+ * @property integer id
+ * @property integer role
+ * @property string name
+ * @property string username
+ * @property string email
+ * @property string phone
+ * @property string password
+ * @property string password_junk
+ * @property string secondary_password
+ * @property string secondary_password_junk
+ * @property string username_doge
+ * @property string password_doge
+ * @property string account_cookie
+ * @property string wallet_btc
+ * @property string wallet_ltc
+ * @property string wallet_doge
+ * @property string wallet_eth
+ * @property integer level
+ * @property integer status
+ * @property integer suspend
+ */
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+  use HasFactory, Notifiable, SoftDeletes;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array
+   */
+  protected $fillable = [
+    'role',
+    'name',
+    'username',
+    'email',
+    'phone',
+    'password',
+    'password_junk',
+    'secondary_password',
+    'secondary_password_junk',
+    'username_doge',
+    'password_doge',
+    'account_cookie',
+    'wallet_btc',
+    'wallet_ltc',
+    'wallet_doge',
+    'wallet_eth',
+    'level',
+    'status',
+    'suspend',
+  ];
 
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password',
-        'remember_token',
-    ];
+  /**
+   * The attributes that should be hidden for arrays.
+   *
+   * @var array
+   */
+  protected $hidden = [
+    'password',
+    'password_junk',
+    'secondary_password',
+    'secondary_password_junk',
+    'remember_token',
+  ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+  /**
+   * The attributes that should be cast to native types.
+   *
+   * @var array
+   */
+  protected $casts = [
+    'email_verified_at' => 'datetime',
+  ];
 }

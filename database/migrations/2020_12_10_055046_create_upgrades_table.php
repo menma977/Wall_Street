@@ -6,26 +6,32 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateUpgradesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('upgrades', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+  /**
+   * Run the migrations.
+   *
+   * @return void
+   */
+  public function up()
+  {
+    Schema::create('upgrades', function (Blueprint $table) {
+      $table->id();
+      $table->bigInteger('from');
+      $table->bigInteger('to');
+      $table->string('debit');
+      $table->string('credit');
+      $table->string('level');
+      $table->timestamps();
+      $table->softDeletes();
+    });
+  }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('upgrades');
-    }
+  /**
+   * Reverse the migrations.
+   *
+   * @return void
+   */
+  public function down()
+  {
+    Schema::dropIfExists('upgrades');
+  }
 }

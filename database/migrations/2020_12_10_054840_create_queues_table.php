@@ -6,26 +6,31 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateQueuesTable extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
-    {
-        Schema::create('queues', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+  /**
+   * Run the migrations.
+   *
+   * @return void
+   */
+  public function up()
+  {
+    Schema::create('queues', function (Blueprint $table) {
+      $table->id();
+      $table->bigInteger('user_Id');
+      $table->bigInteger('send');
+      $table->string('value');
+      $table->string('total');
+      $table->boolean('send')->default(false);
+      $table->timestamps();
+    });
+  }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
-    {
-        Schema::dropIfExists('queues');
-    }
+  /**
+   * Reverse the migrations.
+   *
+   * @return void
+   */
+  public function down()
+  {
+    Schema::dropIfExists('queues');
+  }
 }
