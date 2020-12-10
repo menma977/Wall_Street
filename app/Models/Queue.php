@@ -12,5 +12,18 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Queue extends Model
 {
-    use HasFactory;
+  use HasFactory;
+
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array
+   */
+  protected $fillable = [
+    'user_id',
+    'send',
+    'value',
+    'total',
+    'status',
+  ];
 }
