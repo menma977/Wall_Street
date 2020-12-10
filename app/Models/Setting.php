@@ -4,20 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class BTC
+ * Class Setting
  * @package App\Models
  * @property integer id
- * @property integer user_id
- * @property string description
- * @property integer debit
- * @property integer credit
+ * @property boolean maintenance
+ * @property integer version
  */
-class BTC extends Model
+class Setting extends Model
 {
-  use HasFactory, SoftDeletes;
+  use HasFactory;
 
   /**
    * The attributes that are mass assignable.
@@ -25,9 +22,7 @@ class BTC extends Model
    * @var array
    */
   protected $fillable = [
-    'user_id',
-    'description',
-    'debit',
-    'credit',
+    'maintenance',
+    'version',
   ];
 }

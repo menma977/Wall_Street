@@ -32,7 +32,6 @@ class UserSeeder extends Seeder
     $user->wallet_doge = 'DHRDzBmt5NJtq1nkGz7rdEWVETUDWmQkKm';
     $user->wallet_eth = '0x7804e3b33fa898c7fde6606946ed2ef440a4f7de';
     $user->level = 0;
-    $user->active = true;
     $user->save();
   }
 }
