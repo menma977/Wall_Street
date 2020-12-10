@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\Queue;
 use App\Models\ShareLevel;
@@ -17,78 +18,82 @@ class UpgradeController extends Controller
   {
     $request->validate([
       "type" => ["required", function ($attr, $val, $fail) {
-        if (!in_array($val, ["ltc", "btc", "eth", "doge"]))
+        if (!in_array($val, ["ltc", "btc", "eth", "doge"])) {
           $fail($attr . " must be either ltc, btc, eth, or doge");
+        }
       }],
       "upgrade_list" => ["required", function ($attr, $val, $fail) {
-        if (!in_array($val, ["btc_usd", "doge_usd", "ltc_usd", "eth_usd"]))
+        if (!in_array($val, ["btc_usd", "doge_usd", "ltc_usd", "eth_usd"])) {
           $fail($attr . " must be either btc_usd, doge_usd, ltc_usd or eth_usd");
+        }
       }],
-      "balance" => "requied|numeric"
+      "balance" => "required|numeric"
     ]);
     $ok = Upgrade::where($request->upgrade_list, "<=", $request->balance)->first();
-    $balanceleft = $request->balance;
+    $balance_left = $request->balance;
     if ($ok) {
       $level = ShareLevel::all();
       $current = Auth::id();
 
       $random_share_percent = $level->firstWhere("name", "IT")->percent + $level->firstWhere("name", "BuyWall")->percent;
       $wallet_it = $current * $level->firstWhere("name", "IT")->percent;
-      $buywall = $current * $level->firstWhere("name", "BuyWall")->percent;
+      $buy_wall = $current * $level->firstWhere("name", "BuyWall")->percent;
 
       $c_level = 1;
       while (true) {
-        $binary = Binary::where("downline", $current);
-        if (!$binary) break;
-        $potongan = $request->balance * $level->firstWhere("name", "Level " . $c_level)->percent;
+        $binary = Binary::where("down_line", $current);
+        if (!$binary) {
+          break;
+        }
+        $cut = $request->balance * $level->firstWhere("name", "Level " . $c_level)->percent;
         $random_share_percent += $level->firstWhere("name", "Level " . $c_level)->percent;
-        if ($c_level++ == 1) {
+        if ($c_level++ === 1) {
           $userBinary = User::where("id", $binary->sponsor);
         } else {
           $userBinary = User::where("id", $binary->upline);
           $current = $userBinary->id;
         }
-        $balanceleft -= $potongan;
+        $balance_left -= $cut;
         $q = new Queue([
           "user_Id" => Auth::id(),
           "send" => $userBinary->id,
-          "value" => $potongan,
+          "value" => $cut,
           "type" => $request->type . "_level",
-          "total" => $balanceleft,
+          "total" => $balance_left,
         ]);
         $q->save();
       }
 
       $wallet_admin = WalletAdmin::where("name", $request->type);
 
-      $balanceleft -= $wallet_it;
+      $balance_left -= $wallet_it;
       $it_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
         "value" => $wallet_it,
         "type" => $request->type . "_it",
-        "total" => $balanceleft,
+        "total" => $balance_left,
       ]);
       $it_queue->save();
 
-      $balanceleft -= $buywall;
-      $buywall_queue = new Queue([
+      $balance_left -= $buy_wall;
+      $buy_wall_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $buywall,
-        "type" => $request->type . "_buywall",
-        "total" => $balanceleft,
+        "value" => $buy_wall,
+        "type" => $request->type . "_buyWall",
+        "total" => $balance_left,
       ]);
-      $buywall_queue->save();
+      $buy_wall_queue->save();
 
       $total_random_share = $request->balance * $random_share_percent;
-      $balanceleft -= $total_random_share;
+      $balance_left -= $total_random_share;
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
-        "send" => $wallet_admin->id,
+        "send" => 1,
         "value" => $total_random_share,
         "type" => $request->type . "_share",
-        "total" => $balanceleft,
+        "total" => $balance_left,
       ]);
       $share_queue->save();
     }
