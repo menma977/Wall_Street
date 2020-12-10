@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Class UpgradeList
  * @package App\Models
+ * @property integer id
  * @property string dollar
  * @property string idr
  * @property string btc

@@ -31,7 +31,6 @@ use Illuminate\Notifications\Notifiable;
  * @property string wallet_eth
  * @property integer level
  * @property boolean suspend
- * @property boolean active
  */
 class User extends Authenticatable
 {
@@ -61,7 +60,6 @@ class User extends Authenticatable
     'wallet_eth',
     'level',
     'suspend',
-    'active',
   ];
 
   /**

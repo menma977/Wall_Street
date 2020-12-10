@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * Class Doge
  * @package App\Models
+ * @property integer id
  * @property integer user_id
  * @property string description
  * @property integer debit
