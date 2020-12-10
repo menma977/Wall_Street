@@ -15,10 +15,7 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
-    $schedule->command('updateBTC')->everyFiveMinutes()->withoutOverlapping();
-    $schedule->command('updateDoge')->everyFiveMinutes()->withoutOverlapping();
-    $schedule->command('updateETH')->everyFiveMinutes()->withoutOverlapping();
-    $schedule->command('updateLTC')->everyFiveMinutes()->withoutOverlapping();
+    $schedule->command('upgradeList')->everyFiveMinutes()->withoutOverlapping();
   }
 
   /**

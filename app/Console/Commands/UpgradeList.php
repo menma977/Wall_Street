@@ -2,20 +2,19 @@
 
 namespace App\Console\Commands;
 
-use App\Models\UpgradeList;
 use http\Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
-class UpdateDoge extends Command
+class UpgradeList extends Command
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'updateDoge';
+  protected $signature = 'upgradeList';
 
   /**
    * The console command description.
@@ -31,22 +30,27 @@ class UpdateDoge extends Command
    */
   public function handle()
   {
-    sleep(2);
     try {
-      $get = Http::get("https://indodax.com/api/doge_idr/ticker");
+      $get = Http::get("https://indodax.com/api/summaries");
       if ($get->ok() || $get->status() === 200 || str_contains($get->body(), 'ticker')) {
         $ticker = $get->json()['ticker'];
-        $upgradeList = UpgradeList::all();
+        $upgradeList = \App\Models\UpgradeList::all();
         foreach ($upgradeList as $item) {
-          $item->doge = $ticker['buy'];
+          $item->btc = $ticker['btc_idr']['buy'];
+          $item->btc_usd = ($item->dollar * $item->idr) / $item->btc;
+          $item->doge = $ticker['doge_idr']['buy'];
           $item->doge_usd = ($item->dollar * $item->idr) / $item->doge;
+          $item->eth = $ticker['eth_idr']['buy'];
+          $item->eth_usd = ($item->dollar * $item->idr) / $item->eth;
+          $item->ltc = $ticker['ltc_idr']['buy'];
+          $item->ltc_usd = ($item->dollar * $item->idr) / $item->ltc;
           $item->save();
         }
       } else {
         Log::error($get);
       }
     } catch (Exception $e) {
-      Log::warning($e->getMessage() . " Update DOGE LINE : " . $e->getLine());
+      Log::warning($e->getMessage() . " Update BTC LINE : " . $e->getLine());
     }
   }
 }
