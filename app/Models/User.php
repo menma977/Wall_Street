@@ -16,6 +16,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string name
  * @property string username
  * @property string email
+ * @property string email_verified_at
  * @property string phone
  * @property string password
  * @property string password_junk
@@ -30,6 +31,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string wallet_eth
  * @property integer level
  * @property boolean suspend
+ * @property boolean active
  */
 class User extends Authenticatable
 {
@@ -59,6 +61,7 @@ class User extends Authenticatable
     'wallet_eth',
     'level',
     'suspend',
+    'active',
   ];
 
   /**
