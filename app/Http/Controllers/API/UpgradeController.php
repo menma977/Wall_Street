@@ -6,6 +6,7 @@ use App\Models\Binary;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\Upgrade;
+use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
 use Illuminate\Http\Request;
@@ -26,9 +27,9 @@ class UpgradeController extends Controller
       }],
       "balance" => "requied|numeric"
     ]);
-    $ok = Upgrade::where($request->upgrade_list, "<=", $request->balance)->first();
+    $upgradelist = UpgradeList::where($request->upgrade_list, "<=", $request->balance)->first();
     $balanceleft = $request->balance;
-    if ($ok) {
+    if ($upgradelist) {
       $level = ShareLevel::all();
       $current = Auth::id();
 
@@ -38,12 +39,19 @@ class UpgradeController extends Controller
 
       $c_level = 1;
       while (true) {
-        $binary = Binary::where("downline", $current);
+        $binary = Binary::where("downline", $current)->first();
         if (!$binary) break;
         $potongan = $request->balance * $level->firstWhere("name", "Level " . $c_level)->percent;
         $random_share_percent += $level->firstWhere("name", "Level " . $c_level)->percent;
         if ($c_level++ == 1) {
           $userBinary = User::where("id", $binary->sponsor);
+          $upline = User::where("id", $binary->upline);
+
+          // level upline minim harus sama atau lebih dari level yang mau di upgrade ini
+          if($upline->level < $upgradelist->id){
+            return response()->json(["message","Operation not permitted"], 401);
+          }
+
         } else {
           $userBinary = User::where("id", $binary->upline);
           $current = $userBinary->id;
@@ -81,7 +89,7 @@ class UpgradeController extends Controller
       ]);
       $buywall_queue->save();
 
-      $total_random_share = $request->balance * $random_share_percent;
+      $total_random_share = $request->balance * (100 - $random_share_percent);
       $balanceleft -= $total_random_share;
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
