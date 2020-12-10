@@ -68,10 +68,5 @@ class ShareLevelSeeder extends Seeder
     $shareLevel->level = "BuyWall";
     $shareLevel->percent = 0.05;
     $shareLevel->save();
-
-    $shareLevel = new ShareLevel();
-    $shareLevel->level = "Share";
-    $shareLevel->percent = 0.44;
-    $shareLevel->save();
   }
 }
