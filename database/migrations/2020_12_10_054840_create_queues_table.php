@@ -18,6 +18,7 @@ class CreateQueuesTable extends Migration
       $table->bigInteger('user_Id');
       $table->bigInteger('send');
       $table->string('value');
+      $table->string('type');
       $table->string('total');
       $table->boolean('status')->default(false);
       $table->timestamps();

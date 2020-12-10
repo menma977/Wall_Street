@@ -12,5 +12,20 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Queue extends Model
 {
-    use HasFactory;
+
+  use HasFactory, SoftDeletes;
+
+  /**
+   * The attributes that are mass assignable.
+   *
+   * @var array
+   */
+  protected $fillable = [
+    "user_Id",
+    "send",
+    "value",
+    "type",
+    "total",
+    "status",
+  ];
 }
