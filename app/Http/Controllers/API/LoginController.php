@@ -8,6 +8,7 @@ use http\Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
@@ -30,12 +31,12 @@ class LoginController extends Controller
 
     $this->validate($request, [
       'username' => 'required|string|exists:users,' . $type,
-      'password' => 'required|string|min:6'
+      'password' => 'required|string'
     ]);
 
     try {
       if (Auth::attempt([$type => $request->input('username'), 'password' => $request->input('password')])) {
-        Log::info('username: ' . $request->input('username') . ' | password: ' . $request->input('password') . ' | IP(' . $this->ip() . ')');
+        Log::info('username: ' . $request->input('username') . ' | password: ' . $request->input('password') . ' | IP(' . $request->ip() . ')');
         foreach (Auth::user()->tokens as $id => $item) {
           $item->revoke();
         }
@@ -53,17 +54,33 @@ class LoginController extends Controller
             return response()->json(['message' => 'Under Maintenance.'], 500);
           }
 
-          $user->token = $user->createToken('Android')->accessToken;
-
-          return response()->json([
-            'token' => $user->token,
-            'account_cookie' => $user->account_cookie,
-            'phone' => $user->phone,
-            'wallet_btc' => $user->wallet_btc,
-            'wallet_doge' => $user->wallet_doge,
-            'wallet_ltc' => $user->wallet_ltc,
-            'wallet_eth' => $user->wallet_eth,
+          $doge999 = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+            'a' => 'Login',
+            'key' => 'f3023b66b9304852abddc71ccd8237e9',
+            'username' => $user->username_doge,
+            'password' => $user->password_doge
           ]);
+
+          if ($doge999->ok() && $doge999->successful()) {
+            $user->account_cookie = $doge999->json()['SessionCookie'];
+
+            $user->token = $user->createToken('Android')->accessToken;
+
+            return response()->json([
+              'token' => $user->token,
+              'account_cookie' => $user->account_cookie,
+              'email' => $user->email,
+              'username' => $user->username,
+              'phone' => $user->phone,
+              'wallet_btc' => $user->wallet_btc,
+              'wallet_doge' => $user->wallet_doge,
+              'wallet_ltc' => $user->wallet_ltc,
+              'wallet_eth' => $user->wallet_eth,
+            ]);
+          }
+
+          Log::info($doge999);
+          return response()->json(['message' => 'CODE:401 - user is invalid.'], 401);
         }
 
         return response()->json(['message' => 'CODE:401 - user is invalid.'], 401);
