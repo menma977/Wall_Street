@@ -63,13 +63,13 @@ class LoginController extends Controller
           ]);
 
           if ($doge999->ok() && $doge999->successful()) {
-            $user->account_cookie = $doge999->json()['SessionCookie'];
+            $user->cookie = $doge999->json()['SessionCookie'];
 
             $user->token = $user->createToken('Android')->accessToken;
 
             return response()->json([
               'token' => $user->token,
-              'account_cookie' => $user->account_cookie,
+              'account_cookie' => $user->cookie,
               'email' => $user->email,
               'username' => $user->username,
               'phone' => $user->phone,
