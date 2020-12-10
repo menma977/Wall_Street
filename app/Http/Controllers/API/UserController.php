@@ -10,21 +10,38 @@ use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
-  public function self()
+  protected $dataUser;
+
+  public function __construct()
   {
-    return response()->json(["user" => Auth::user()]);
+    $this->dataUser = $this->getUser(Auth::id());
   }
 
-  public function get($user_identifiable)
+  public function self()
   {
-    $user = User::where("username", $user_identifiable)
+    return response()->json(["user" => $this->dataUser]);
+  }
+
+  private function getUser($user_identifiable)
+  {
+    return User::select(
+      'name',
+      'username',
+      'email',
+      'phone',
+      'password',
+      'account_cookie',
+      'wallet_btc',
+      'wallet_ltc',
+      'wallet_doge',
+      'wallet_eth',
+      'level',
+      'suspend',
+    )
+      ->where("username", $user_identifiable)
       ->orWhere("id", $user_identifiable)
       ->orWhere("phone", $user_identifiable)
       ->orWhere("email", $user_identifiable)
       ->first();
-    if ($user)
-      return response()->json(["user" => $user]);
-    else
-      return response()->json(["message", "User not found"], 404);
   }
 }
