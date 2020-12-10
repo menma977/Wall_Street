@@ -37,13 +37,13 @@ class UpgradeList extends Command
         $upgradeList = \App\Models\UpgradeList::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
-          $item->btc_usd = ($item->dollar * $item->idr) / $item->btc;
+          $item->btc_usd = number_format((($item->dollar * $item->idr) / $item->btc) * 10 ** 8, 0, ',', '');
           $item->doge = $ticker['doge_idr']['buy'];
-          $item->doge_usd = ($item->dollar * $item->idr) / $item->doge;
+          $item->doge_usd = number_format((($item->dollar * $item->idr) / $item->doge) * 10 ** 8, 0, ',', '');
           $item->eth = $ticker['eth_idr']['buy'];
-          $item->eth_usd = ($item->dollar * $item->idr) / $item->eth;
+          $item->eth_usd = number_format((($item->dollar * $item->idr) / $item->eth) * 10 ** 8, 0, ',', '');
           $item->ltc = $ticker['ltc_idr']['buy'];
-          $item->ltc_usd = ($item->dollar * $item->idr) / $item->ltc;
+          $item->ltc_usd = number_format((($item->dollar * $item->idr) / $item->ltc) * 10 ** 8, 0, ',', '');
           $item->save();
         }
       } else {
