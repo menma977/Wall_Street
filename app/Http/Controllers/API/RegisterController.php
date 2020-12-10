@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\User;
 use http\Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
@@ -17,6 +18,7 @@ class RegisterController extends Controller
 {
   /**
    * @param Request $request
+   * @return JsonResponse
    * @throws ValidationException
    */
   public function out(Request $request)
@@ -45,6 +47,7 @@ class RegisterController extends Controller
         'a' => 'CreateAccount',
         'Key' => '1b4755ced78e4d91bce9128b9a053cad',
       ]);
+      Log::info($createAccount999Doge);
 
       try {
         if ($createAccount999Doge->ok() && $createAccount999Doge->successful()) {
@@ -59,17 +62,48 @@ class RegisterController extends Controller
           $user->secondary_password_junk = $request->input('secondary_password');
           $user->cookie = $createAccount999Doge->json()['SessionCookie'];
 
-          $getWallet999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'BeginSession',
-            'Key' => '1b4755ced78e4d91bce9128b9a053cad',
-            'AccountCookie' => $createAccount999Doge->json()['AccountCookie'],
+          $walletBTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+            'a' => 'GetDepositAddress',
+            's' => $createAccount999Doge->json()['SessionCookie'],
+            'Currency' => "btc"
           ]);
+          Log::info($walletBTC);
 
-          if ($getWallet999Doge->ok() && $getWallet999Doge->successful()) {
-            $user->wallet_btc = $getWallet999Doge->json('BTC')['DepositAddress'];
-            $user->wallet_doge = $getWallet999Doge->json('Doge')['DepositAddress'];
-            $user->wallet_ltc = $getWallet999Doge->json('LTC')['DepositAddress'];
-            $user->wallet_eth = $getWallet999Doge->json('ETH')['DepositAddress'];
+          if ($walletBTC->ok() && $walletBTC->successful()) {
+            $user->wallet_btc = $walletBTC->json()['Address'];
+          }
+
+          $walletDoge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+            'a' => 'GetDepositAddress',
+            's' => $createAccount999Doge->json()['SessionCookie'],
+            'Currency' => "doge"
+          ]);
+          Log::info($walletDoge);
+
+          if ($walletBTC->ok() && $walletBTC->successful()) {
+            $user->wallet_doge = $walletBTC->json()['Address'];
+          }
+
+          $walletLTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+            'a' => 'GetDepositAddress',
+            's' => $createAccount999Doge->json()['SessionCookie'],
+            'Currency' => "ltc"
+          ]);
+          Log::info($walletLTC);
+
+          if ($walletBTC->ok() && $walletBTC->successful()) {
+            $user->wallet_ltc = $walletBTC->json()['Address'];
+          }
+
+          $walletETH = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+            'a' => 'GetDepositAddress',
+            's' => $createAccount999Doge->json()['SessionCookie'],
+            'Currency' => "eth"
+          ]);
+          Log::info($walletETH);
+
+          if ($walletBTC->ok() && $walletBTC->successful()) {
+            $user->wallet_eth = $walletBTC->json()['Address'];
           }
 
           $user->username_doge = $this->generateRandomString();
@@ -81,6 +115,8 @@ class RegisterController extends Controller
             'Username' => $user->username_doge,
             'Password' => $user->password_doge,
           ]);
+
+          Log::info($createUser999Doge);
 
           if ($createUser999Doge->ok() && $createUser999Doge->successful()) {
             $user->save();
