@@ -29,8 +29,7 @@ use Illuminate\Notifications\Notifiable;
  * @property string wallet_doge
  * @property string wallet_eth
  * @property integer level
- * @property integer status
- * @property integer suspend
+ * @property boolean suspend
  */
 class User extends Authenticatable
 {
@@ -59,7 +58,6 @@ class User extends Authenticatable
     'wallet_doge',
     'wallet_eth',
     'level',
-    'status',
     'suspend',
   ];
 

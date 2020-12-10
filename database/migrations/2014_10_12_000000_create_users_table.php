@@ -33,8 +33,7 @@ class CreateUsersTable extends Migration
       $table->text('wallet_doge')->nullable();
       $table->text('wallet_eth')->nullable();
       $table->integer('level')->default(1);
-      $table->integer('status')->default(1);
-      $table->integer('suspend')->default(0);
+      $table->boolean('suspend')->default(false);
       $table->rememberToken();
       $table->timestamps();
       $table->softDeletes();
