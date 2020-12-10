@@ -27,12 +27,12 @@ class CreateUsersTable extends Migration
       $table->string('secondary_password_junk');
       $table->string('username_doge')->nullable();
       $table->string('password_doge')->nullable();
-      $table->text('account_cookie')->nullable();
+      $table->text('cookie')->nullable();
       $table->text('wallet_btc')->nullable();
       $table->text('wallet_ltc')->nullable();
       $table->text('wallet_doge')->nullable();
       $table->text('wallet_eth')->nullable();
-      $table->integer('level')->default(1);
+      $table->integer('level')->default(0);
       $table->boolean('suspend')->default(false);
       $table->rememberToken();
       $table->timestamps();

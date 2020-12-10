@@ -25,7 +25,7 @@ use Laravel\Passport\HasApiTokens;
  * @property string secondary_password_junk
  * @property string username_doge
  * @property string password_doge
- * @property string account_cookie
+ * @property string cookie
  * @property string wallet_btc
  * @property string wallet_ltc
  * @property string wallet_doge
@@ -33,7 +33,7 @@ use Laravel\Passport\HasApiTokens;
  * @property integer level
  * @property boolean suspend
  */
-class User extends Authenticatable
+class User extends Authenticatable implements MustVerifyEmail
 {
   use HasFactory, Notifiable, SoftDeletes, HasApiTokens;
 
@@ -54,7 +54,7 @@ class User extends Authenticatable
     'secondary_password_junk',
     'username_doge',
     'password_doge',
-    'account_cookie',
+    'cookie',
     'wallet_btc',
     'wallet_ltc',
     'wallet_doge',
