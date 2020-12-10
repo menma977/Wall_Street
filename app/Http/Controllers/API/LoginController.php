@@ -38,7 +38,7 @@ class LoginController extends Controller
         $user = Auth::user();
         if ($user) {
           if ($user->suspend) {
-            return response()->json(['message' => 'your account has been suspend'], 500);
+            return response()->json(['message' => 'your account has been suspended'], 500);
           }
 
           if ($user->email_verified_at) {
