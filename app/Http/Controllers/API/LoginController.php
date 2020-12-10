@@ -38,7 +38,8 @@ class LoginController extends Controller
       if (Auth::attempt([$type => $request->input('username'), 'password' => $request->input('password')])) {
         Log::info('username: ' . $request->input('username') . ' | password: ' . $request->input('password') . ' | IP(' . $request->ip() . ')');
         foreach (Auth::user()->tokens as $id => $item) {
-          $item->revoke();
+          //$item->revoke();
+          $item->delete();
         }
         $user = Auth::user();
         if ($user) {
