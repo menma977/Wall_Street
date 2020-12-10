@@ -22,6 +22,7 @@ class WalletAdmin extends Model
    * @var array
    */
   protected $fillable = [
+    'name',
     'wallet',
   ];
 }

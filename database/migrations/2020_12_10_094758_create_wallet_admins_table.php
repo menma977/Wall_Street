@@ -15,6 +15,7 @@ class CreateWalletAdminsTable extends Migration
   {
     Schema::create('wallet_admins', function (Blueprint $table) {
       $table->id();
+      $table->text('name');
       $table->text('wallet');
       $table->timestamps();
       $table->softDeletes();
