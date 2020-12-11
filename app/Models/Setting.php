@@ -11,6 +11,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer id
  * @property boolean maintenance
  * @property integer version
+ * @property string username
+ * @property string password
+ * @property string wallet_btc
+ * @property string wallet_doge
+ * @property string wallet_ltc
+ * @property string wallet_eth
  */
 class Setting extends Model
 {
@@ -24,5 +30,11 @@ class Setting extends Model
   protected $fillable = [
     'maintenance',
     'version',
+    'username',
+    'password',
+    'wallet_btc',
+    'wallet_doge',
+    'wallet_ltc',
+    'wallet_eth',
   ];
 }

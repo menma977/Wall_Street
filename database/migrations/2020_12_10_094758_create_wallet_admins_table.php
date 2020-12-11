@@ -16,7 +16,10 @@ class CreateWalletAdminsTable extends Migration
     Schema::create('wallet_admins', function (Blueprint $table) {
       $table->id();
       $table->text('name');
-      $table->text('wallet');
+      $table->text('wallet_btc');
+      $table->text('wallet_doge');
+      $table->text('wallet_ltc');
+      $table->text('wallet_eth');
       $table->timestamps();
       $table->softDeletes();
     });
