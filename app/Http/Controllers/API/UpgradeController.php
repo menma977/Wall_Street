@@ -146,7 +146,7 @@ class UpgradeController extends Controller
       $balance_left -= $total_random_share;
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
-        "send" => 1,
+        "send" => $wallet_admin->id,
         "value" => $total_random_share,
         "type" => $request->type . "_share",
         "total" => $balance_left,
