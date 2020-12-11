@@ -44,9 +44,8 @@ class UpgradeController extends Controller
     $progress = $btc_progress + $doge_progress + $ltc_progress + $eth_progress;
     $target = $btc_target + $doge_target + $ltc_target + $eth_target;
 
-
     $data = [
-      'progress' => $progress,
+      'progress' => $target / $progress,
       'target' => $target,
       'btc' => $btc->sum('debit') - $btc->sum('credit'),
       'doge' => $doge->sum('debit') - $doge->sum('credit'),
@@ -150,6 +149,9 @@ class UpgradeController extends Controller
         "total" => $balance_left,
       ]);
       $share_queue->save();
+      return response()->json(["message","Upgrade now queued"]);
+    }else{
+      return response()->json(["message", "Incorrect balance amount"], 400);
     }
   }
 }
