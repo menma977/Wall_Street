@@ -17,6 +17,7 @@ use App\Models\WalletAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class UpgradeController extends Controller
 {
@@ -80,33 +81,41 @@ class UpgradeController extends Controller
     if ($upgradeList) {
       $level = ShareLevel::all();
       $current = Auth::id();
-
-      $random_share_percent = $level->firstWhere("name", "IT")->percent + $level->firstWhere("name", "BuyWall")->percent;
-      $wallet_it = $current * $level->firstWhere("name", "IT")->percent;
-      $buy_wall = $current * $level->firstWhere("name", "BuyWall")->percent;
+      $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
+      $wallet_it = $request->balance * $level->firstWhere("level", "IT")->percent;
+      $buy_wall = $request->balance * $level->firstWhere("level", "BuyWall")->percent;
+      Log::debug($balance_left);
 
       $c_level = 1;
       while (true) {
-        $binary = Binary::where("down_line", $current);
+        $binary = Binary::where("down_line", $current)->first();
         if (!$binary) {
           break;
         }
-        $cut = $request->balance * $level->firstWhere("name", "Level " . $c_level)->percent;
-        $random_share_percent += $level->firstWhere("name", "Level " . $c_level)->percent;
+        $cut = $request->balance * $level->firstWhere("level", "Level " . $c_level)->percent;
+        $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
         if ($c_level++ === 1) {
-          $userBinary = User::where("id", $binary->sponsor);
-          $upLine = User::where("id", $binary->up_line);
+          $userBinary = User::where("id", $binary->sponsor)->first();
+          $upLine = User::where("id", $binary->up_line)->first();
+          Log::debug($current);
+          Log::debug('(message)');
 
           // level upline minim harus sama atau lebih dari level yang mau di upgrade ini
-          if ($upLine->level < $upgradeList->id) {
-            return response()->json(["message", "Operation not permitted"], 401);
-          }
+          //if ($upLine->level < $upgradeList->id) {
+          //  return response()->json(["message", "Operation not permitted"], 401);
+          //}
 
         } else {
-          $userBinary = User::where("id", $binary->upline);
-          $current = $userBinary->id;
+          $userBinary = User::where("id", $binary->up_line)->first();
+          Log::debug($current);
+          Log::debug('message');
+          if($userBinary)
+            $current = $userBinary->id;
+          else
+            $current = "";
         }
         $balance_left -= $cut;
+        Log::debug($balance_left);
         $q = new Queue([
           "user_Id" => Auth::id(),
           "send" => $userBinary->id,
@@ -117,9 +126,10 @@ class UpgradeController extends Controller
         $q->save();
       }
 
-      $wallet_admin = WalletAdmin::where("name", $request->type);
+      $wallet_admin = WalletAdmin::inRandomOrder()->first();
 
       $balance_left -= $wallet_it;
+      Log::debug($balance_left);
       $it_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
@@ -130,6 +140,7 @@ class UpgradeController extends Controller
       $it_queue->save();
 
       $balance_left -= $buy_wall;
+      Log::debug($balance_left);
       $buy_wall_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
@@ -139,8 +150,10 @@ class UpgradeController extends Controller
       ]);
       $buy_wall_queue->save();
 
-      $total_random_share = $request->balance * $random_share_percent;
+      $total_random_share = $request->balance * (1 - $random_share_percent);
+      Log::debug($balance_left."-=".$total_random_share);
       $balance_left -= $total_random_share;
+      Log::debug($balance_left);
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => 1,
