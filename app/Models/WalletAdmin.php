@@ -10,7 +10,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Class WalletAdmin
  * @package App\Models
  * @property integer id
- * @property string wallet
+ * @property string wallet_btc
+ * @property string wallet_doge
+ * @property string wallet_ltc
+ * @property string wallet_eth
  */
 class WalletAdmin extends Model
 {
@@ -23,6 +26,9 @@ class WalletAdmin extends Model
    */
   protected $fillable = [
     'name',
-    'wallet',
+    'wallet_btc',
+    'wallet_doge',
+    'wallet_ltc',
+    'wallet_eth',
   ];
 }
