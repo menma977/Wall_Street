@@ -37,7 +37,6 @@ class UpgradeList extends Command
         $upgradeList = \App\Models\UpgradeList::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
-          $tes = number_format(($item->dollar * $item->idr) / $item->btc, 8, ',', '');
           $item->btc_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->btc, 8, ',', ''));
           $item->doge = $ticker['doge_idr']['buy'];
           $item->doge_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->doge, 8, ',', ''));
