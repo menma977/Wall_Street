@@ -149,9 +149,9 @@ class UpgradeController extends Controller
         "total" => $balance_left,
       ]);
       $share_queue->save();
-      return response()->json(["message","Upgrade now queued"]);
+      return response()->json(["message"=>"Upgrade now queued"]);
     }else{
-      return response()->json(["message", "Incorrect balance amount"], 400);
+      return response()->json(["message"=> "Incorrect balance amount"], 400);
     }
   }
 }
