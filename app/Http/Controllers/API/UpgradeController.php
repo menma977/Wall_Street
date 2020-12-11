@@ -84,7 +84,6 @@ class UpgradeController extends Controller
       $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
       $wallet_it = $request->balance * $level->firstWhere("level", "IT")->percent;
       $buy_wall = $request->balance * $level->firstWhere("level", "BuyWall")->percent;
-      Log::debug($balance_left);
 
       $c_level = 1;
       while (true) {
@@ -97,8 +96,6 @@ class UpgradeController extends Controller
         if ($c_level++ === 1) {
           $userBinary = User::where("id", $binary->sponsor)->first();
           $upLine = User::where("id", $binary->up_line)->first();
-          Log::debug($current);
-          Log::debug('(message)');
 
           // level upline minim harus sama atau lebih dari level yang mau di upgrade ini
           //if ($upLine->level < $upgradeList->id) {
@@ -107,15 +104,12 @@ class UpgradeController extends Controller
 
         } else {
           $userBinary = User::where("id", $binary->up_line)->first();
-          Log::debug($current);
-          Log::debug('message');
           if($userBinary)
             $current = $userBinary->id;
           else
             $current = "";
         }
         $balance_left -= $cut;
-        Log::debug($balance_left);
         $q = new Queue([
           "user_Id" => Auth::id(),
           "send" => $userBinary->id,
@@ -129,7 +123,6 @@ class UpgradeController extends Controller
       $wallet_admin = WalletAdmin::inRandomOrder()->first();
 
       $balance_left -= $wallet_it;
-      Log::debug($balance_left);
       $it_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
@@ -140,7 +133,6 @@ class UpgradeController extends Controller
       $it_queue->save();
 
       $balance_left -= $buy_wall;
-      Log::debug($balance_left);
       $buy_wall_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
@@ -151,9 +143,7 @@ class UpgradeController extends Controller
       $buy_wall_queue->save();
 
       $total_random_share = $request->balance * (1 - $random_share_percent);
-      Log::debug($balance_left."-=".$total_random_share);
       $balance_left -= $total_random_share;
-      Log::debug($balance_left);
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => 1,
