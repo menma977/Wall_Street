@@ -37,13 +37,14 @@ class UpgradeList extends Command
         $upgradeList = \App\Models\UpgradeList::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
-          $item->btc_usd = number_format((($item->dollar * $item->idr) / $item->btc) * 10 ** 8, 0, ',', '');
+          $tes = number_format(($item->dollar * $item->idr) / $item->btc, 8, ',', '');
+          $item->btc_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->btc, 8, ',', ''));
           $item->doge = $ticker['doge_idr']['buy'];
-          $item->doge_usd = number_format((($item->dollar * $item->idr) / $item->doge) * 10 ** 8, 0, ',', '');
+          $item->doge_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->doge, 8, ',', ''));
           $item->eth = $ticker['eth_idr']['buy'];
-          $item->eth_usd = number_format((($item->dollar * $item->idr) / $item->eth) * 10 ** 8, 0, ',', '');
+          $item->eth_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->eth, 8, ',', ''));
           $item->ltc = $ticker['ltc_idr']['buy'];
-          $item->ltc_usd = number_format((($item->dollar * $item->idr) / $item->ltc) * 10 ** 8, 0, ',', '');
+          $item->ltc_usd = str_replace(',', '', number_format(($item->dollar * $item->idr) / $item->ltc, 8, ',', ''));
           $item->save();
         }
       } else {
