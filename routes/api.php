@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\UpgradeController;
 use App\Http\Controllers\API\UserController;
+use App\Http\Controllers\API\VersionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,9 +19,18 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('/login', [LoginController::class, 'index'])->middleware(['throttle:1,1', 'verified']);
-Route::post('/register', [RegisterController::class, 'out'])->middleware(['throttle:6,1']);
+Route::get('/version', [VersionController::class, 'index'])->middleware(['throttle:6,1']);
+Route::post('/login', [LoginController::class, 'index'])->middleware(['throttle:6,1']);
+Route::post('/registration', [RegisterController::class, 'out'])->middleware(['throttle:6,1']);
 
-Route::middleware('auth:api')->group(function () {
+Route::middleware(['auth:api', 'verified'])->group(function () {
+  Route::group(['prefix' => 'user', 'as' => 'user.'], static function () {
+    Route::get('/show', [UserController::class, 'self']);
+    Route::post('/registered', [RegisterController::class, 'in'])->middleware(['throttle:6,1']);
+  });
 
+  Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], static function () {
+    Route::get('/index', [UpgradeController::class, 'index']);
+    Route::post('/upgrade', [UpgradeController::class, 'upgrade']);
+  });
 });

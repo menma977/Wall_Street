@@ -4,18 +4,64 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
+use App\Models\BTC;
+use App\Models\Doge;
+use App\Models\ETH;
+use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class UpgradeController extends Controller
 {
-  public function index(Request $request)
+  /**
+   * @return JsonResponse
+   */
+  public function index()
+  {
+    $idrConverter = UpgradeList::find(1);
+    $btc = BTC::where('user_id', Auth::id());
+    $doge = Doge::where('user_id', Auth::id());
+    $ltc = LTC::where('user_id', Auth::id());
+    $eth = ETH::where('user_id', Auth::id());
+
+    $btc_progress = (($btc->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->btc;
+    $doge_progress = (($doge->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->doge;
+    $ltc_progress = (($ltc->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->ltc;
+    $eth_progress = (($eth->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->eth;
+
+    $btc_target = (($btc->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->btc;
+    $doge_target = (($doge->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->doge;
+    $ltc_target = (($ltc->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->ltc;
+    $eth_target = (($eth->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->eth;
+
+    $progress = $btc_progress + $doge_progress + $ltc_progress + $eth_progress;
+    $target = $btc_target + $doge_target + $ltc_target + $eth_target;
+
+
+    $data = [
+      'progress' => $progress,
+      'target' => $target,
+      'btc' => $btc->sum('debit') - $btc->sum('credit'),
+      'doge' => $doge->sum('debit') - $doge->sum('credit'),
+      'ltc' => $ltc->sum('debit') - $ltc->sum('credit'),
+      'eth' => $eth->sum('debit') - $eth->sum('credit'),
+    ];
+
+    return response()->json($data);
+  }
+
+  /**
+   * @param Request $request
+   * @return JsonResponse
+   */
+  public function upgrade(Request $request)
   {
     $request->validate([
       "type" => ["required", function ($attr, $val, $fail) {
@@ -30,9 +76,9 @@ class UpgradeController extends Controller
       }],
       "balance" => "required|numeric"
     ]);
-    $upgradelist = UpgradeList::where($request->upgrade_list, "<=", $request->balance)->first();
+    $upgradeList = UpgradeList::where($request->upgrade_list, "<=", $request->balance)->first();
     $balance_left = $request->balance;
-    if ($upgradelist) {
+    if ($upgradeList) {
       $level = ShareLevel::all();
       $current = Auth::id();
 
@@ -50,11 +96,11 @@ class UpgradeController extends Controller
         $random_share_percent += $level->firstWhere("name", "Level " . $c_level)->percent;
         if ($c_level++ === 1) {
           $userBinary = User::where("id", $binary->sponsor);
-          $upline = User::where("id", $binary->upline);
+          $upLine = User::where("id", $binary->up_line);
 
           // level upline minim harus sama atau lebih dari level yang mau di upgrade ini
-          if($upline->level < $upgradelist->id){
-            return response()->json(["message","Operation not permitted"], 401);
+          if ($upLine->level < $upgradeList->id) {
+            return response()->json(["message", "Operation not permitted"], 401);
           }
 
         } else {

@@ -11,8 +11,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @package App\Models
  * @property integer id
  * @property integer sponsor
- * @property integer upline
- * @property integer downline
+ * @property integer up_line
+ * @property integer down_line
  * @property boolean active
  */
 class Binary extends Model
@@ -26,8 +26,8 @@ class Binary extends Model
    */
   protected $fillable = [
     'sponsor',
-    'upline',
-    'downline',
+    'up_line',
+    'down_line',
     'active',
   ];
 }

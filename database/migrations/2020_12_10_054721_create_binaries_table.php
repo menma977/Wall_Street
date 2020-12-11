@@ -16,8 +16,8 @@ class CreateBinariesTable extends Migration
     Schema::create('binaries', function (Blueprint $table) {
       $table->id();
       $table->bigInteger('sponsor');
-      $table->bigInteger('upline');
-      $table->bigInteger('downline');
+      $table->bigInteger('up_line');
+      $table->bigInteger('down_line');
       $table->boolean('active')->default(false);
       $table->timestamps();
       $table->softDeletes();

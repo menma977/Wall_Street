@@ -5,8 +5,6 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
