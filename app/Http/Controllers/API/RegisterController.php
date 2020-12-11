@@ -145,9 +145,10 @@ class RegisterController extends Controller
         return response()->json(['message' => "your registration failed"], 500);
       } catch (Exception $e) {
         Log::error($e->getMessage() . " - " . $e->getFile() . " - " . $e->getLine());
+        return response()->json(['message' => $e->getMessage()], 500);
       }
     }
-    return response()->json(['message' => "your sponsor is not registered properly"], 500);
+    return response()->json(['message' => "your sponsor didnt exist or not verified user"], 500);
   }
 
   public function in(Request $request)
@@ -264,7 +265,7 @@ class RegisterController extends Controller
       Log::error($e->getMessage() . " - " . $e->getFile() . " - " . $e->getLine());
     }
 
-    return response()->json(['message' => "your sponsor is not registered properly"], 500);
+    return response()->json(['message' => $e->getMessage()], 500);
   }
 
   /**
