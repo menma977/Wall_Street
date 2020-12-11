@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
     $this->call(ShareLevelSeeder::class);
     $this->call(UpgradeListSeeder::class);
     $this->call(UserSeeder::class);
+    $this->call(WalletAdminSeeder::class);
   }
 }
