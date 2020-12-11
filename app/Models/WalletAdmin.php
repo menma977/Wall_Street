@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Class WalletAdmin
  * @package App\Models
  * @property integer id
+ * @property string name
  * @property string wallet_btc
  * @property string wallet_doge
  * @property string wallet_ltc
