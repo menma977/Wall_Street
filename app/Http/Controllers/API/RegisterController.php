@@ -39,7 +39,7 @@ class RegisterController extends Controller
       'email' => 'required|email|unique:users',
       'phone' => 'required|numeric|min:10',
       'password' => 'required|same:confirmation_password|min:6',
-      'secondary_password' => 'required|same:confirmation_secondary_password|min:6'
+      'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
     ]);
 
     $up_line = User::where($type, $request->input('sponsor'))->first();
