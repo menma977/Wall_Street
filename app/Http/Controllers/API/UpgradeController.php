@@ -45,7 +45,7 @@ class UpgradeController extends Controller
     $target = $btc_target + $doge_target + $ltc_target + $eth_target;
 
     $data = [
-      'progress' => $target / $progress,
+      'progress' => ($progress * $target) / 100,
       'target' => $target,
       'btc' => $btc->sum('debit') - $btc->sum('credit'),
       'doge' => $doge->sum('debit') - $doge->sum('credit'),
