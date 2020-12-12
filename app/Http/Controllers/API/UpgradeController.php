@@ -149,7 +149,7 @@ class UpgradeController extends Controller
       ]);
       $share_queue->save();
 
-      Binary::where('down_line', Auth::id())->upgrade(['active' => true]);
+      Binary::where('down_line', Auth::id())->update(['active' => true]);
 
       return response()->json(["message" => "Upgrade now queued"]);
     }

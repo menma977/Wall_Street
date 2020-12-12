@@ -30,7 +30,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
   });
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], static function () {
-    Route::post('/', [UpgradeController::class, 'upgrade']);
+    Route::post('', [UpgradeController::class, 'upgrade']);
     Route::get('/index', [UpgradeController::class, 'index']);
   });
 });

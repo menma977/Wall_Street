@@ -18,8 +18,8 @@ class CreateUpgradesTable extends Migration
       $table->bigInteger('from');
       $table->bigInteger('to');
       $table->text('description')->nullable();
-      $table->string('debit');
-      $table->string('credit');
+      $table->string('debit')->default(0);
+      $table->string('credit')->default(0);
       $table->string('level');
       $table->string('type');
       $table->timestamps();

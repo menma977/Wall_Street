@@ -6,8 +6,10 @@ use App\Models\Queue;
 use App\Models\Setting;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
+use App\Models\User;
 use App\Models\WalletAdmin;
-use http\Client\Curl\User;
+use Carbon\Carbon;
+use http\Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -35,62 +37,87 @@ class QueueExecution extends Command
    */
   public function handle()
   {
-    $queue = Queue::where('status', false)->first();
+    $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
     if ($queue) {
-      $user = User::find($queue->user_id);
-      $type = explode('_', $queue->type);
-      $typeBalance = $type[1];
-      $targetBalance = $type[0];
-      if (!$user->cookie) {
-        $user->cookie = $this->getUserCookie($user->username_doge, $user->password_doge);
-        $user->save();
-      }
-      if ($typeBalance === 'level') {
-        if ($targetBalance === 'btc') {
-          $walletTarget = User::find($queue->send)->wallet_btc;
-        } else if ($targetBalance === 'doge') {
-          $walletTarget = User::find($queue->send)->wallet_doge;
-        } else if ($targetBalance === 'eth') {
-          $walletTarget = User::find($queue->send)->wallet_eth;
+      try {
+        $user = User::find($queue->user_id);
+        $type = explode('_', $queue->type);
+        $typeBalance = $type[1];
+        $targetBalance = $type[0];
+        if (!$user->cookie) {
+          $user->cookie = $this->getUserCookie($user->username_doge, $user->password_doge);
+          $user->save();
+        }
+        if ($typeBalance === 'level') {
+          if ($targetBalance === 'btc') {
+            $walletTarget = User::find($queue->send)->wallet_btc;
+          } else if ($targetBalance === 'doge') {
+            $walletTarget = User::find($queue->send)->wallet_doge;
+          } else if ($targetBalance === 'eth') {
+            $walletTarget = User::find($queue->send)->wallet_eth;
+          } else {
+            $walletTarget = User::find($queue->send)->wallet_ltc;
+          }
+          if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $queue->value)) {
+            $queue->status = true;
+          } else {
+            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+          }
+          $queue->save();
+        } else if ($typeBalance === 'buyWall') {
+          if ($targetBalance === 'btc') {
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_btc;
+          } else if ($targetBalance === 'doge') {
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_doge;
+          } else if ($targetBalance === 'eth') {
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_eth;
+          } else {
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
+          }
+          if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $queue->value)) {
+            $queue->status = true;
+          } else {
+            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+          }
+          $queue->save();
+        } else if ($typeBalance === 'it') {
+          if ($targetBalance === 'btc') {
+            $walletTarget = Setting::find($queue->send)->wallet_btc;
+          } else if ($targetBalance === 'doge') {
+            $walletTarget = Setting::find($queue->send)->wallet_doge;
+          } else if ($targetBalance === 'eth') {
+            $walletTarget = Setting::find($queue->send)->wallet_eth;
+          } else {
+            $walletTarget = Setting::find($queue->send)->wallet_ltc;
+          }
+          if ($this->it($targetBalance, $user, $walletTarget, $queue->value)) {
+            $queue->status = true;
+          } else {
+            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+          }
+          $queue->save();
         } else {
-          $walletTarget = User::find($queue->send)->wallet_ltc;
+          if ($targetBalance === 'btc') {
+            $walletTarget = Setting::find($queue->send)->wallet_btc;
+          } else if ($targetBalance === 'doge') {
+            $walletTarget = Setting::find($queue->send)->wallet_doge;
+          } else if ($targetBalance === 'eth') {
+            $walletTarget = Setting::find($queue->send)->wallet_eth;
+          } else {
+            $walletTarget = Setting::find($queue->send)->wallet_ltc;
+          }
+          if ($this->withdraw($user->cookie, $queue->value, $walletTarget, $type)) {
+            $this->share($targetBalance, $queue->value);
+            $queue->status = true;
+          } else {
+            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+            $queue->save();
+          }
         }
-        $this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $queue->value);
-      } else if ($typeBalance === 'buyWall') {
-        if ($targetBalance === 'btc') {
-          $walletTarget = WalletAdmin::find($queue->send)->wallet_btc;
-        } else if ($targetBalance === 'doge') {
-          $walletTarget = WalletAdmin::find($queue->send)->wallet_doge;
-        } else if ($targetBalance === 'eth') {
-          $walletTarget = WalletAdmin::find($queue->send)->wallet_eth;
-        } else {
-          $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
-        }
-        $this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $queue->value);
-      } else if ($typeBalance === 'it') {
-        if ($targetBalance === 'btc') {
-          $walletTarget = Setting::find($queue->send)->wallet_btc;
-        } else if ($targetBalance === 'doge') {
-          $walletTarget = Setting::find($queue->send)->wallet_doge;
-        } else if ($targetBalance === 'eth') {
-          $walletTarget = Setting::find($queue->send)->wallet_eth;
-        } else {
-          $walletTarget = Setting::find($queue->send)->wallet_ltc;
-        }
-        $this->it($targetBalance, $user, $walletTarget, $queue->value);
-      } else {
-        if ($targetBalance === 'btc') {
-          $walletTarget = Setting::find($queue->send)->wallet_btc;
-        } else if ($targetBalance === 'doge') {
-          $walletTarget = Setting::find($queue->send)->wallet_doge;
-        } else if ($targetBalance === 'eth') {
-          $walletTarget = Setting::find($queue->send)->wallet_eth;
-        } else {
-          $walletTarget = Setting::find($queue->send)->wallet_ltc;
-        }
-        if ($this->withdraw($user->cookie, $queue->value, $walletTarget, $type)) {
-          $this->share($targetBalance, $queue->value);
-        }
+      } catch (Exception $e) {
+        Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
+        $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+        $queue->save();
       }
     }
   }
@@ -101,6 +128,7 @@ class QueueExecution extends Command
    * @param $targetUser
    * @param $walletTarget
    * @param $value
+   * @return bool
    */
   private function level($type, $user, $targetUser, $walletTarget, $value)
   {
@@ -113,7 +141,11 @@ class QueueExecution extends Command
       $upgrade->level = $user->level;
       $upgrade->credit = $value;
       $upgrade->save();
+
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -122,6 +154,7 @@ class QueueExecution extends Command
    * @param $targetUser
    * @param $walletTarget
    * @param $value
+   * @return bool
    */
   private function buyWall($type, $user, $targetUser, $walletTarget, $value)
   {
@@ -134,7 +167,11 @@ class QueueExecution extends Command
       $upgrade->level = $user->level;
       $upgrade->credit = $value;
       $upgrade->save();
+
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -142,6 +179,7 @@ class QueueExecution extends Command
    * @param $user
    * @param $walletTarget
    * @param $value
+   * @return bool
    */
   private function it($type, $user, $walletTarget, $value)
   {
@@ -154,7 +192,11 @@ class QueueExecution extends Command
       $upgrade->level = $user->level;
       $upgrade->credit = $value;
       $upgrade->save();
+
+      return true;
     }
+
+    return false;
   }
 
   /**
@@ -166,7 +208,7 @@ class QueueExecution extends Command
     $balanceToShare = $value / 20;
     for ($i = 0; $i < 20; $i++) {
       $shareQueue = new ShareQueue();
-      $shareQueue->user_id = User::inRandomOrder()->first();
+      $shareQueue->user_id = User::inRandomOrder()->first()->id;
       $shareQueue->value = $balanceToShare;
       $shareQueue->type = $type;
       $shareQueue->save();
@@ -192,7 +234,7 @@ class QueueExecution extends Command
     ]);
     Log::info($withdraw->body());
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'InvalidApiKey') === false && str_contains($withdraw->body(), 'LoginInvalid') === false;
+    return $withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true;
   }
 
   /**
