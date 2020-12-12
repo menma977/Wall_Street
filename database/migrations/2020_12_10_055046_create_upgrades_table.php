@@ -17,9 +17,11 @@ class CreateUpgradesTable extends Migration
       $table->id();
       $table->bigInteger('from');
       $table->bigInteger('to');
+      $table->text('description')->nullable();
       $table->string('debit');
       $table->string('credit');
       $table->string('level');
+      $table->string('type');
       $table->timestamps();
       $table->softDeletes();
     });

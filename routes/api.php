@@ -5,7 +5,6 @@ use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\UpgradeController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VersionController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,7 +30,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
   });
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], static function () {
+    Route::post('/', [UpgradeController::class, 'upgrade']);
     Route::get('/index', [UpgradeController::class, 'index']);
-    Route::post('/upgrade', [UpgradeController::class, 'upgrade']);
   });
 });

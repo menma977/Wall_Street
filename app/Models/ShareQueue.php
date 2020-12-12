@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer id
  * @property integer user_id
  * @property string value
- * @property string total
+ * @property string type
  * @property boolean status
  */
 class ShareQueue extends Model
@@ -26,7 +26,7 @@ class ShareQueue extends Model
   protected $fillable = [
     'user_id',
     'value',
-    'total',
+    'type',
     'status',
   ];
 }

@@ -12,9 +12,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property integer id
  * @property integer from
  * @property integer to
+ * @property string description
  * @property string debit
  * @property string credit
  * @property integer level
+ * @property string type
  */
 class Upgrade extends Model
 {
@@ -28,8 +30,10 @@ class Upgrade extends Model
   protected $fillable = [
     'from',
     'to',
+    'description',
     'debit',
     'credit',
     'level',
+    'type',
   ];
 }

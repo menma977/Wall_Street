@@ -17,7 +17,7 @@ class CreateShareQueuesTable extends Migration
       $table->id();
       $table->bigInteger('user_id');
       $table->string('value');
-      $table->string('total');
+      $table->string('type');
       $table->boolean('status')->default(false);
       $table->timestamps();
     });

@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * Class Queue
  * @package App\Models
  * @property integer id
+ * @property integer user_id
+ * @property integer send
+ * @property string value
+ * @property string type
+ * @property string total
+ * @property boolean status
  */
 class Queue extends Model
 {
