@@ -10,6 +10,7 @@ use App\Models\ETH;
 use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareLevel;
+use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
@@ -68,20 +69,12 @@ class UpgradeController extends Controller
           $fail($attr . " must be either ltc, btc, eth, or doge");
         }
       }],
-      // "upgrade_list" => ["required", function ($attr, $val, $fail) {
-      //   if (!in_array($val, ["btc_usd", "doge_usd", "ltc_usd", "eth_usd"])) {
-      //     $fail($attr . " must be either btc_usd, doge_usd, ltc_usd or eth_usd");
-      //   }
-      // }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric"
     ]);
     $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
     if ($upgradeList) {
-      $upList = $request->type . "_usd";
-      Log::debug($upList);
-      $upList = $upgradeList->$upList;
-      Log::debug($upList);
+      $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
       $level = ShareLevel::all();
       $current = Auth::id();
@@ -149,6 +142,17 @@ class UpgradeController extends Controller
       ]);
       $share_queue->save();
 
+      $upgrade = new Upgrade([
+        'from'=> Auth::id(),
+        'to'=> Auth::id(),
+        'description'=> Auth::user()->username." did an upgrade",
+        'debit'=> $upList * 5,
+        'credit'=> 0,
+        'level'=> $upgradeList->id,
+        'type'=> $request->type
+      ]);
+      $upgrade->save();
+
       Binary::where('down_line', Auth::id())->update(['active' => true]);
 
       return response()->json(["message" => "Upgrade now queued"]);
@@ -157,8 +161,8 @@ class UpgradeController extends Controller
     return response()->json(["message" => "Incorrect balance amount"], 400);
   }
 
-  private function toFixed($number, $precision)
+  private function toFixed($number, $precision, $separator=",")
   {
-    return number_format($number, $precision, '', "");
+    return number_format($number, $precision, $separator, "");
   }
 }
