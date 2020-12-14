@@ -101,33 +101,35 @@ class UpgradeController extends Controller
           $q = new Queue([
             "user_Id" => Auth::id(),
             "send" => $userBinary->id,
-            "value" => $this->toFixed($this->toFixed($cut, 0), 0),
+            "value" => $this->toFixed($this->toFixed($cut, 3), 3),
             "type" => $request->type . "_level",
-            "total" => $this->toFixed($balance_left, 0),
+            "total" => $this->toFixed($balance_left, 3),
           ]);
           $q->save();
         }
       }
 
-      $wallet_admin = WalletAdmin::inRandomOrder()->first();
-
       $balance_left -= $wallet_it;
       $it_queue = new Queue([
         "user_Id" => Auth::id(),
-        "send" => $wallet_admin->id,
-        "value" => $this->toFixed($wallet_it, 0),
+        "send" => 1,
+        "value" => $this->toFixed($wallet_it, 3),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 0),
+        "total" => $this->toFixed($balance_left, 3),
       ]);
       $it_queue->save();
+
+      $wallet_admin = WalletAdmin::inRandomOrder()->first();
+
+      Log::info($wallet_admin);
 
       $balance_left -= $buy_wall;
       $buy_wall_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 0),
+        "value" => $this->toFixed($buy_wall, 3),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 0),
+        "total" => $this->toFixed($balance_left, 3),
       ]);
       $buy_wall_queue->save();
 
@@ -136,20 +138,20 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_Id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($total_random_share, 0),
+        "value" => $this->toFixed($total_random_share, 3),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed($balance_left, 0),
+        "total" => $this->toFixed($balance_left, 3),
       ]);
       $share_queue->save();
 
       $upgrade = new Upgrade([
-        'from'=> Auth::id(),
-        'to'=> Auth::id(),
-        'description'=> Auth::user()->username." did an upgrade",
-        'debit'=> $upList * 5,
-        'credit'=> 0,
-        'level'=> $upgradeList->id,
-        'type'=> $request->type
+        'from' => Auth::id(),
+        'to' => Auth::id(),
+        'description' => Auth::user()->username . " did an upgrade",
+        'debit' => $upList * 5,
+        'credit' => 0,
+        'level' => $upgradeList->id,
+        'type' => $request->type
       ]);
       $upgrade->save();
 
@@ -161,8 +163,8 @@ class UpgradeController extends Controller
     return response()->json(["message" => "Incorrect balance amount"], 400);
   }
 
-  private function toFixed($number, $precision, $separator=",")
+  private function toFixed($number, $precision, $separator = ",")
   {
-    return number_format($number, $precision, $separator, "");
+    return number_format($number, $precision, $separator, ".");
   }
 }

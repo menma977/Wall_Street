@@ -29,6 +29,8 @@ class Kernel extends ConsoleKernel
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+
+    $schedule->command('ShareQueueExecution')->everyTwoMinutes()->withoutOverlapping();
   }
 
   /**
