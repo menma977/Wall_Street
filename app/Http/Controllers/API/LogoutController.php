@@ -1,16 +1,15 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 
 class LogoutController extends Controller
 {
   public function index()
   {
-    $token = Auth::user()->token();
-    foreach ($token as $key => $value) {
+    foreach (Auth::user()->tokens as $key => $value) {
       $value->delete();
     }
     return response('', 204);
