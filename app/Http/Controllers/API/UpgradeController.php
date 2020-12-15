@@ -13,6 +13,7 @@ use App\Models\WalletAdmin;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
 class UpgradeController extends Controller
@@ -46,7 +47,11 @@ class UpgradeController extends Controller
         }
       }],
       "upgrade_list" => "required|integer",
-      "balance" => "required|numeric"
+      "balance" => "required|numeric",
+      'secondaryPassword' =>  ["required", function ($attr, $val, $fail){
+        if(!Hash::check($val, User::find(Auth::id())->secondary_password))
+          $fail("Secondary password did not match!");
+      }],
     ]);
     $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
     if ($upgradeList) {
