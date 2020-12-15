@@ -26,32 +26,12 @@ class UpgradeController extends Controller
    */
   public function index()
   {
-    $idrConverter = UpgradeList::find(1);
-    $btc = BTC::where('user_id', Auth::id());
-    $doge = Doge::where('user_id', Auth::id());
-    $ltc = LTC::where('user_id', Auth::id());
-    $eth = ETH::where('user_id', Auth::id());
-
-    $btc_progress = (($btc->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->btc;
-    $doge_progress = (($doge->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->doge;
-    $ltc_progress = (($ltc->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->ltc;
-    $eth_progress = (($eth->sum('credit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->eth;
-
-    $btc_target = (($btc->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->btc;
-    $doge_target = (($doge->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->doge;
-    $ltc_target = (($ltc->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->ltc;
-    $eth_target = (($eth->sum('debit') / 10 ** 8) / $idrConverter->idr) * $idrConverter->eth;
-
-    $progress = $btc_progress + $doge_progress + $ltc_progress + $eth_progress;
-    $target = $btc_target + $doge_target + $ltc_target + $eth_target;
+    $progress = Upgrade::where('from', Auth::user())->sum('credit');
+    $target = Upgrade::where('from', Auth::user())->sum('debit');
 
     $data = [
       'progress' => ($progress / $target) * 100,
       'target' => $target,
-      'btc' => $btc->sum('debit') - $btc->sum('credit'),
-      'doge' => $doge->sum('debit') - $doge->sum('credit'),
-      'ltc' => $ltc->sum('debit') - $ltc->sum('credit'),
-      'eth' => $eth->sum('debit') - $eth->sum('credit'),
     ];
 
     return response()->json($data);
