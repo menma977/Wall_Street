@@ -4,10 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
-use App\Models\BTC;
-use App\Models\Doge;
-use App\Models\ETH;
-use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\Upgrade;
