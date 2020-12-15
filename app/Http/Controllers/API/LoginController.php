@@ -64,12 +64,13 @@ class LoginController extends Controller
 
           if ($doge999->ok() && $doge999->successful()) {
             $user->cookie = $doge999->json()['SessionCookie'];
+            $user->save();
 
             $user->token = $user->createToken('Android')->accessToken;
 
             return response()->json([
               'token' => $user->token,
-              'account_cookie' => $user->cookie,
+              'cookie' => $user->cookie,
               'email' => $user->email,
               'username' => $user->username,
               'phone' => $user->phone,
@@ -77,6 +78,7 @@ class LoginController extends Controller
               'wallet_doge' => $user->wallet_doge,
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
+              'level' => $user->level,
             ]);
           }
 
