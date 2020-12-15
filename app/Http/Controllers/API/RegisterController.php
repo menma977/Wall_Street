@@ -46,7 +46,7 @@ class RegisterController extends Controller
     if ($up_line->email_verified_at) {
       $createAccount999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
         'a' => 'CreateAccount',
-        'Key' => '1b4755ced78e4d91bce9128b9a053cad',
+        'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
       ]);
       Log::info($createAccount999Doge);
 
@@ -162,7 +162,7 @@ class RegisterController extends Controller
 
     $createAccount999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
       'a' => 'CreateAccount',
-      'Key' => '1b4755ced78e4d91bce9128b9a053cad',
+      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
     ]);
     Log::info($createAccount999Doge);
 

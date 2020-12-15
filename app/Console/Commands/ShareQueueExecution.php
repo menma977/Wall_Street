@@ -113,7 +113,7 @@ class ShareQueueExecution extends Command
   {
     $getCookie = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
       'a' => 'Login',
-      'Key' => '1b4755ced78e4d91bce9128b9a053cad',
+      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
       'username' => $usernameDoge,
       'password' => $passwordDoge,
       'Totp' => ''

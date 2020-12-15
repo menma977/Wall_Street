@@ -25,12 +25,12 @@ class UserSeeder extends Seeder
     $user->password_junk = 'admin';
     $user->secondary_password = Hash::make('123456');
     $user->secondary_password_junk = '123456';
-    $user->username_doge = 'arn2';
-    $user->password_doge = 'arif999999';
-    $user->wallet_btc = '1CiAqMLHrCA7UUqQNd8GgHC4px8rmzVFdT';
-    $user->wallet_ltc = 'LXoWkszKFrbyLY4sVajkL4vrbDoZFRFpLa';
-    $user->wallet_doge = 'DHRDzBmt5NJtq1nkGz7rdEWVETUDWmQkKm';
-    $user->wallet_eth = '0x7804e3b33fa898c7fde6606946ed2ef440a4f7de';
+    $user->username_doge = 'menma977';
+    $user->password_doge = '081211610807';
+    $user->wallet_btc = '1JWfKbLhkFfe9N7b4zVriHPpWXCAAMecdZ';
+    $user->wallet_ltc = 'LQQnR56oN7WHLsoiTj4RP9MaVb1u7rzAnp';
+    $user->wallet_doge = 'DM9L2mUkLwwbdoHMBjj5g2NLVXoVKPFyag';
+    $user->wallet_eth = '0xda6b7abb9830d11bbde456178f435e1a23ae4776';
     $user->level = 10;
     $user->save();
 
@@ -44,12 +44,12 @@ class UserSeeder extends Seeder
     $user->password_junk = 'bank';
     $user->secondary_password = Hash::make('123456');
     $user->secondary_password_junk = '123456';
-    $user->username_doge = 'arn2';
-    $user->password_doge = 'arif999999';
-    $user->wallet_btc = '1CiAqMLHrCA7UUqQNd8GgHC4px8rmzVFdT';
-    $user->wallet_ltc = 'LXoWkszKFrbyLY4sVajkL4vrbDoZFRFpLa';
-    $user->wallet_doge = 'DHRDzBmt5NJtq1nkGz7rdEWVETUDWmQkKm';
-    $user->wallet_eth = '0x7804e3b33fa898c7fde6606946ed2ef440a4f7de';
+    $user->username_doge = 'menma977';
+    $user->password_doge = '081211610807';
+    $user->wallet_btc = '1JWfKbLhkFfe9N7b4zVriHPpWXCAAMecdZ';
+    $user->wallet_ltc = 'LQQnR56oN7WHLsoiTj4RP9MaVb1u7rzAnp';
+    $user->wallet_doge = 'DM9L2mUkLwwbdoHMBjj5g2NLVXoVKPFyag';
+    $user->wallet_eth = '0xda6b7abb9830d11bbde456178f435e1a23ae4776';
     $user->level = 0;
     $user->save();
   }
