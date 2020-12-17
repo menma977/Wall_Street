@@ -16,6 +16,16 @@ class LTCController extends Controller
   /**
    * @return JsonResponse
    */
+  public function index()
+  {
+    return response()->json([
+      'balance' => LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit')
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');

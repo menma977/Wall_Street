@@ -16,6 +16,16 @@ class ETHController extends Controller
   /**
    * @return JsonResponse
    */
+  public function index()
+  {
+    return response()->json([
+      'balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit')
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');

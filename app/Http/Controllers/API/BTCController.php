@@ -16,6 +16,16 @@ class BTCController extends Controller
   /**
    * @return JsonResponse
    */
+  public function index()
+  {
+    return response()->json([
+      'balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit')
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');

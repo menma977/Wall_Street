@@ -16,6 +16,16 @@ class DogeController extends Controller
   /**
    * @return JsonResponse
    */
+  public function index()
+  {
+    return response()->json([
+      'balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit')
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
