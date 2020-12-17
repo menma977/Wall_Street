@@ -4,6 +4,7 @@ use App\Http\Controllers\API\BTCController;
 use App\Http\Controllers\API\DogeController;
 use App\Http\Controllers\API\ETHController;
 use App\Http\Controllers\API\LoginController;
+use App\Http\Controllers\API\LogoutController;
 use App\Http\Controllers\API\LTCController;
 use App\Http\Controllers\API\PasswordResetLinkController;
 use App\Http\Controllers\API\RegisterController;
@@ -29,6 +30,8 @@ Route::post('/registration', [RegisterController::class, 'out'])->middleware(['t
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware(['throttle:3,1', 'guest']);
 
 Route::middleware(['auth:api', 'verified'])->group(function () {
+  Route::get('/logout', [LogoutController::class, 'index']);
+
   Route::group(['prefix' => 'user', 'as' => 'user.'], function () {
     Route::get('/show', [UserController::class, 'self']);
     Route::post('/registered', [RegisterController::class, 'in'])->middleware(['throttle:6,1']);
@@ -43,25 +46,25 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'btc', 'as' => 'btc.'], function () {
     Route::get('', [BTCController::class, 'index']);
-    Route::get('create', [BTCController::class, 'create']);
-    Route::post('store/{username}', [BTCController::class, 'store'])->middleware(['throttle:1,1']);
+    Route::get('/create', [BTCController::class, 'create']);
+    Route::post('/store', [BTCController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'doge', 'as' => 'doge.'], function () {
     Route::get('', [DogeController::class, 'index']);
-    Route::get('create', [DogeController::class, 'create']);
-    Route::post('store/{username}', [DogeController::class, 'store'])->middleware(['throttle:1,1']);
+    Route::get('/create', [DogeController::class, 'create']);
+    Route::post('/store', [DogeController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'ltc', 'as' => 'ltc.'], function () {
     Route::get('', [LTCController::class, 'index']);
-    Route::get('create', [LTCController::class, 'create']);
-    Route::post('store/{username}', [LTCController::class, 'store'])->middleware(['throttle:1,1']);
+    Route::get('/create', [LTCController::class, 'create']);
+    Route::post('/store', [LTCController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'eth', 'as' => 'eth.'], function () {
     Route::get('', [ETHController::class, 'index']);
-    Route::get('create', [ETHController::class, 'create']);
-    Route::post('store/{username}', [ETHController::class, 'store'])->middleware(['throttle:1,1']);
+    Route::get('/create', [ETHController::class, 'create']);
+    Route::post('/store', [ETHController::class, 'store'])->middleware(['throttle:2,1']);
   });
 });
