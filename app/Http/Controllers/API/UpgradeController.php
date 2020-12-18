@@ -4,10 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
-use App\Models\BTC;
-use App\Models\Doge;
-use App\Models\ETH;
-use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\Upgrade;
@@ -27,20 +23,13 @@ class UpgradeController extends Controller
    */
   public function index()
   {
-    $btc = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');
-    $doge = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
-    $ltc = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');
-    $eth = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');
-    $progress = Upgrade::where('from', Auth::user())->sum('credit');
-    $target = Upgrade::where('from', Auth::user())->sum('debit');
+    $progress = Upgrade::where('to', Auth::id())->sum('credit');
+    $target = Upgrade::where('to', Auth::id())->sum('debit');
 
     $data = [
-      'progress' => ($progress / $target) * 100,
+      'progress' => $progress != 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
+      'progress_value' => $progress,
       'target' => $target,
-      'btc' => $btc,
-      'doge' => $doge,
-      'ltc' => $ltc,
-      'eth' => $eth,
     ];
 
     return response()->json($data);
@@ -60,9 +49,10 @@ class UpgradeController extends Controller
       }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric",
-      'secondaryPassword' => ["required", function ($attr, $val, $fail) {
-        if (!Hash::check($val, User::find(Auth::id())->secondary_password))
+      'secondaryPassword' => ["required", function ($val, $fail) {
+        if (!Hash::check($val, User::find(Auth::id())->secondary_password)) {
           $fail("Secondary password did not match!");
+        }
       }],
     ]);
     $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
