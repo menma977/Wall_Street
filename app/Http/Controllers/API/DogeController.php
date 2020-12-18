@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class DogeController extends Controller
@@ -53,25 +54,25 @@ class DogeController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
       'value' => 'required|numeric',
-      'wallet' => 'required|string|exists:users,wallet_btc',
+      'wallet' => 'required|string|exists:users,wallet_doge',
       'fake' => 'required|string',
     ]);
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
-        $targetUser = User::where('wallet_btc', $request->input('wallet'))->first();
+        $targetUser = User::where('wallet_doge', $request->input('wallet'))->first();
 
         $formatDoge = number_format($request->input('value') / 10 ** 8, 8, ',', '.');
 
         $btc = new Doge();
         $btc->user_id = $targetUser->id;
-        $btc->description = "receive btc " . $formatDoge . " from " . Auth::user()->username;
+        $btc->description = "receive doge " . $formatDoge . " from " . Auth::user()->username;
         $btc->debit = $request->input('value');
         $btc->save();
 
         $btc = new Doge();
         $btc->user_id = Auth::id();
-        $btc->description = "send btc " . $formatDoge . " to " . $targetUser->username;
+        $btc->description = "send doge " . $formatDoge . " to " . $targetUser->username;
         $btc->credit = $request->input('value');
         $btc->save();
 
@@ -85,6 +86,7 @@ class DogeController extends Controller
         'Address' => $request->input('wallet'),
         'Currency' => 'doge',
       ]);
+      Log::info($withdraw->body());
 
       if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
         return response()->json(['message' => 'success transfer Doge']);

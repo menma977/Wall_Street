@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 class BTCController extends Controller
@@ -85,6 +86,7 @@ class BTCController extends Controller
         'Address' => $request->input('wallet'),
         'Currency' => 'btc',
       ]);
+      Log::info($withdraw->body());
 
       if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
         return response()->json(['message' => 'success transfer BTC']);

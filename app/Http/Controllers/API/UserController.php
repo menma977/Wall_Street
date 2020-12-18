@@ -32,7 +32,7 @@ class UserController extends Controller
       'email',
       'phone',
       'password',
-      'account_cookie',
+      'cookie',
       'wallet_btc',
       'wallet_ltc',
       'wallet_doge',
@@ -57,24 +57,20 @@ class UserController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6'
     ]);
-    if (Auth::attempt(['secondary_password' => $request->input('secondary_password')])) {
+    if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       $user = User::find(Auth::id());
       if ($request->has('name')) {
         $this->validate($request, [
-          'secondary_password' => 'required|string'
+          'name' => 'required|string'
         ]);
         $user->name = $request->input('name');
-      }
-
-      if ($request->has('password')) {
+      } else if ($request->has('password')) {
         $this->validate($request, [
           'password' => 'required|same:confirmation_password|min:6',
         ]);
         $user->password = Hash::make($request->input('password'));
         $user->password_junk = $request->input('password');
-      }
-
-      if ($request->has('secondary_password')) {
+      } else {
         $this->validate($request, [
           'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
         ]);
@@ -83,7 +79,7 @@ class UserController extends Controller
       }
       $user->save();
 
-      return response()->json(['message' => 'success update data'], 500);
+      return response()->json(['message' => 'success update data']);
     }
 
     return response()->json(['message' => 'wrong secondary password'], 500);
