@@ -36,10 +36,20 @@ class UpgradeController extends Controller
   }
 
   /**
+   * @return JsonResponse
+   */
+  public function create()
+  {
+    $upgradeList = UpgradeList::all();
+
+    return response()->json(["upgradeList" => $upgradeList]);
+  }
+
+  /**
    * @param Request $request
    * @return JsonResponse
    */
-  public function upgrade(Request $request)
+  public function store(Request $request)
   {
     $request->validate([
       "type" => ["required", function ($attr, $val, $fail) {
