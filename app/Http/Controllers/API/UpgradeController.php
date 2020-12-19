@@ -59,7 +59,7 @@ class UpgradeController extends Controller
       }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric",
-      'secondaryPassword' => ["required", function ($val, $fail) {
+      'secondaryPassword' => ["required", function ($attr, $val, $fail) {
         if (!Hash::check($val, User::find(Auth::id())->secondary_password)) {
           $fail("Secondary password did not match!");
         }
@@ -154,6 +154,12 @@ class UpgradeController extends Controller
     }
 
     return response()->json(["message" => "Incorrect balance amount"], 400);
+  }
+
+  public function packages()
+  {
+    $packages = UpgradeList::select(["id","dollar"])->get();
+    return response()->json(["packages" => $packages]);
   }
 
   private function toFixed($number, $precision, $separator = ",")

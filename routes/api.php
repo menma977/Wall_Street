@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/version', [VersionController::class, 'index'])->middleware('guest');
+Route::get('/upgrade/packages', [UpgradeController::class, 'packages'])->middleware('guest');
 Route::post('/login', [LoginController::class, 'index'])->middleware(['throttle:3,1', 'guest']);
 Route::post('/registration', [RegisterController::class, 'out'])->middleware(['throttle:6,1', 'guest']);
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware(['throttle:3,1', 'guest']);
@@ -41,7 +42,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], function () {
     Route::get('', [UpgradeController::class, 'index']);
     Route::get('/create', [UpgradeController::class, 'create']);
-    Route::post('/store', [UpgradeController::class, 'store'])->middleware(['throttle:2,1']);
+    Route::post('/store', [UpgradeController::class, 'store']);//->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'btc', 'as' => 'btc.'], function () {
