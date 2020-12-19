@@ -29,6 +29,16 @@ class LTCController extends Controller
   /**
    * @return JsonResponse
    */
+  public function show()
+  {
+    return response()->json([
+      'list' => LTC::where('user_id', Auth::id())->simplePaginate(20)
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');
@@ -62,7 +72,7 @@ class LTCController extends Controller
       if ($request->input('fake') == 'true') {
         $targetUser = User::where('wallet_ltc', $request->input('wallet'))->first();
 
-        $formatLTC = number_format($request->input('value') / 10 ** 8, 8, ',', '.');
+        $formatLTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $btc = new LTC();
         $btc->user_id = $targetUser->id;

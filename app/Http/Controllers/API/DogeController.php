@@ -29,6 +29,16 @@ class DogeController extends Controller
   /**
    * @return JsonResponse
    */
+  public function show()
+  {
+    return response()->json([
+      'list' => Doge::where('user_id', Auth::id())->simplePaginate(20)
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
@@ -62,7 +72,7 @@ class DogeController extends Controller
       if ($request->input('fake') == 'true') {
         $targetUser = User::where('wallet_doge', $request->input('wallet'))->first();
 
-        $formatDoge = number_format($request->input('value') / 10 ** 8, 8, ',', '.');
+        $formatDoge = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $btc = new Doge();
         $btc->user_id = $targetUser->id;

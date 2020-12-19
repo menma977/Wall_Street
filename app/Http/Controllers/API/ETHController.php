@@ -29,6 +29,16 @@ class ETHController extends Controller
   /**
    * @return JsonResponse
    */
+  public function show()
+  {
+    return response()->json([
+      'list' => ETH::where('user_id', Auth::id())->simplePaginate(20)
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');
@@ -62,7 +72,7 @@ class ETHController extends Controller
       if ($request->input('fake') == 'true') {
         $targetUser = User::where('wallet_eth', $request->input('wallet'))->first();
 
-        $formatETH = number_format($request->input('value') / 10 ** 8, 8, ',', '.');
+        $formatETH = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $btc = new ETH();
         $btc->user_id = $targetUser->id;

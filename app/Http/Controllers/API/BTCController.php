@@ -29,6 +29,16 @@ class BTCController extends Controller
   /**
    * @return JsonResponse
    */
+  public function show()
+  {
+    return response()->json([
+      'list' => BTC::where('user_id', Auth::id())->simplePaginate(20)
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $btc = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');
@@ -62,7 +72,7 @@ class BTCController extends Controller
       if ($request->input('fake') == 'true') {
         $targetUser = User::where('wallet_btc', $request->input('wallet'))->first();
 
-        $formatBTC = number_format($request->input('value') / 10 ** 8, 8, ',', '.');
+        $formatBTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $btc = new BTC();
         $btc->user_id = $targetUser->id;

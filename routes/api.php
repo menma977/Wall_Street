@@ -46,6 +46,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'btc', 'as' => 'btc.'], function () {
     Route::get('', [BTCController::class, 'index']);
+    Route::get('/show', [BTCController::class, 'show']);
     Route::get('/create', [BTCController::class, 'create']);
     Route::post('/store', [BTCController::class, 'store'])->middleware(['throttle:2,1']);
   });
