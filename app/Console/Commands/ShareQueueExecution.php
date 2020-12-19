@@ -42,21 +42,19 @@ class ShareQueueExecution extends Command
 
         if ($shareQueue->type === 'btc') {
           $walletTarget = User::find($shareQueue->send)->wallet_btc;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->btc, 8, ',', '');
-          $value = str_replace(',', '', $formatValue);
+          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
         } else if ($shareQueue->type === 'doge') {
           $walletTarget = User::find($shareQueue->send)->wallet_doge;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->doge, 8, ',', '');
-          $value = str_replace(',', '', $formatValue);
+          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
         } else if ($shareQueue->type === 'eth') {
           $walletTarget = User::find($shareQueue->send)->wallet_eth;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->eth, 8, ',', '');
-          $value = str_replace(',', '', $formatValue);
+          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
         } else {
           $walletTarget = User::find($shareQueue->send)->wallet_ltc;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->ltc, 8, ',', '');
-          $value = str_replace(',', '', $formatValue);
+          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
         }
+
+        $value = $formatValue;
 
         if (!$userAdmin->cookie) {
           $userAdmin->cookie = $this->getUserCookie($userAdmin->username_doge, $userAdmin->password_doge);
