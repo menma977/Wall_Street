@@ -54,21 +54,20 @@ class QueueExecution extends Command
         if ($typeBalance === 'level') {
           if ($targetBalance === 'btc') {
             $walletTarget = User::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = User::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = User::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
           } else {
             $walletTarget = User::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           }
+
+          $value = $formatValue;
+
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value)) {
             $queue->status = true;
           } else {
@@ -78,21 +77,20 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'buyWall') {
           if ($targetBalance === 'btc') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
           } else {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           }
+
+          $value = $formatValue;
+
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value)) {
             $queue->status = true;
           } else {
@@ -102,21 +100,20 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'it') {
           if ($targetBalance === 'btc') {
             $walletTarget = Setting::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = Setting::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = Setting::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
           } else {
             $walletTarget = Setting::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           }
+
+          $value = $formatValue;
+
           if ($this->it($targetBalance, $user, $walletTarget, $value)) {
             $queue->status = true;
           } else {
@@ -125,22 +122,21 @@ class QueueExecution extends Command
           $queue->save();
         } else {
           if ($targetBalance === 'btc') {
-            $walletTarget = Setting::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $walletTarget = User::find($queue->send)->wallet_btc;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
-            $walletTarget = Setting::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $walletTarget = User::find($queue->send)->wallet_doge;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
-            $walletTarget = Setting::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $walletTarget = User::find($queue->send)->wallet_eth;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
           } else {
-            $walletTarget = Setting::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, ',', '');
-            $value = str_replace(',', '', $formatValue);
+            $walletTarget = User::find($queue->send)->wallet_ltc;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           }
+
+          $value = $formatValue;
+
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
