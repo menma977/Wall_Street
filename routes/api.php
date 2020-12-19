@@ -40,8 +40,8 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], function () {
     Route::get('', [UpgradeController::class, 'index']);
-    Route::post('', [UpgradeController::class, 'upgrade']);
-    Route::get('/index', [UpgradeController::class, 'index'])->middleware(['throttle:2,1']);
+    Route::get('/create', [UpgradeController::class, 'create']);
+    Route::post('/store', [UpgradeController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'btc', 'as' => 'btc.'], function () {
