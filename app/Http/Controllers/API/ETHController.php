@@ -31,12 +31,12 @@ class ETHController extends Controller
    */
   public function show()
   {
-    $list = ETH::where('user_id', Auth::id())->get();
-    $list->map(function ($item) {
+    $list = ETH::where('user_id', Auth::id())->simplePaginate(20);
+    $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
 
       return $item;
-    })->simplePaginate(20);
+    });
 
     return response()->json([
       'list' => $list

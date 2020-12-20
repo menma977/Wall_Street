@@ -40,13 +40,12 @@ class UpgradeController extends Controller
    */
   public function show()
   {
-    $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->get();
-    $list->map(function ($item) {
+    $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->simplePaginate(20);
+    $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
 
       return $item;
-    })->simplePaginate(20);
-
+    });
     return response()->json([
       'list' => $list
     ]);

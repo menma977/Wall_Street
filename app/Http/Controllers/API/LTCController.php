@@ -31,12 +31,12 @@ class LTCController extends Controller
    */
   public function show()
   {
-    $list = LTC::where('user_id', Auth::id())->get();
-    $list->map(function ($item) {
+    $list = LTC::where('user_id', Auth::id())->simplePaginate(20);
+    $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
 
       return $item;
-    })->simplePaginate(20);
+    });
 
     return response()->json([
       'list' => $list
