@@ -31,8 +31,15 @@ class DogeController extends Controller
    */
   public function show()
   {
+    $list = Doge::where('user_id', Auth::id())->get();
+    $list->map(function ($item) {
+      $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
+
+      return $item;
+    })->simplePaginate(20);
+
     return response()->json([
-      'list' => Doge::where('user_id', Auth::id())->simplePaginate(20)
+      'list' => $list
     ]);
   }
 

@@ -38,6 +38,23 @@ class UpgradeController extends Controller
   /**
    * @return JsonResponse
    */
+  public function show()
+  {
+    $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->get();
+    $list->map(function ($item) {
+      $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
+
+      return $item;
+    })->simplePaginate(20);
+
+    return response()->json([
+      'list' => $list
+    ]);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function create()
   {
     $upgradeList = UpgradeList::all();
@@ -158,7 +175,7 @@ class UpgradeController extends Controller
 
   public function packages()
   {
-    $packages = UpgradeList::select(["id","dollar"])->get();
+    $packages = UpgradeList::select(["id", "dollar"])->get();
     return response()->json(["packages" => $packages]);
   }
 
