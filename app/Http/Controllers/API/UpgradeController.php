@@ -10,6 +10,7 @@ use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,6 +44,7 @@ class UpgradeController extends Controller
     $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->simplePaginate(20);
     $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
+      $item->date = Carbon::parse($item->created_at)->format("d-M-Y");
 
       return $item;
     });

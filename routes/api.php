@@ -54,18 +54,21 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'doge', 'as' => 'doge.'], function () {
     Route::get('', [DogeController::class, 'index']);
+    Route::get('/show', [DogeController::class, 'show']);
     Route::get('/create', [DogeController::class, 'create']);
     Route::post('/store', [DogeController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'ltc', 'as' => 'ltc.'], function () {
     Route::get('', [LTCController::class, 'index']);
+    Route::get('/show', [LTCController::class, 'show']);
     Route::get('/create', [LTCController::class, 'create']);
     Route::post('/store', [LTCController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'eth', 'as' => 'eth.'], function () {
     Route::get('', [ETHController::class, 'index']);
+    Route::get('/show', [ETHController::class, 'show']);
     Route::get('/create', [ETHController::class, 'create']);
     Route::post('/store', [ETHController::class, 'store'])->middleware(['throttle:2,1']);
   });
