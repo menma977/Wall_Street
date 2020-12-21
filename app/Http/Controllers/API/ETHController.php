@@ -36,6 +36,7 @@ class ETHController extends Controller
     $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
       $item->date = Carbon::parse($item->created_at)->format("d-M-Y");
+      $item->color = $item->debit != 0 ? "in" : "out";
 
       return $item;
     });
