@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\BinaryController;
 use App\Http\Controllers\API\BTCController;
 use App\Http\Controllers\API\DogeController;
 use App\Http\Controllers\API\ETHController;
@@ -71,5 +72,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('/show', [ETHController::class, 'show']);
     Route::get('/create', [ETHController::class, 'create']);
     Route::post('/store', [ETHController::class, 'store'])->middleware(['throttle:2,1']);
+  });
+
+  Route::group(['prefix' => 'binary', 'as' => 'api.binary.'], function () {
+    Route::get('', [BinaryController::class, 'index'])->name("index");
+    Route::get('/show/{id}', [BinaryController::class, 'show'])->name("show");
   });
 });

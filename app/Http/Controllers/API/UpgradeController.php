@@ -4,6 +4,10 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
+use App\Models\BTC;
+use App\Models\Doge;
+use App\Models\ETH;
+use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\Upgrade;
@@ -78,7 +82,7 @@ class UpgradeController extends Controller
       }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric",
-      'secondaryPassword' => ["required", function ($attr, $val, $fail) {
+      'secondaryPassword' => ["required", function ($val, $fail) {
         if (!Hash::check($val, User::find(Auth::id())->secondary_password)) {
           $fail("Secondary password did not match!");
         }
@@ -111,13 +115,39 @@ class UpgradeController extends Controller
         if ($userBinary->level >= $upgradeList->id) {
           $balance_left -= $cut;
           $q = new Queue([
-            "user_Id" => Auth::id(),
+            "user_id" => Auth::id(),
             "send" => $userBinary->id,
             "value" => $this->toFixed($this->toFixed($cut, 3), 3),
             "type" => $request->type . "_level",
             "total" => $this->toFixed($balance_left, 3),
           ]);
           $q->save();
+          if ($request->type == "ltc") {
+            $shareBalance = new LTC([
+              "user_id" => $userBinary->id,
+              "description" => "bonus Level " . $c_level,
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+            ]);
+          } else if ($request->type == "btc") {
+            $shareBalance = new BTC([
+              "user_id" => $userBinary->id,
+              "description" => "bonus Level " . $c_level,
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+            ]);
+          } else if ($request->type == "eth") {
+            $shareBalance = new ETH([
+              "user_id" => $userBinary->id,
+              "description" => "bonus Level " . $c_level,
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+            ]);
+          } else {
+            $shareBalance = new Doge([
+              "user_id" => $userBinary->id,
+              "description" => "bonus Level " . $c_level,
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+            ]);
+          }
+          $shareBalance->save();
         }
       }
 

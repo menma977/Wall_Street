@@ -27,7 +27,7 @@ class Queue extends Model
    * @var array
    */
   protected $fillable = [
-    "user_Id",
+    "user_id",
     "send",
     "value",
     "type",

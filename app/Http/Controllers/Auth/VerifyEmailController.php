@@ -34,6 +34,6 @@ class VerifyEmailController extends Controller
       event(new Verified($user));
     }
 
-    return redirect('/')->with('verified', true);
+    return redirect('/valid')->with('verified', true);
   }
 }

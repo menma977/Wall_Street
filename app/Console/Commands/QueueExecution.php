@@ -217,7 +217,7 @@ class QueueExecution extends Command
     if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
-      $upgrade->to = 1;
+      $upgrade->to = 2;
       $upgrade->description = 'Share ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
@@ -264,8 +264,7 @@ class QueueExecution extends Command
       'Currency' => $type,
     ]);
     Log::info("====================================");
-    Log::info($value);
-    Log::info($wallet);
+    Log::info($value . " - " . $wallet);
     Log::info("====================================");
 
     Log::info($withdraw->body());
