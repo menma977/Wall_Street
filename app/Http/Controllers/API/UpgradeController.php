@@ -82,127 +82,127 @@ class UpgradeController extends Controller
       }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric",
-      'secondaryPassword' => ["required", function ($val, $fail) {
-        if (!Hash::check($val, User::find(Auth::id())->secondary_password)) {
-          $fail("Secondary password did not match!");
-        }
-      }],
+      'secondaryPassword' => "required|numeric",
     ]);
-    $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
-    if ($upgradeList) {
-      $upList = $upgradeList->dollar / 2;
-      $balance_left = $upList;
-      $level = ShareLevel::all();
-      $current = Auth::id();
-      $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
-      $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
-      $buy_wall = $upList * $level->firstWhere("level", "BuyWall")->percent;
+    if (Hash::check($request->secondaryPassword, Auth::user()->secondary_password)) {
+      $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
+      if ($upgradeList) {
+        $upList = $upgradeList->dollar / 2;
+        $balance_left = $upList;
+        $level = ShareLevel::all();
+        $current = Auth::id();
+        $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
+        $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
+        $buy_wall = $upList * $level->firstWhere("level", "BuyWall")->percent;
 
-      $c_level = 1;
-      while (true) {
-        $binary = Binary::where("down_line", $current)->first();
-        if (!$binary || $c_level >= 9) {
-          break;
-        }
-        $cut = $upList * $level->firstWhere("level", "Level " . $c_level)->percent;
-        $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
-        if ($c_level++ === 1) {
-          $userBinary = User::where("id", $binary->sponsor)->first();
-        } else {
-          $userBinary = User::where("id", $binary->up_line)->first();
-          $current = $userBinary->id ?? "";
-        }
-        if ($userBinary->level >= $upgradeList->id) {
-          $balance_left -= $cut;
-          $q = new Queue([
-            "user_id" => Auth::id(),
-            "send" => $userBinary->id,
-            "value" => $this->toFixed($this->toFixed($cut, 3), 3),
-            "type" => $request->type . "_level",
-            "total" => $this->toFixed($balance_left, 3),
-          ]);
-          $q->save();
-          if ($request->type == "ltc") {
-            $shareBalance = new LTC([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else if ($request->type == "btc") {
-            $shareBalance = new BTC([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else if ($request->type == "eth") {
-            $shareBalance = new ETH([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else {
-            $shareBalance = new Doge([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
+        $c_level = 1;
+        while (true) {
+          $binary = Binary::where("down_line", $current)->first();
+          if (!$binary || $c_level >= 9) {
+            break;
           }
-          $shareBalance->save();
+          $cut = $upList * $level->firstWhere("level", "Level " . $c_level)->percent;
+          $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
+          if ($c_level++ === 1) {
+            $userBinary = User::where("id", $binary->sponsor)->first();
+          } else {
+            $userBinary = User::where("id", $binary->up_line)->first();
+            $current = $userBinary->id ?? "";
+          }
+          if ($userBinary->level >= $upgradeList->id) {
+            $balance_left -= $cut;
+            $q = new Queue([
+              "user_id" => Auth::id(),
+              "send" => $userBinary->id,
+              "value" => $this->toFixed($this->toFixed($cut, 3), 3),
+              "type" => $request->type . "_level",
+              "total" => $this->toFixed($balance_left, 3),
+            ]);
+            $q->save();
+            if ($request->type == "ltc") {
+              $shareBalance = new LTC([
+                "user_id" => $userBinary->id,
+                "description" => "bonus Level " . $c_level,
+                "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+              ]);
+            } else if ($request->type == "btc") {
+              $shareBalance = new BTC([
+                "user_id" => $userBinary->id,
+                "description" => "bonus Level " . $c_level,
+                "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+              ]);
+            } else if ($request->type == "eth") {
+              $shareBalance = new ETH([
+                "user_id" => $userBinary->id,
+                "description" => "bonus Level " . $c_level,
+                "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+              ]);
+            } else {
+              $shareBalance = new Doge([
+                "user_id" => $userBinary->id,
+                "description" => "bonus Level " . $c_level,
+                "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+              ]);
+            }
+            $shareBalance->save();
+          }
         }
+
+        $balance_left -= $wallet_it;
+        $it_queue = new Queue([
+          "user_Id" => Auth::id(),
+          "send" => 1,
+          "value" => $this->toFixed($wallet_it, 3),
+          "type" => $request->type . "_it",
+          "total" => $this->toFixed($balance_left, 3),
+        ]);
+        $it_queue->save();
+
+        $wallet_admin = WalletAdmin::inRandomOrder()->first();
+
+        Log::info($wallet_admin);
+
+        $balance_left -= $buy_wall;
+        $buy_wall_queue = new Queue([
+          "user_Id" => Auth::id(),
+          "send" => $wallet_admin->id,
+          "value" => $this->toFixed($buy_wall, 3),
+          "type" => $request->type . "_buyWall",
+          "total" => $this->toFixed($balance_left, 3),
+        ]);
+        $buy_wall_queue->save();
+
+        $total_random_share = $upList * (1 - $random_share_percent);
+        $balance_left -= $total_random_share;
+        $share_queue = new Queue([
+          "user_Id" => Auth::id(),
+          "send" => 2,
+          "value" => $this->toFixed($total_random_share, 3),
+          "type" => $request->type . "_share",
+          "total" => $this->toFixed($balance_left, 3),
+        ]);
+        $share_queue->save();
+
+        $upgrade = new Upgrade([
+          'from' => Auth::id(),
+          'to' => Auth::id(),
+          'description' => Auth::user()->username . " did an upgrade",
+          'debit' => $upList * 3,
+          'credit' => 0,
+          'level' => $upgradeList->id,
+          'type' => $request->type
+        ]);
+        $upgrade->save();
+
+        Binary::where('down_line', Auth::id())->update(['active' => true]);
+
+        return response()->json(["message" => "Upgrade now queued"]);
       }
 
-      $balance_left -= $wallet_it;
-      $it_queue = new Queue([
-        "user_Id" => Auth::id(),
-        "send" => 1,
-        "value" => $this->toFixed($wallet_it, 3),
-        "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 3),
-      ]);
-      $it_queue->save();
-
-      $wallet_admin = WalletAdmin::inRandomOrder()->first();
-
-      Log::info($wallet_admin);
-
-      $balance_left -= $buy_wall;
-      $buy_wall_queue = new Queue([
-        "user_Id" => Auth::id(),
-        "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 3),
-        "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 3),
-      ]);
-      $buy_wall_queue->save();
-
-      $total_random_share = $upList * (1 - $random_share_percent);
-      $balance_left -= $total_random_share;
-      $share_queue = new Queue([
-        "user_Id" => Auth::id(),
-        "send" => 2,
-        "value" => $this->toFixed($total_random_share, 3),
-        "type" => $request->type . "_share",
-        "total" => $this->toFixed($balance_left, 3),
-      ]);
-      $share_queue->save();
-
-      $upgrade = new Upgrade([
-        'from' => Auth::id(),
-        'to' => Auth::id(),
-        'description' => Auth::user()->username . " did an upgrade",
-        'debit' => $upList * 5,
-        'credit' => 0,
-        'level' => $upgradeList->id,
-        'type' => $request->type
-      ]);
-      $upgrade->save();
-
-      Binary::where('down_line', Auth::id())->update(['active' => true]);
-
-      return response()->json(["message" => "Upgrade now queued"]);
+      return response()->json(["message" => "Insufficient balance amount"], 400);
     }
 
-    return response()->json(["message" => "Incorrect balance amount"], 400);
+    return response()->json(["message" => "your secondary password is incorrect"], 400);
   }
 
   public function packages()

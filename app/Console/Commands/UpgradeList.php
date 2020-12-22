@@ -25,7 +25,7 @@ class UpgradeList extends Command
 
   /**
    * Execute the console command.
-   *
+   * @todo target wallet change to camel
    * @return void
    */
   public function handle()

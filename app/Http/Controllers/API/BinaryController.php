@@ -24,7 +24,7 @@ class BinaryController extends Controller
       } else {
         $dollar = UpgradeList::find($item->userDownLine->level)->dollar;
       }
-      $item->userDownLine->level = "$" . number_format($dollar, 2, ',', '.');
+      $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
 
       return $item;
     });
@@ -49,7 +49,7 @@ class BinaryController extends Controller
       } else {
         $dollar = UpgradeList::find($item->userDownLine->level)->dollar;
       }
-      $item->userDownLine->level = "$" . number_format($dollar, 2, ',', '.');
+      $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
 
       return $item;
     });

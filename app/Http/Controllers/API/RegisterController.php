@@ -21,6 +21,8 @@ class RegisterController extends Controller
    * @param Request $request
    * @return JsonResponse
    * @throws ValidationException
+   * @todo add wallet camel(base58), privateKey and publicKey
+   * @todo add model camel wall
    */
   public function out(Request $request)
   {

@@ -30,6 +30,7 @@ class Kernel extends ConsoleKernel
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
 
+    //todo dynamic schedule process
     $schedule->command('ShareQueueExecution')->everyTwoMinutes()->withoutOverlapping();
   }
 

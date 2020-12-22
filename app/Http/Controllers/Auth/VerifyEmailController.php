@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\Binary;
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -25,6 +26,9 @@ class VerifyEmailController extends Controller
   {
 
     $user = User::find($id);
+    $binary = Binary::where('down_line', $user->id)->first();
+    $binary->active = true;
+    $binary->save();
 
     if (!hash_equals((string)$hash, sha1($user->getEmailForVerification()))) {
       throw new AuthorizationException;
