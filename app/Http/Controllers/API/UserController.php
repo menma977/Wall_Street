@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\UpgradeList;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
@@ -21,7 +22,26 @@ class UserController extends Controller
 
   public function self()
   {
-    return response()->json(["user" => $this->dataUser]);
+    $user = User::find(Auth::id());
+    if (Auth::id() == 1) {
+      $dollar = 10000;
+    } else {
+      $dollar = UpgradeList::find(Auth::user()->level)->dollar;
+    }
+
+    $user->level = $dollar;
+
+    return response()->json([
+      'cookie' => $user->cookie,
+      'email' => $user->email,
+      'username' => $user->username,
+      'phone' => $user->phone,
+      'wallet_btc' => $user->wallet_btc,
+      'wallet_doge' => $user->wallet_doge,
+      'wallet_ltc' => $user->wallet_ltc,
+      'wallet_eth' => $user->wallet_eth,
+      'level' => $dollar,
+    ]);
   }
 
   private function getUser($user_identifiable)
