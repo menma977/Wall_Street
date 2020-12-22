@@ -20,7 +20,8 @@
     <ul class="tree" style="min-width: 1000px">
       <li>
         <div class="fa fa-minus-circle" style="min-width: 200px">
-          {{ Auth::user()->email }} <i class="fa fa-trophy text-danger" style="font-size: 10px;"> LEVEL-{{ Auth::user()->level }} </i>
+          {{ Auth::user()->email }} <i class="text-danger" style="font-size: 10px;">
+            ${{ App\Models\UpgradeList::find(Auth::user()->level) ? number_format(App\Models\UpgradeList::find(Auth::user()->level)->dollar, 2, ',', '.') :number_format( 10000, 2, ',', '.') }} </i>
         </div>
         <ul class="nested">
           @foreach ($binary as $item)
@@ -28,7 +29,7 @@
               <li>
                 <a href="#" id="caret-{{ $item->down_line }}" class="fa fa-plus-circle" onclick="addCaret('{{ $item->down_line }}')" style="min-width: 200px">
                   @if ($item->userDownLine)
-                    {{ $item->userDownLine->email }} <i class="fa fa-trophy text-danger" style="font-size: 10px;"> LEVEL-{{ $item->userDownLine->level }} </i>
+                    {{ $item->userDownLine->email }} <i class="text-danger" style="font-size: 10px;"> {{ $item->userDownLine->level }} </i>
                   @endif
                 </a>
                 <div id="{{ $item->down_line }}"></div>
@@ -107,7 +108,7 @@
                 + element.down_line
                 + '" class="fa fa-plus-circle" onclick="addCaret(`%data%`)" style="min-width: 200px"> '
                 + element.userDownLine.email
-                + '<i class="fa fa-trophy text-danger" style="font-size: 10px;"> LEVEL-'
+                + '<i class="text-danger" style="font-size: 10px;"> '
                 + element.userDownLine.level
                 + ' </i>'
                 + '</a> <div id="'
