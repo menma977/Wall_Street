@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
+use App\Models\UpgradeList;
 use http\Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -68,6 +69,12 @@ class LoginController extends Controller
 
             $user->token = $user->createToken('Android')->accessToken;
 
+            if ($user->id == 1) {
+              $dollar = 10000;
+            } else {
+              $dollar = UpgradeList::find($user->level)->dollar;
+            }
+
             return response()->json([
               'token' => $user->token,
               'cookie' => $user->cookie,
@@ -78,7 +85,7 @@ class LoginController extends Controller
               'wallet_doge' => $user->wallet_doge,
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
-              'level' => $user->level,
+              'level' => $dollar,
             ]);
           }
 
