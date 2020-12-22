@@ -42,7 +42,9 @@ class BinaryController extends Controller
     $binary = Binary::where('up_line', $id)->get();
     $binary->map(function ($item) {
       $item->userDownLine = User::find($item->down_line);
-      if ($item->id == 1) {
+      if ($item->userDownLine->level == 0) {
+        $dollar = 0;
+      } elseif ($item->userDownLine->level == 10) {
         $dollar = 10000;
       } else {
         $dollar = UpgradeList::find($item->userDownLine->level)->dollar;

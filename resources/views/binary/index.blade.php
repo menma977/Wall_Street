@@ -98,11 +98,11 @@
             "Access-Control-Allow-Origin": "*",
           }),
         }).then((response) => response.json()).then((responseData) => {
-          let idSponsor = 0;
+          let idUpLine = 0;
           let htmlBody = '';
           responseData.forEach(element => {
             if (element.active === 1) {
-              idSponsor = element.sponsor;
+              idUpLine = element.up_line;
               let user = '<li>' +
                 '<a href="#" id="caret-'
                 + element.down_line
@@ -118,9 +118,9 @@
               htmlBody += '<ul class="nested active">' + user + '</ul>';
             }
           });
-          document.getElementById(idSponsor).innerHTML = htmlBody;
+          document.getElementById(idUpLine).innerHTML = htmlBody;
         }).catch((error) => {
-          //console.log(error);
+          // console.log(error);
         });
       }
     }
