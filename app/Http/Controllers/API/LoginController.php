@@ -3,6 +3,10 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\BTC;
+use App\Models\Doge;
+use App\Models\ETH;
+use App\Models\LTC;
 use App\Models\Setting;
 use App\Models\UpgradeList;
 use http\Exception;
@@ -63,6 +67,8 @@ class LoginController extends Controller
             'password' => $user->password_doge
           ]);
 
+          Log::info("Login" . $doge999->body());
+
           if ($doge999->ok() && $doge999->successful()) {
             $user->cookie = $doge999->json()['SessionCookie'];
             $user->save();
@@ -86,6 +92,14 @@ class LoginController extends Controller
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
               'level' => $dollar,
+              'doge_balance' => $doge999->json()["Doge"]["Balance"],
+              'ltc_balance' => $doge999->json()["LTC"]["Balance"],
+              'eth_balance' => $doge999->json()["ETH"]["Balance"],
+              'btc_balance' => $doge999->json()["Balance"],
+              'fake_doge_balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
+              'fake_ltc_balance' => LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit'),
+              'fake_eth_balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
+              'fake_btc_balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit'),
             ]);
           }
 
