@@ -51,13 +51,13 @@ class BTCController extends Controller
    */
   public function create()
   {
-    $btc = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');
-    $btcList = BTC::where('user_id', Auth::id())->paginate(20);
+    $balance = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');
+    $balanceList = BTC::where('user_id', Auth::id())->paginate(20);
     $package = UpgradeList::all();
 
     $data = [
-      'btc' => $btc,
-      'btcList' => $btcList,
+      'balance' => $balance,
+      'balanceList' => $balanceList,
       'package' => $package
     ];
 
@@ -74,7 +74,7 @@ class BTCController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
       'value' => 'required|numeric',
-      'wallet' => 'required|string|exists:users,wallet_btc',
+      'wallet' => 'required|string',
       'fake' => 'required|string',
     ]);
 
@@ -84,19 +84,19 @@ class BTCController extends Controller
 
         $formatBTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
-        $btc = new BTC();
-        $btc->user_id = $targetUser->id;
-        $btc->description = "receive btc " . $formatBTC . " from " . Auth::user()->username;
-        $btc->debit = $request->input('value');
-        $btc->save();
+        $balance = new BTC();
+        $balance->user_id = $targetUser->id;
+        $balance->description = "receive btc " . $formatBTC . " from " . Auth::user()->username;
+        $balance->debit = $request->input('value');
+        $balance->save();
 
-        $btc = new BTC();
-        $btc->user_id = Auth::id();
-        $btc->description = "send btc " . $formatBTC . " to " . $targetUser->username;
-        $btc->credit = $request->input('value');
-        $btc->save();
+        $balance = new BTC();
+        $balance->user_id = Auth::id();
+        $balance->description = "send btc " . $formatBTC . " to " . $targetUser->username;
+        $balance->credit = $request->input('value');
+        $balance->save();
 
-        return response()->json(['message' => 'success transfer BTC']);
+        return response()->json(['message' => 'success transfer BTC Wall']);
       }
 
       $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [

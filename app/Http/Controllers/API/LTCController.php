@@ -51,13 +51,13 @@ class LTCController extends Controller
    */
   public function create()
   {
-    $btc = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');
-    $btcList = LTC::where('user_id', Auth::id())->paginate(20);
+    $balance = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');
+    $balanceList = LTC::where('user_id', Auth::id())->paginate(20);
     $package = UpgradeList::all();
 
     $data = [
-      'btc' => $btc,
-      'btcList' => $btcList,
+      'balance' => $balance,
+      'balanceList' => $balanceList,
       'package' => $package
     ];
 
@@ -74,7 +74,7 @@ class LTCController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
       'value' => 'required|numeric',
-      'wallet' => 'required|string|exists:users,wallet_ltc',
+      'wallet' => 'required|string',
       'fake' => 'required|string',
     ]);
 
@@ -84,19 +84,19 @@ class LTCController extends Controller
 
         $formatLTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
-        $btc = new LTC();
-        $btc->user_id = $targetUser->id;
-        $btc->description = "receive ltc " . $formatLTC . " from " . Auth::user()->username;
-        $btc->debit = $request->input('value');
-        $btc->save();
+        $balance = new LTC();
+        $balance->user_id = $targetUser->id;
+        $balance->description = "receive ltc " . $formatLTC . " from " . Auth::user()->username;
+        $balance->debit = $request->input('value');
+        $balance->save();
 
-        $btc = new LTC();
-        $btc->user_id = Auth::id();
-        $btc->description = "send ltc " . $formatLTC . " to " . $targetUser->username;
-        $btc->credit = $request->input('value');
-        $btc->save();
+        $balance = new LTC();
+        $balance->user_id = Auth::id();
+        $balance->description = "send ltc " . $formatLTC . " to " . $targetUser->username;
+        $balance->credit = $request->input('value');
+        $balance->save();
 
-        return response()->json(['message' => 'success transfer LTC']);
+        return response()->json(['message' => 'success transfer LTC Wall']);
       }
 
       $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [

@@ -51,13 +51,13 @@ class DogeController extends Controller
    */
   public function create()
   {
-    $btc = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
-    $btcList = Doge::where('user_id', Auth::id())->paginate(20);
+    $balance = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
+    $balanceList = Doge::where('user_id', Auth::id())->paginate(20);
     $package = UpgradeList::all();
 
     $data = [
-      'btc' => $btc,
-      'btcList' => $btcList,
+      'balance' => $balance,
+      'balanceList' => $balanceList,
       'package' => $package
     ];
 
@@ -74,7 +74,7 @@ class DogeController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
       'value' => 'required|numeric',
-      'wallet' => 'required|string|exists:users,wallet_doge',
+      'wallet' => 'required|string',
       'fake' => 'required|string',
     ]);
 
@@ -84,19 +84,19 @@ class DogeController extends Controller
 
         $formatDoge = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
-        $btc = new Doge();
-        $btc->user_id = $targetUser->id;
-        $btc->description = "receive doge " . $formatDoge . " from " . Auth::user()->username;
-        $btc->debit = $request->input('value');
-        $btc->save();
+        $balance = new Doge();
+        $balance->user_id = $targetUser->id;
+        $balance->description = "receive doge " . $formatDoge . " from " . Auth::user()->username;
+        $balance->debit = $request->input('value');
+        $balance->save();
 
-        $btc = new Doge();
-        $btc->user_id = Auth::id();
-        $btc->description = "send doge " . $formatDoge . " to " . $targetUser->username;
-        $btc->credit = $request->input('value');
-        $btc->save();
+        $balance = new Doge();
+        $balance->user_id = Auth::id();
+        $balance->description = "send doge " . $formatDoge . " to " . $targetUser->username;
+        $balance->credit = $request->input('value');
+        $balance->save();
 
-        return response()->json(['message' => 'success transfer Doge']);
+        return response()->json(['message' => 'success transfer Doge Wall']);
       }
 
       $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [

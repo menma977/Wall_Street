@@ -51,13 +51,13 @@ class ETHController extends Controller
    */
   public function create()
   {
-    $btc = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');
-    $btcList = ETH::where('user_id', Auth::id())->paginate(20);
+    $balance = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');
+    $balanceList = ETH::where('user_id', Auth::id())->paginate(20);
     $package = UpgradeList::all();
 
     $data = [
-      'btc' => $btc,
-      'btcList' => $btcList,
+      'balance' => $balance,
+      'balanceList' => $balanceList,
       'package' => $package
     ];
 
@@ -74,7 +74,7 @@ class ETHController extends Controller
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
       'value' => 'required|numeric',
-      'wallet' => 'required|string|exists:users,wallet_eth',
+      'wallet' => 'required|string',
       'fake' => 'required|string',
     ]);
 
@@ -84,19 +84,19 @@ class ETHController extends Controller
 
         $formatETH = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
-        $btc = new ETH();
-        $btc->user_id = $targetUser->id;
-        $btc->description = "receive eth " . $formatETH . " from " . Auth::user()->username;
-        $btc->debit = $request->input('value');
-        $btc->save();
+        $balance = new ETH();
+        $balance->user_id = $targetUser->id;
+        $balance->description = "receive eth " . $formatETH . " from " . Auth::user()->username;
+        $balance->debit = $request->input('value');
+        $balance->save();
 
-        $btc = new ETH();
-        $btc->user_id = Auth::id();
-        $btc->description = "send eth " . $formatETH . " to " . $targetUser->username;
-        $btc->credit = $request->input('value');
-        $btc->save();
+        $balance = new ETH();
+        $balance->user_id = Auth::id();
+        $balance->description = "send eth " . $formatETH . " to " . $targetUser->username;
+        $balance->credit = $request->input('value');
+        $balance->save();
 
-        return response()->json(['message' => 'success transfer ETH']);
+        return response()->json(['message' => 'success transfer ETH Wall']);
       }
 
       $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [

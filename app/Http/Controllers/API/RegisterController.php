@@ -215,7 +215,7 @@ class RegisterController extends Controller
       'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
     ]);
 
-    $camel = Http::get("https://api.cameltoken.io/tronapi//createaccount");
+    $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");
 
     Log::info("===================doge=camel=====================");
     Log::info($doge);
