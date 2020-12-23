@@ -18,7 +18,7 @@ class ShareQueueExecution extends Command
    *
    * @var string
    */
-  protected $signature = 'ShareQueueExecution';
+  protected $signature = 'shareQueueExecution';
 
   /**
    * The console command description.

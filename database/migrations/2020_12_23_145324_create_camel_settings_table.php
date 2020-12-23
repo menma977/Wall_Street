@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSettingsTable extends Migration
+class CreateCamelSettingsTable extends Migration
 {
   /**
    * Run the migrations.
@@ -13,10 +13,14 @@ class CreateSettingsTable extends Migration
    */
   public function up()
   {
-    Schema::create('settings', function (Blueprint $table) {
+    Schema::create('camel_settings', function (Blueprint $table) {
       $table->id();
-      $table->boolean('maintenance')->default(false);
-      $table->integer('version')->default(1);
+      $table->string('private_key');
+      $table->string('public_key');
+      $table->string('wallet_camel');
+      $table->string('hex_camel');
+      $table->string('share_value');
+      $table->integer('share_time');
       $table->timestamps();
     });
   }
@@ -28,6 +32,6 @@ class CreateSettingsTable extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('settings');
+    Schema::dropIfExists('camel_settings');
   }
 }

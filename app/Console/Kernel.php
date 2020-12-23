@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Models\CamelSetting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -30,8 +31,8 @@ class Kernel extends ConsoleKernel
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
 
-    //todo dynamic schedule process
-    $schedule->command('ShareQueueExecution')->everyTwoMinutes()->withoutOverlapping();
+    $camelSetting = CamelSetting::find(1)->share_time;
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
   }
 
   /**

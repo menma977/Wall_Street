@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSettingsTable extends Migration
+class CreateBankAccountsTable extends Migration
 {
   /**
    * Run the migrations.
@@ -13,10 +13,14 @@ class CreateSettingsTable extends Migration
    */
   public function up()
   {
-    Schema::create('settings', function (Blueprint $table) {
+    Schema::create('bank_accounts', function (Blueprint $table) {
       $table->id();
-      $table->boolean('maintenance')->default(false);
-      $table->integer('version')->default(1);
+      $table->string('username');
+      $table->string('password');
+      $table->string('wallet_btc');
+      $table->string('wallet_doge');
+      $table->string('wallet_ltc');
+      $table->string('wallet_eth');
       $table->timestamps();
     });
   }
@@ -28,6 +32,6 @@ class CreateSettingsTable extends Migration
    */
   public function down()
   {
-    Schema::dropIfExists('settings');
+    Schema::dropIfExists('bank_accounts');
   }
 }

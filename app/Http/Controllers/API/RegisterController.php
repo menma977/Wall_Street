@@ -21,8 +21,6 @@ class RegisterController extends Controller
    * @param Request $request
    * @return JsonResponse
    * @throws ValidationException
-   * @todo add wallet camel(base58), privateKey and publicKey
-   * @todo add model camel wall
    */
   public function out(Request $request)
   {
@@ -46,14 +44,10 @@ class RegisterController extends Controller
 
     $up_line = User::where($type, $request->input('sponsor'))->first();
     if ($up_line->email_verified_at) {
-      $createAccount999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-        'a' => 'CreateAccount',
-        'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
-      ]);
-      Log::info($createAccount999Doge);
-
       try {
-        if ($createAccount999Doge->ok() && $createAccount999Doge->successful()) {
+        $account = $this->createAccount();
+
+        if ($account['code'] == 200) {
           $user = new User();
           $user->name = $request->input('name');
           $user->username = $request->input('username');
@@ -63,88 +57,52 @@ class RegisterController extends Controller
           $user->password_junk = $request->input('password');
           $user->secondary_password = Hash::make($request->input('secondary_password'));
           $user->secondary_password_junk = $request->input('secondary_password');
-          $user->cookie = $createAccount999Doge->json()['SessionCookie'];
+          $user->cookie = $account['cookie'];
 
-          $walletBTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'GetDepositAddress',
-            's' => $createAccount999Doge->json()['SessionCookie'],
-            'Currency' => "btc"
-          ]);
-          Log::info($walletBTC);
+          $wallet = $this->getWallet($account['cookie']);
+          if ($wallet['code'] == 200) {
+            $user->private_key = $account['privateKey'];
+            $user->public_key = $account['publicKey'];
+            $user->wallet_camel = $account['walletCamel'];
+            $user->hex_camel = $account['hexCamel'];
 
-          if ($walletBTC->ok() && $walletBTC->successful()) {
-            $user->wallet_btc = $walletBTC->json()['Address'];
-          }
+            $user->wallet_btc = $wallet['btc'];
+            $user->wallet_doge = $wallet['doge'];
+            $user->wallet_ltc = $wallet['ltc'];
+            $user->wallet_eth = $wallet['eth'];
 
-          $walletDoge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'GetDepositAddress',
-            's' => $createAccount999Doge->json()['SessionCookie'],
-            'Currency' => "doge"
-          ]);
-          Log::info($walletDoge);
+            $user->username_doge = $this->generateRandomString();
+            $user->password_doge = $this->generateRandomString();
 
-          if ($walletDoge->ok() && $walletDoge->successful()) {
-            $user->wallet_doge = $walletDoge->json()['Address'];
-          }
+            $addUser = $this->addUser($account['cookie'], $user->username_doge, $user->password_doge);
 
-          $walletLTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'GetDepositAddress',
-            's' => $createAccount999Doge->json()['SessionCookie'],
-            'Currency' => "ltc"
-          ]);
-          Log::info($walletLTC);
+            if ($addUser['code'] == 200) {
+              $user->save();
 
-          if ($walletLTC->ok() && $walletLTC->successful()) {
-            $user->wallet_ltc = $walletLTC->json()['Address'];
-          }
+              $binary = new Binary();
+              $binaryData = Binary::where('up_line', $up_line->id)->first();
+              if ($binaryData) {
+                $binary->sponsor = $binaryData->sponsor;
+                $binary->up_line = $up_line->id;
+              } else {
+                $binary->sponsor = $up_line->id;
+                $binary->up_line = $up_line->id;
+              }
+              $binary->down_line = $user->id;
+              $binary->save();
 
-          $walletETH = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'GetDepositAddress',
-            's' => $createAccount999Doge->json()['SessionCookie'],
-            'Currency' => "eth"
-          ]);
-          Log::info($walletETH);
+              event(new Registered($user));
 
-          if ($walletETH->ok() && $walletETH->successful()) {
-            $user->wallet_eth = $walletETH->json()['Address'];
-          }
-
-          $user->username_doge = $this->generateRandomString();
-          $user->password_doge = $this->generateRandomString();
-
-          $createUser999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-            'a' => 'CreateUser',
-            's' => $createAccount999Doge->json()['SessionCookie'],
-            'Username' => $user->username_doge,
-            'Password' => $user->password_doge,
-          ]);
-
-          Log::info($createUser999Doge);
-
-          if ($createUser999Doge->ok() && $createUser999Doge->successful()) {
-            $user->save();
-
-            $binary = new Binary();
-            $binaryData = Binary::where('up_line', $up_line->id)->first();
-            if ($binaryData) {
-              $binary->sponsor = $binaryData->sponsor;
-              $binary->up_line = $up_line->id;
-            } else {
-              $binary->sponsor = $up_line->id;
-              $binary->up_line = $up_line->id;
+              return response()->json(['message' => "your registration successful. please confirmation your email address"]);
             }
-            $binary->down_line = $user->id;
-            $binary->save();
 
-            event(new Registered($user));
-
-            return response()->json(['message' => "your registration successful. please confirmation your email address"]);
+            return response()->json(['message' => $addUser['message']], 500);
           }
 
-          return response()->json(['message' => "your registration failed"], 500);
+          return response()->json(['message' => $wallet['message']], 500);
         }
 
-        return response()->json(['message' => "your registration failed"], 500);
+        return response()->json(['message' => $account['message']], 500);
       } catch (Exception $e) {
         Log::error($e->getMessage() . " - " . $e->getFile() . " - " . $e->getLine());
         return response()->json(['message' => $e->getMessage()], 500);
@@ -162,14 +120,10 @@ class RegisterController extends Controller
       'phone' => 'required|numeric|min:10|unique:users',
     ]);
 
-    $createAccount999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-      'a' => 'CreateAccount',
-      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
-    ]);
-    Log::info($createAccount999Doge);
-
     try {
-      if ($createAccount999Doge->ok() && $createAccount999Doge->successful()) {
+      $account = $this->createAccount();
+
+      if ($account['code'] == 200) {
         $user = new User();
         $user->name = $request->input('name');
         $user->username = $request->input('username');
@@ -181,88 +135,52 @@ class RegisterController extends Controller
         $user->password_junk = $generatePassword;
         $user->secondary_password = Hash::make($generateSecondaryPassword);
         $user->secondary_password_junk = $generateSecondaryPassword;
-        $user->cookie = $createAccount999Doge->json()['SessionCookie'];
+        $user->cookie = $account['cookie'];
 
-        $walletBTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-          'a' => 'GetDepositAddress',
-          's' => $createAccount999Doge->json()['SessionCookie'],
-          'Currency' => "btc"
-        ]);
-        Log::info($walletBTC);
+        $wallet = $this->getWallet($account['cookie']);
+        if ($wallet['code'] == 200) {
+          $user->private_key = $account['privateKey'];
+          $user->public_key = $account['publicKey'];
+          $user->wallet_camel = $account['walletCamel'];
+          $user->hex_camel = $account['hexCamel'];
 
-        if ($walletBTC->ok() && $walletBTC->successful()) {
-          $user->wallet_btc = $walletBTC->json()['Address'];
-        }
+          $user->wallet_btc = $wallet['btc'];
+          $user->wallet_doge = $wallet['doge'];
+          $user->wallet_ltc = $wallet['ltc'];
+          $user->wallet_eth = $wallet['eth'];
 
-        $walletDoge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-          'a' => 'GetDepositAddress',
-          's' => $createAccount999Doge->json()['SessionCookie'],
-          'Currency' => "doge"
-        ]);
-        Log::info($walletDoge);
+          $user->username_doge = $this->generateRandomString();
+          $user->password_doge = $this->generateRandomString();
 
-        if ($walletDoge->ok() && $walletDoge->successful()) {
-          $user->wallet_doge = $walletDoge->json()['Address'];
-        }
+          $addUser = $this->addUser($account['cookie'], $user->username_doge, $user->password_doge);
 
-        $walletLTC = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-          'a' => 'GetDepositAddress',
-          's' => $createAccount999Doge->json()['SessionCookie'],
-          'Currency' => "ltc"
-        ]);
-        Log::info($walletLTC);
+          if ($addUser['code'] == 200) {
+            $user->save();
 
-        if ($walletLTC->ok() && $walletLTC->successful()) {
-          $user->wallet_ltc = $walletLTC->json()['Address'];
-        }
+            $binary = new Binary();
+            $binaryData = Binary::where('up_line', Auth::id())->first();
+            if ($binaryData) {
+              $binary->sponsor = $binaryData->sponsor;
+              $binary->up_line = Auth::id();
+            } else {
+              $binary->sponsor = Auth::id();
+              $binary->up_line = Auth::id();
+            }
+            $binary->down_line = $user->id;
+            $binary->save();
 
-        $walletETH = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-          'a' => 'GetDepositAddress',
-          's' => $createAccount999Doge->json()['SessionCookie'],
-          'Currency' => "eth"
-        ]);
-        Log::info($walletETH);
+            event(new Registered($user));
 
-        if ($walletETH->ok() && $walletETH->successful()) {
-          $user->wallet_eth = $walletETH->json()['Address'];
-        }
-
-        $user->username_doge = $this->generateRandomString();
-        $user->password_doge = $this->generateRandomString();
-
-        $createUser999Doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-          'a' => 'CreateUser',
-          's' => $createAccount999Doge->json()['SessionCookie'],
-          'Username' => $user->username_doge,
-          'Password' => $user->password_doge,
-        ]);
-
-        Log::info($createUser999Doge);
-
-        if ($createUser999Doge->ok() && $createUser999Doge->successful()) {
-          $user->save();
-
-          $binary = new Binary();
-          $binaryData = Binary::where('up_line', Auth::id())->first();
-          if ($binaryData) {
-            $binary->sponsor = $binaryData->sponsor;
-            $binary->up_line = Auth::id();
-          } else {
-            $binary->sponsor = Auth::id();
-            $binary->up_line = Auth::id();
+            return response()->json(['message' => "your registration successful. please confirmation your email address"]);
           }
-          $binary->down_line = $user->id;
-          $binary->save();
 
-          event(new Registered($user));
-
-          return response()->json(['message' => "your registration successful. please confirmation your email address"]);
+          return response()->json(['message' => $addUser['message']], 500);
         }
 
-        return response()->json(['message' => "your registration failed"], 500);
+        return response()->json(['message' => $wallet['message']], 500);
       }
 
-      return response()->json(['message' => "your registration failed"], 500);
+      return response()->json(['message' => $account['message']], 500);
     } catch (Exception $e) {
       Log::error($e->getMessage() . " - " . $e->getFile() . " - " . $e->getLine());
     }
@@ -285,5 +203,119 @@ class RegisterController extends Controller
       $randomString .= $characters[random_int(0, $charactersLength - 1)];
     }
     return $randomString;
+  }
+
+  /**
+   * @return array
+   */
+  public function createAccount()
+  {
+    $doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'CreateAccount',
+      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
+    ]);
+
+    $camel = Http::get("https://api.cameltoken.io/tronapi//createaccount");
+
+    Log::info("===================doge=camel=====================");
+    Log::info($doge);
+    Log::info($camel);
+    Log::info("=========================================");
+
+    if ($doge->ok() && $doge->successful() && $camel->ok() && $camel->successful()) {
+      return [
+        'code' => 200,
+        'cookie' => $doge->json()['SessionCookie'],
+        'privateKey' => $camel->json()['privateKey'],
+        'publicKey' => $camel->json()['publicKey'],
+        'walletCamel' => $camel->json()['address']['base58'],
+        'hexCamel' => $camel->json()['address']['hex'],
+      ];
+    }
+
+    return [
+      'code' => 500,
+      'message' => "failed create account",
+    ];
+  }
+
+  /**
+   * @param $cookie
+   * @return array
+   */
+  public function getWallet($cookie)
+  {
+    $btc = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'GetDepositAddress',
+      's' => $cookie,
+      'Currency' => "btc"
+    ]);
+
+    $doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'GetDepositAddress',
+      's' => $cookie,
+      'Currency' => "doge"
+    ]);
+
+    $ltc = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'GetDepositAddress',
+      's' => $cookie,
+      'Currency' => "ltc"
+    ]);
+
+    $eth = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'GetDepositAddress',
+      's' => $cookie,
+      'Currency' => "eth"
+    ]);
+
+    Log::info("=================btc=doge=ltc=eth=====================");
+    Log::info($btc);
+    Log::info($doge);
+    Log::info($ltc);
+    Log::info($eth);
+    Log::info("=========================================");
+
+    if ($btc->ok() && $btc->successful() && $doge->ok() && $doge->successful() && $ltc->ok() && $ltc->successful() && $eth->ok() && $eth->successful()) {
+      return [
+        'code' => 200,
+        'btc' => $btc->json()['Address'],
+        'doge' => $doge->json()['Address'],
+        'ltc' => $ltc->json()['Address'],
+        'eth' => $eth->json()['Address'],
+      ];
+    }
+
+    return [
+      'code' => 500,
+      'message' => "failed to get wallet",
+    ];
+  }
+
+  public function addUser($cookie, $username, $password)
+  {
+    $createUser = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      'a' => 'CreateUser',
+      's' => $cookie,
+      'Username' => $username,
+      'Password' => $password,
+    ]);
+
+    Log::info("==================createUser=======================");
+    Log::info($createUser);
+    Log::info("=========================================");
+
+    if ($createUser->ok() && $createUser->successful()) {
+      return [
+        'code' => 200,
+        'username' => $username,
+        'password' => $password,
+      ];
+    }
+
+    return [
+      'code' => 500,
+      'message' => "Failed to add user",
+    ];
   }
 }

@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BankAccount;
 use App\Models\Queue;
-use App\Models\Setting;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
@@ -99,16 +99,16 @@ class QueueExecution extends Command
           $queue->save();
         } else if ($typeBalance === 'it') {
           if ($targetBalance === 'btc') {
-            $walletTarget = Setting::find($queue->send)->wallet_btc;
+            $walletTarget = BankAccount::find(1)->wallet_btc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
-            $walletTarget = Setting::find($queue->send)->wallet_doge;
+            $walletTarget = BankAccount::find(1)->wallet_doge;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
-            $walletTarget = Setting::find($queue->send)->wallet_eth;
+            $walletTarget = BankAccount::find(1)->wallet_eth;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
           } else {
-            $walletTarget = Setting::find($queue->send)->wallet_ltc;
+            $walletTarget = BankAccount::find(1)->wallet_ltc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           }
 
@@ -219,7 +219,7 @@ class QueueExecution extends Command
       $upgrade->from = $user->id;
       $upgrade->to = 2;
       $upgrade->description = 'Share ' . $user->username;
-      $upgrade->type = $type;
+      $upgrade->type = "camel";
       $upgrade->level = $user->level;
       $upgrade->credit = $value;
       $upgrade->save();

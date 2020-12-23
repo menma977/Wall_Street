@@ -25,6 +25,10 @@ use Laravel\Passport\HasApiTokens;
  * @property string secondary_password_junk
  * @property string username_doge
  * @property string password_doge
+ * @property string private_key
+ * @property string public_key
+ * @property string wallet_camel
+ * @property string hex_camel
  * @property string cookie
  * @property string wallet_btc
  * @property string wallet_ltc
@@ -54,6 +58,10 @@ class User extends Authenticatable implements MustVerifyEmail
     'secondary_password_junk',
     'username_doge',
     'password_doge',
+    'private_key',
+    'public_key',
+    'wallet_camel',
+    'hex_camel',
     'cookie',
     'wallet_btc',
     'wallet_ltc',
