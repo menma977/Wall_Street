@@ -27,6 +27,11 @@ class CreateUsersTable extends Migration
       $table->string('secondary_password_junk');
       $table->string('username_doge')->nullable();
       $table->string('password_doge')->nullable();
+      $table->text('wallet_camel')->nullable();
+      $table->text('hex_camel')->nullable();
+      $table->text('private_key')->nullable();
+      $table->text('public_key')->nullable();
+      $table->text('cookie')->nullable();
       $table->text('cookie')->nullable();
       $table->text('wallet_btc')->nullable();
       $table->text('wallet_ltc')->nullable();
