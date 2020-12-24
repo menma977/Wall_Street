@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string wallet_doge
  * @property string wallet_ltc
  * @property string wallet_eth
+ * @property string wallet_camel
  */
 class WalletAdmin extends Model
 {
@@ -31,5 +32,6 @@ class WalletAdmin extends Model
     'wallet_doge',
     'wallet_ltc',
     'wallet_eth',
+    'wallet_camel',
   ];
 }

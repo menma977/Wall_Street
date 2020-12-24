@@ -61,9 +61,12 @@ class QueueExecution extends Command
           } else if ($targetBalance === 'eth') {
             $walletTarget = User::find($queue->send)->wallet_eth;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else {
+          } else if ($targetBalance === 'ltc') {
             $walletTarget = User::find($queue->send)->wallet_ltc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
+          } else {
+            $walletTarget = User::find($queue->send)->wallet_camel;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
           }
 
           $value = $formatValue;
@@ -84,9 +87,12 @@ class QueueExecution extends Command
           } else if ($targetBalance === 'eth') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_eth;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else {
+          } else if ($targetBalance === 'ltc') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
+          } else {
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_camel;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
           }
 
           $value = $formatValue;
@@ -107,9 +113,12 @@ class QueueExecution extends Command
           } else if ($targetBalance === 'eth') {
             $walletTarget = BankAccount::find(1)->wallet_eth;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else {
+          } else if ($targetBalance === 'ltc') {
             $walletTarget = BankAccount::find(1)->wallet_ltc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
+          } else {
+            $walletTarget = BankAccount::find(1)->wallet_camel;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
           }
 
           $value = $formatValue;
@@ -130,9 +139,12 @@ class QueueExecution extends Command
           } else if ($targetBalance === 'eth') {
             $walletTarget = User::find($queue->send)->wallet_eth;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else {
+          } else if ($targetBalance === 'ltc') {
             $walletTarget = User::find($queue->send)->wallet_ltc;
             $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
+          } else {
+            $walletTarget = User::find($queue->send)->wallet_camel;
+            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
           }
 
           $value = $formatValue;

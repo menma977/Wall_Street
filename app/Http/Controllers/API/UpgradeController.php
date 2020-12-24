@@ -76,8 +76,8 @@ class UpgradeController extends Controller
   {
     $request->validate([
       "type" => ["required", function ($attr, $val, $fail) {
-        if (!in_array($val, ["ltc", "btc", "eth", "doge"])) {
-          $fail($attr . " must be either ltc, btc, eth, or doge");
+        if (!in_array($val, ["ltc", "btc", "eth", "doge", "camel"])) {
+          $fail($attr . " must be either ltc, btc, eth, doge or camel");
         }
       }],
       "upgrade_list" => "required|integer",

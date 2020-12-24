@@ -37,9 +37,11 @@ class UpgradeList extends Model
     'ltc',
     'doge',
     'eth',
+    'camel',
     'btc_usd',
     'ltc_usd',
     'doge_usd',
     'eth_usd',
+    'camel_usd'
   ];
 }
