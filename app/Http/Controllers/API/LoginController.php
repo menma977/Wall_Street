@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\BTC;
+use App\Models\Camel;
 use App\Models\Doge;
 use App\Models\ETH;
 use App\Models\LTC;
@@ -81,6 +82,12 @@ class LoginController extends Controller
               $dollar = UpgradeList::find($user->level)->dollar;
             }
 
+            $camelResponse = Http::get("https://www.999doge.com/getbalance/".$user->wallet_camel);
+            $camelBalance = 0;
+            if($camelResponse->ok() && $camelResponse->successful()){
+              $camelBalance = $camelResponse->json()["balance"];
+            }
+
             return response()->json([
               'token' => $user->token,
               'cookie' => $user->cookie,
@@ -94,15 +101,18 @@ class LoginController extends Controller
               'wallet_doge' => $user->wallet_doge,
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
+              'wallet_eth' => $user->wallet_camel,
               'level' => $dollar,
               'doge_balance' => $doge999->json()["Doge"]["Balance"],
               'ltc_balance' => $doge999->json()["LTC"]["Balance"],
               'eth_balance' => $doge999->json()["ETH"]["Balance"],
               'btc_balance' => $doge999->json()["Balance"],
+              'camel_balance' => $camelBalance,
               'fake_doge_balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
               'fake_ltc_balance' => LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit'),
               'fake_eth_balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
               'fake_btc_balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit'),
+              'fake_camel_balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit'),
             ]);
           }
 
