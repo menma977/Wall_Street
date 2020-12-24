@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\API\BinaryController;
 use App\Http\Controllers\API\BTCController;
+use App\Http\Controllers\API\CamelController;
 use App\Http\Controllers\API\DogeController;
 use App\Http\Controllers\API\ETHController;
 use App\Http\Controllers\API\LoginController;
@@ -73,6 +74,13 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('/show', [ETHController::class, 'show']);
     Route::get('/create', [ETHController::class, 'create']);
     Route::post('/store', [ETHController::class, 'store'])->middleware(['throttle:2,1']);
+  });
+
+  Route::group(['prefix' => 'camel', 'as' => 'camel.'], function () {
+    Route::get('', [CamelController::class, 'index']);
+    Route::get('/show', [CamelController::class, 'show']);
+    Route::get('/create', [CamelController::class, 'create']);
+    Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
   Route::group(['prefix' => 'binary', 'as' => 'api.binary.'], function () {
