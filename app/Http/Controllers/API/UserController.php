@@ -41,6 +41,10 @@ class UserController extends Controller
       'wallet_doge' => $user->wallet_doge,
       'wallet_ltc' => $user->wallet_ltc,
       'wallet_eth' => $user->wallet_eth,
+      'private_key' => $user->private_key,
+      'public_key' => $user->public_key,
+      'wallet_camel' => $user->wallet_camel,
+      'hex_camel' => $user->hex_camel,
       'level' => $dollar,
       'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
