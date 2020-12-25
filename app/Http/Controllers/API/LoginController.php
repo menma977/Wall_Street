@@ -83,7 +83,13 @@ class LoginController extends Controller
               $dollar = UpgradeList::find($user->level)->dollar;
             }
 
-            $camelResponse = Http::get("https://www.999doge.com/getbalance/" . $user->wallet_camel);
+            $tronResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
+            $tronBalance = 0;
+            if ($tronResponse->ok() && $tronResponse->successful()) {
+              $tronBalance = $tronResponse->json()["balance"];
+            }
+
+            $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $user->wallet_camel);
             $camelBalance = 0;
             if ($camelResponse->ok() && $camelResponse->successful()) {
               $camelBalance = $camelResponse->json()["balance"];
@@ -99,6 +105,7 @@ class LoginController extends Controller
               'public_key' => $user->public_key,
               'wallet_camel' => $user->wallet_camel,
               'hex_camel' => $user->hex_camel,
+              'wallet_btc' => $user->wallet_btc,
               'wallet_doge' => $user->wallet_doge,
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
@@ -109,6 +116,7 @@ class LoginController extends Controller
               'eth_balance' => $doge999->json()["ETH"]["Balance"],
               'btc_balance' => $doge999->json()["Balance"],
               'camel_balance' => $camelBalance,
+              'tron_balance' => $tronBalance,
               'fake_doge_balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
               'fake_ltc_balance' => LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit'),
               'fake_eth_balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
