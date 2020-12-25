@@ -140,11 +140,17 @@ class UpgradeController extends Controller
               "description" => "bonus Level " . $c_level,
               "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
             ]);
+          } else if ($request->type == "doge") {
+            $shareBalance = new ETH([
+              "user_id" => $userBinary->id,
+              "description" => "bonus Level " . $c_level,
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->doge, 8, '', '')
+            ]);
           } else {
             $shareBalance = new Doge([
               "user_id" => $userBinary->id,
               "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
+              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->camel, 8, '', '')
             ]);
           }
           $shareBalance->save();
@@ -198,6 +204,9 @@ class UpgradeController extends Controller
       $upgrade->save();
 
       Binary::where('down_line', Auth::id())->update(['active' => true]);
+      $user = User::find(Auth::id());
+      ++$user->level;
+      $user->save();
 
       return response()->json(["message" => "Upgrade now queued"]);
     }
@@ -211,8 +220,8 @@ class UpgradeController extends Controller
     return response()->json(["packages" => $packages]);
   }
 
-  private function toFixed($number, $precision, $separator = ",")
+  private function toFixed($number, $precision, $separator = ".")
   {
-    return number_format($number, $precision, $separator, ".");
+    return number_format($number, $precision, $separator, "");
   }
 }

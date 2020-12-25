@@ -21,6 +21,7 @@ class CreateCamelSettingsTable extends Migration
       $table->string('hex_camel');
       $table->string('share_value');
       $table->integer('share_time');
+      $table->string('to_dollar')->default(1);
       $table->timestamps();
     });
   }

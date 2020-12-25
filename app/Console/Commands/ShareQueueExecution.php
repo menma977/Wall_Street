@@ -2,7 +2,10 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Camel;
+use App\Models\CamelSetting;
 use App\Models\ShareQueue;
+use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
@@ -25,7 +28,7 @@ class ShareQueueExecution extends Command
    *
    * @var string
    */
-  protected $description = 'Execute Share Queue';
+  protected $description = 'Execute Share Queue to camel';
 
   /**
    * Execute the console command.
@@ -37,32 +40,28 @@ class ShareQueueExecution extends Command
     $shareQueue = ShareQueue::where('status', false)->where('created_at', Carbon::now())->first();
     if ($shareQueue) {
       try {
+        $user = User::find($shareQueue->user_id);
         $upgradeList = UpgradeList::find(1);
-        $userAdmin = User::find(2);
+        $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->camel, 8, '.', '');
 
-        if ($shareQueue->type === 'btc') {
-          $walletTarget = User::find($shareQueue->send)->wallet_btc;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
-        } else if ($shareQueue->type === 'doge') {
-          $walletTarget = User::find($shareQueue->send)->wallet_doge;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
-        } else if ($shareQueue->type === 'eth') {
-          $walletTarget = User::find($shareQueue->send)->wallet_eth;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-        } else {
-          $walletTarget = User::find($shareQueue->send)->wallet_ltc;
-          $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
-        }
+        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->camel_wallet, $formatValue)) {
+          $upgrade = new Upgrade();
+          $upgrade->from = 1;
+          $upgrade->to = $user->id;
+          $upgrade->description = 'Random Share ' . $user->username;
+          $upgrade->type = "camel";
+          $upgrade->level = $user->level;
+          $upgrade->credit = $shareQueue->value;
+          $upgrade->save();
 
-        $value = $formatValue;
+          $camel = new Camel();
+          $camel->user_id = $user->id;
+          $camel->debit = $formatValue;
+          $camel->description = 'Random Share ' . $user->username;
+          $camel->save();
 
-        if (!$userAdmin->cookie) {
-          $userAdmin->cookie = $this->getUserCookie($userAdmin->username_doge, $userAdmin->password_doge);
-          $userAdmin->save();
-        }
-
-        if ($this->withdraw($userAdmin->cookie, $value, $walletTarget, $shareQueue->type)) {
           $shareQueue->status = true;
+
         } else {
           $shareQueue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
         }
@@ -76,48 +75,23 @@ class ShareQueueExecution extends Command
   }
 
   /**
-   * @param $cookie
+   * @param $privateKey
+   * @param $targetWallet
    * @param $value
-   * @param $wallet
-   * @param $type
    * @return bool
    */
-  private function withdraw($cookie, $value, $wallet, $type)
+  private function withdraw($privateKey, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-      'a' => 'Withdraw',
-      's' => $cookie,
-      'Amount' => $value,
-      'Address' => $wallet,
-      'Totp ' => '',
-      'Currency' => $type,
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+      'privkey' => $privateKey,
+      'to' => $targetWallet,
+      'amount' => $value,
     ]);
     Log::info("====================================");
-    Log::info($value);
-    Log::info($wallet);
-    Log::info("====================================");
-
+    Log::info($value . " - " . $targetWallet);
     Log::info($withdraw->body());
+    Log::info("====================================");
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true;
-  }
-
-  /**
-   * @param $usernameDoge
-   * @param $passwordDoge
-   * @return string
-   */
-  private function getUserCookie($usernameDoge, $passwordDoge)
-  {
-    $getCookie = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
-      'a' => 'Login',
-      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
-      'username' => $usernameDoge,
-      'password' => $passwordDoge,
-      'Totp' => ''
-    ]);
-    Log::info($getCookie->body());
-
-    return $getCookie->json()['SessionCookie'];
+    return $withdraw->successful() && str_contains($withdraw->body(), 'success') === true;
   }
 }

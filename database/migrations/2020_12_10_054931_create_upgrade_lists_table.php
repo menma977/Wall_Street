@@ -17,10 +17,12 @@ class CreateUpgradeListsTable extends Migration
       $table->id();
       $table->string('dollar')->default(0);
       $table->string('idr')->default(15000);
+      $table->string('camel')->default(0);
       $table->string('btc')->default(0);
       $table->string('ltc')->default(0);
       $table->string('doge')->default(0);
       $table->string('eth')->default(0);
+      $table->string('camel_usd')->default(0);
       $table->string('btc_usd')->default(0);
       $table->string('ltc_usd')->default(0);
       $table->string('doge_usd')->default(0);

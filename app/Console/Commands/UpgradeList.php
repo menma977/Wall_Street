@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\CamelSetting;
 use http\Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -25,8 +26,8 @@ class UpgradeList extends Command
 
   /**
    * Execute the console command.
-   * @todo target wallet change to camel
    * @return void
+   * @todo target wallet change to camel
    */
   public function handle()
   {
@@ -44,6 +45,8 @@ class UpgradeList extends Command
           $item->eth_usd = number_format(($item->dollar * $item->idr) / $item->eth, 8, '', '');
           $item->ltc = $ticker['ltc_idr']['buy'];
           $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
+          $item->camel = CamelSetting::find(1)->to_dollar;
+          $item->camel_usd = number_format(($item->dollar * $item->idr) / $item->camel, 8, '', '');
           $item->save();
         }
       } else {

@@ -22,12 +22,12 @@ class SettingSeeder extends Seeder
     $setting->save();
 
     $backAccount = new BankAccount();
-    $backAccount->username = 'menma977';
-    $backAccount->password = '081211610807';
-    $backAccount->wallet_btc = '1JWfKbLhkFfe9N7b4zVriHPpWXCAAMecdZ';
-    $backAccount->wallet_doge = 'DM9L2mUkLwwbdoHMBjj5g2NLVXoVKPFyag';
-    $backAccount->wallet_ltc = 'LQQnR56oN7WHLsoiTj4RP9MaVb1u7rzAnp';
-    $backAccount->wallet_eth = '0xda6b7abb9830d11bbde456178f435e1a23ae4776';
+    $backAccount->username = 'bankwall';
+    $backAccount->password = '123456+A';
+    $backAccount->wallet_btc = '1BNr4qg1b8tEmvVU1LPLqQZNcxkW7XERax';
+    $backAccount->wallet_doge = 'DNinFWZDow6KgHwgKtvoEkAKDZzq9JddqT';
+    $backAccount->wallet_ltc = 'LVrhjRoAvQ6K6ACp1trXd6FV2nTZvkage4';
+    $backAccount->wallet_eth = '0xe48183f994292ace1d14301f84887747e4539434';
     $backAccount->save();
 
     $camelSetting = new CamelSetting();
@@ -37,6 +37,7 @@ class SettingSeeder extends Seeder
     $camelSetting->hex_camel = '4177F60461A542CEA90794551FDE20380651311767';
     $camelSetting->share_time = 1;
     $camelSetting->share_value = 1;
+    $camelSetting->to_dollar = 1;
     $camelSetting->save();
   }
 }

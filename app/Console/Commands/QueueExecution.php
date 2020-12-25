@@ -38,7 +38,7 @@ class QueueExecution extends Command
    */
   public function handle()
   {
-    $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
+    $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'not like', 'camel_%')->first();
     if ($queue) {
       try {
         $user = User::find($queue->user_id);
@@ -51,27 +51,30 @@ class QueueExecution extends Command
         }
         $upgradeList = UpgradeList::find(1);
 
+        if ($targetBalance === 'btc') {
+          $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
+        } else if ($targetBalance === 'doge') {
+          $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
+        } else if ($targetBalance === 'eth') {
+          $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
+        } else {
+          $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
+        }
+
+        $value = $formatValue;
+
         if ($typeBalance === 'level') {
           if ($targetBalance === 'btc') {
             $walletTarget = User::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = User::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = User::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else if ($targetBalance === 'ltc') {
-            $walletTarget = User::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           } else {
-            $walletTarget = User::find($queue->send)->wallet_camel;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
+            $walletTarget = User::find($queue->send)->wallet_ltc;
           }
 
-          $value = $formatValue;
-
-          if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value)) {
+          if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
@@ -80,24 +83,15 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'buyWall') {
           if ($targetBalance === 'btc') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = WalletAdmin::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else if ($targetBalance === 'ltc') {
-            $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           } else {
-            $walletTarget = WalletAdmin::find($queue->send)->wallet_camel;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
+            $walletTarget = WalletAdmin::find($queue->send)->wallet_ltc;
           }
 
-          $value = $formatValue;
-
-          if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value)) {
+          if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
@@ -106,24 +100,15 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'it') {
           if ($targetBalance === 'btc') {
             $walletTarget = BankAccount::find(1)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = BankAccount::find(1)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = BankAccount::find(1)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else if ($targetBalance === 'ltc') {
-            $walletTarget = BankAccount::find(1)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           } else {
-            $walletTarget = BankAccount::find(1)->wallet_camel;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
+            $walletTarget = BankAccount::find(1)->wallet_ltc;
           }
 
-          $value = $formatValue;
-
-          if ($this->it($targetBalance, $user, $walletTarget, $value)) {
+          if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
@@ -132,22 +117,13 @@ class QueueExecution extends Command
         } else {
           if ($targetBalance === 'btc') {
             $walletTarget = User::find($queue->send)->wallet_btc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->btc, 8, '', '');
           } else if ($targetBalance === 'doge') {
             $walletTarget = User::find($queue->send)->wallet_doge;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->doge, 8, '', '');
           } else if ($targetBalance === 'eth') {
             $walletTarget = User::find($queue->send)->wallet_eth;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->eth, 8, '', '');
-          } else if ($targetBalance === 'ltc') {
-            $walletTarget = User::find($queue->send)->wallet_ltc;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->ltc, 8, '', '');
           } else {
-            $walletTarget = User::find($queue->send)->wallet_camel;
-            $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '', '');
+            $walletTarget = User::find($queue->send)->wallet_ltc;
           }
-
-          $value = $formatValue;
 
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
@@ -171,9 +147,10 @@ class QueueExecution extends Command
    * @param $targetUser
    * @param $walletTarget
    * @param $value
+   * @param $rawValue
    * @return bool
    */
-  private function level($type, $user, $targetUser, $walletTarget, $value)
+  private function level($type, $user, $targetUser, $walletTarget, $value, $rawValue)
   {
     if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
       $upgrade = new Upgrade();
@@ -182,7 +159,7 @@ class QueueExecution extends Command
       $upgrade->description = 'upgrade level ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
-      $upgrade->credit = $value;
+      $upgrade->credit = $rawValue;
       $upgrade->save();
 
       return true;
@@ -197,9 +174,10 @@ class QueueExecution extends Command
    * @param $targetUser
    * @param $walletTarget
    * @param $value
+   * @param $rawValue
    * @return bool
    */
-  private function buyWall($type, $user, $targetUser, $walletTarget, $value)
+  private function buyWall($type, $user, $targetUser, $walletTarget, $value, $rawValue)
   {
     if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
       $upgrade = new Upgrade();
@@ -208,7 +186,7 @@ class QueueExecution extends Command
       $upgrade->description = 'BuyWall ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
-      $upgrade->credit = $value;
+      $upgrade->credit = $rawValue;
       $upgrade->save();
 
       return true;
@@ -222,18 +200,19 @@ class QueueExecution extends Command
    * @param $user
    * @param $walletTarget
    * @param $value
+   * @param $rawValue
    * @return bool
    */
-  private function it($type, $user, $walletTarget, $value)
+  private function it($type, $user, $walletTarget, $value, $rawValue)
   {
     if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
-      $upgrade->to = 2;
-      $upgrade->description = 'Share ' . $user->username;
+      $upgrade->to = 1;
+      $upgrade->description = 'IT ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
-      $upgrade->credit = $value;
+      $upgrade->credit = $rawValue;
       $upgrade->save();
 
       return true;

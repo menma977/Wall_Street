@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string hex_camel
  * @property string share_value
  * @property integer share_time
+ * @property double to_dollar
  */
 class CamelSetting extends Model
 {
@@ -32,5 +33,6 @@ class CamelSetting extends Model
     'hex_camel',
     'share_value',
     'share_time',
+    'to_dollar',
   ];
 }
