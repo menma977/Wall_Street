@@ -88,6 +88,11 @@ class UpgradeController extends Controller
         }
       }],
     ]);
+
+    if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
+      return response()->json(['message' => 'your are on queue'], 500);
+    }
+
     $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;

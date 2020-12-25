@@ -102,7 +102,7 @@ class LoginController extends Controller
               'wallet_doge' => $user->wallet_doge,
               'wallet_ltc' => $user->wallet_ltc,
               'wallet_eth' => $user->wallet_eth,
-              'on_queue' => Queue::where('user_id', Auth::id())->count(),
+              'on_queue' => Queue::where('user_id', Auth::id())->where('status', false)->count(),
               'level' => $dollar,
               'doge_balance' => $doge999->json()["Doge"]["Balance"],
               'ltc_balance' => $doge999->json()["LTC"]["Balance"],

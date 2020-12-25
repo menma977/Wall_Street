@@ -25,7 +25,7 @@ class DogeController extends Controller
   {
     return response()->json([
       'balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
-      'on_queue' => Queue::where('user_id', Auth::id())->count(),
+      'on_queue' => Queue::where('user_id', Auth::id())->where('status', false)->count(),
     ]);
   }
 
@@ -80,6 +80,10 @@ class DogeController extends Controller
       'fake' => 'required|string',
     ]);
 
+    if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
+      return response()->json(['message' => 'your are on queue'], 500);
+    }
+
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
         $targetUser = User::where('wallet_doge', $request->input('wallet'))->first();
@@ -114,7 +118,7 @@ class DogeController extends Controller
         return response()->json(['message' => 'success transfer Doge']);
       }
 
-      return response()->json(['message' => 'connection has a problem or value to small']);
+      return response()->json(['message' => 'connection has a problem or value to small'], 500);
     }
 
     return response()->json(['message' => 'your secondary password is incorrect'], 500);
