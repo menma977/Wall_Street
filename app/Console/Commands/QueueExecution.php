@@ -83,7 +83,7 @@ class QueueExecution extends Command
           $walletTarget = WalletAdmin::find($queue->send)->$wallet;
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for buy wall", $targetBalance);
+            $this->updateFakeBalance($user->id, false, $wallet_class, "buy wall cut", $targetBalance);
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
@@ -93,7 +93,7 @@ class QueueExecution extends Command
           $walletTarget = BankAccount::find(1)->$wallet;
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for it", $targetBalance);
+            $this->updateFakeBalance($user->id, false, $wallet_class, "IT cut ", $targetBalance);
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
@@ -104,7 +104,7 @@ class QueueExecution extends Command
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for share", $targetBalance);
+            $this->updateFakeBalance($user->id, false, $wallet_class, "Share cut", $targetBalance);
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
