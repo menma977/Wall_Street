@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doge;
+use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
@@ -23,7 +24,8 @@ class DogeController extends Controller
   public function index()
   {
     return response()->json([
-      'balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit')
+      'balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
+      'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
   }
 

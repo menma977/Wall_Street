@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -41,6 +42,7 @@ class UserController extends Controller
       'wallet_ltc' => $user->wallet_ltc,
       'wallet_eth' => $user->wallet_eth,
       'level' => $dollar,
+      'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
   }
 

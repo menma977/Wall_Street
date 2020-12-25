@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\BTC;
+use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
@@ -23,7 +24,8 @@ class BTCController extends Controller
   public function index()
   {
     return response()->json([
-      'balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit')
+      'balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit'),
+      'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
   }
 
@@ -42,7 +44,7 @@ class BTCController extends Controller
     });
 
     return response()->json([
-      'list' => $list
+      'list' => $list,
     ]);
   }
 

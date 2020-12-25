@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
+use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
@@ -22,7 +23,8 @@ class CamelController extends Controller
   public function index()
   {
     return response()->json([
-      'balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit')
+      'balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit'),
+      'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
   }
 

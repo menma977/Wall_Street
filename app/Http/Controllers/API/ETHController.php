@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\ETH;
+use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
@@ -23,7 +24,8 @@ class ETHController extends Controller
   public function index()
   {
     return response()->json([
-      'balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit')
+      'balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
+      'on_queue' => Queue::where('user_id', Auth::id())->count(),
     ]);
   }
 
