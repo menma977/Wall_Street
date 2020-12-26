@@ -4,22 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
- * Class WalletAdmin
+ * Class ShareIt
  * @package App\Models
  * @property integer id
- * @property string name
- * @property string wallet_camel
  * @property string wallet_btc
  * @property string wallet_doge
  * @property string wallet_ltc
  * @property string wallet_eth
+ * @property string private_key
+ * @property string public_key
+ * @property string wallet_camel
+ * @property string hex_camel
  */
-class WalletAdmin extends Model
+class ShareIt extends Model
 {
-  use HasFactory, SoftDeletes;
+  use HasFactory;
 
   /**
    * The attributes that are mass assignable.
@@ -27,11 +28,13 @@ class WalletAdmin extends Model
    * @var array
    */
   protected $fillable = [
-    'name',
-    'wallet_camel',
     'wallet_btc',
     'wallet_doge',
     'wallet_ltc',
     'wallet_eth',
+    'private_key',
+    'public_key',
+    'wallet_camel',
+    'hex_camel',
   ];
 }

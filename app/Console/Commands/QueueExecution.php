@@ -7,6 +7,7 @@ use App\Models\BTC;
 use App\Models\Doge;
 use App\Models\LTC;
 use App\Models\Queue;
+use App\Models\ShareIt;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
@@ -57,29 +58,33 @@ class QueueExecution extends Command
         $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->$targetBalance, 8, '', '');
         $value = $formatValue;
 
-        switch($typeBalance){
+        switch ($typeBalance) {
           case "btc":
-            $wallet_class = BTC::class; break;
+            $wallet_class = BTC::class;
+            break;
           case "ltc":
-            $wallet_class = LTC::class; break;
+            $wallet_class = LTC::class;
+            break;
           case "eth":
-            $wallet_class = ETH::class; break;
+            $wallet_class = ETH::class;
+            break;
           case "doge":
-            $wallet_class = Doge::class; break;
+            $wallet_class = Doge::class;
+            break;
         }
 
         if ($typeBalance === 'level') {
-          $wallet = "wallet_".$targetBalance;
+          $wallet = "wallet_" . $targetBalance;
           $walletTarget = User::find($queue->send)->$wallet;
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for ".$queue->send, $targetBalance);
+            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for " . $queue->send, $targetBalance);
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'buyWall') {
-          $wallet = "wallet_".$targetBalance;
+          $wallet = "wallet_" . $targetBalance;
           $walletTarget = WalletAdmin::find($queue->send)->$wallet;
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
@@ -89,8 +94,8 @@ class QueueExecution extends Command
           }
           $queue->save();
         } else if ($typeBalance === 'it') {
-          $wallet = "wallet_".$targetBalance;
-          $walletTarget = BankAccount::find(1)->$wallet;
+          $wallet = "wallet_" . $targetBalance;
+          $walletTarget = ShareIt::find(1)->$wallet;
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
             $this->updateFakeBalance($user->id, false, $wallet_class, "IT cut ", $targetBalance);
@@ -99,7 +104,7 @@ class QueueExecution extends Command
           }
           $queue->save();
         } else {
-          $wallet = "wallet_".$targetBalance;
+          $wallet = "wallet_" . $targetBalance;
           $walletTarget = User::find($queue->send)->$wallet;
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
@@ -267,14 +272,15 @@ class QueueExecution extends Command
    * @param string $value
    * @return object
    */
-  private function updateFakeBalance($user_id ,$isDebit, $type, $description, $value){
+  private function updateFakeBalance($user_id, $isDebit, $type, $description, $value)
+  {
     $fakeWallet = new $type([
       'user_id' => $user_id,
       'description' => $description,
       'debit' => '0',
       'credit' => '0',
     ]);
-    if($isDebit)
+    if ($isDebit)
       $fakeWallet->debit = $value;
     else
       $fakeWallet->credit = $value;
