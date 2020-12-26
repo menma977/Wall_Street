@@ -79,8 +79,10 @@ class LoginController extends Controller
 
             if ($user->id == 1) {
               $dollar = 10000;
-            } else {
+            } elseif($user->level > 0) {
               $dollar = UpgradeList::find($user->level)->dollar;
+            } else {
+              $dollar = 0;
             }
 
             $tronResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);

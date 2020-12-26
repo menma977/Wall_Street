@@ -108,7 +108,7 @@ class CamelController extends Controller
         'to' => $request->input('wallet'),
         'amount' => $request->input('value'),
       ]);
-      Log::info($withdraw->body());
+      Log::info(Auth::user()->username . ' doge send ' . $request->input('value') . ' address ' . $request->input('wallet'));
 
       if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
         return response()->json(['message' => 'success transfer Camel']);

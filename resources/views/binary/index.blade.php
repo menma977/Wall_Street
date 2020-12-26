@@ -21,7 +21,7 @@
       <li>
         <div class="fa fa-minus-circle" style="min-width: 200px">
           {{ Auth::user()->email }} <i class="text-danger" style="font-size: 10px;">
-            ${{ App\Models\UpgradeList::find(Auth::user()->level) ? number_format(App\Models\UpgradeList::find(Auth::user()->level)->dollar / 3, 2, ',', '.') :number_format( 10000 / 3, 2, ',', '.') }} </i>
+            ${{ App\Models\UpgradeList::find(Auth::user()->level) ? number_format(App\Models\UpgradeList::find(Auth::user()->level)->dollar / 3, 2, ',', '.') :number_format( 0, 2, ',', '.') }} </i>
         </div>
         <ul class="nested">
           @foreach ($binary as $item)

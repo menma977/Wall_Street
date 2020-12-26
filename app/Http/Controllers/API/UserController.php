@@ -24,10 +24,13 @@ class UserController extends Controller
   public function self()
   {
     $user = User::find(Auth::id());
-    if (Auth::id() == 1) {
+
+    if ($user->id == 1) {
       $dollar = 10000;
+    } elseif ($user->level > 0) {
+      $dollar = UpgradeList::find($user->level)->dollar;
     } else {
-      $dollar = UpgradeList::find(Auth::user()->level)->dollar;
+      $dollar = 0;
     }
 
     $user->level = $dollar;

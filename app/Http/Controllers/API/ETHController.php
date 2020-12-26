@@ -112,7 +112,7 @@ class ETHController extends Controller
         'Address' => $request->input('wallet'),
         'Currency' => 'eth',
       ]);
-      Log::info($withdraw->body());
+      Log::info(Auth::user()->username . ' doge send ' . $request->input('value') . ' address ' . $request->input('wallet'));
 
       if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
         return response()->json(['message' => 'success transfer ETH']);
