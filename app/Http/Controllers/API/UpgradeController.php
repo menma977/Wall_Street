@@ -82,6 +82,7 @@ class UpgradeController extends Controller
       }],
       "upgrade_list" => "required|integer",
       "balance" => "required|numeric",
+      "balance_fake" => "required|numeric",
       'secondary_password' => ["required", function ($attr, $val, $fail) {
         if (!Hash::check($val, User::find(Auth::id())->secondary_password)) {
           $fail("The $attr did not match!");
@@ -93,7 +94,7 @@ class UpgradeController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
-    $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where("id", $request->upgrade_list)->first();
+    $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->where("id", $request->upgrade_list)->first();
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
