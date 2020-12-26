@@ -15,7 +15,7 @@ class WalletAdminSeeder extends Seeder
   public function run()
   {
     $wallet = new WalletAdmin();
-    $wallet->name = 'wallet 1';
+    $wallet->name = 'Admin 1';
     $wallet->wallet_camel = '1CiAqMLHrCA7UUqQNd8GgHC4px8rmzVFdT';
     $wallet->wallet_btc = '1JWfKbLhkFfe9N7b4zVriHPpWXCAAMecdZ';
     $wallet->wallet_doge = 'DM9L2mUkLwwbdoHMBjj5g2NLVXoVKPFyag';

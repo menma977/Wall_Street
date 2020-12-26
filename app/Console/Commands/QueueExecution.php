@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\BankAccount;
 use App\Models\BTC;
 use App\Models\Doge;
+use App\Models\ETH;
 use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareIt;
@@ -105,7 +106,7 @@ class QueueExecution extends Command
           $queue->save();
         } else {
           $wallet = "wallet_" . $targetBalance;
-          $walletTarget = User::find($queue->send)->$wallet;
+          $walletTarget = BankAccount::find($queue->send)->$wallet;
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
@@ -254,7 +255,7 @@ class QueueExecution extends Command
   {
     $getCookie = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
       'a' => 'Login',
-      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
+      'Key' => 'ec01af0702f3467a808ba52679e1ee61',
       'username' => $usernameDoge,
       'password' => $passwordDoge,
       'Totp' => ''
@@ -265,11 +266,11 @@ class QueueExecution extends Command
   }
 
   /**
-   * @param int $user_id
-   * @param bool $isDebit
-   * @param \App\Models\BTC|\App\Models\LTC|\App\Models\ETH|\App\Models\Doge $type
-   * @param string $description
-   * @param string $value
+   * @param $user_id
+   * @param $isDebit
+   * @param BTC|LTC|ETH|Doge $type
+   * @param $description
+   * @param $value
    * @return object
    */
   private function updateFakeBalance($user_id, $isDebit, $type, $description, $value)
@@ -280,10 +281,11 @@ class QueueExecution extends Command
       'debit' => '0',
       'credit' => '0',
     ]);
-    if ($isDebit)
+    if ($isDebit) {
       $fakeWallet->debit = $value;
-    else
+    } else {
       $fakeWallet->credit = $value;
+    }
     $fakeWallet->save();
     return $fakeWallet;
   }

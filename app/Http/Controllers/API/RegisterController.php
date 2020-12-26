@@ -212,7 +212,7 @@ class RegisterController extends Controller
   {
     $doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
       'a' => 'CreateAccount',
-      'Key' => 'a8bbdad7d8174c29a0804c1d19023eba',
+      'Key' => 'ec01af0702f3467a808ba52679e1ee61',
     ]);
 
     $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");

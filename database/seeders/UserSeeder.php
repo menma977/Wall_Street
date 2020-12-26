@@ -25,16 +25,16 @@ class UserSeeder extends Seeder
     $user->password_junk = 'admin';
     $user->secondary_password = Hash::make('123456');
     $user->secondary_password_junk = '123456';
-    $user->username_doge = 'menma977';
-    $user->password_doge = '081211610807';
-    $user->private_key = '5CDC02DD97C2EE8F92C41C696A2867E8B07D57E7A13990E36C49DA60237F7182';
-    $user->public_key = '0456B7DD22361ACD8509834B746B941C71877BD9EFC4FFBFCD9175A4C3672B7A1F17C72F4793F25B2801B17981F7AA7E0564DDCC8BE7D18591D2F2EE99FEE30349';
-    $user->wallet_camel = 'TLuW8TP1qcQkgFeJXriSMeCf4Wb8uXJ3gG';
-    $user->hex_camel = '4177F60461A542CEA90794551FDE20380651311767';
-    $user->wallet_btc = '1JWfKbLhkFfe9N7b4zVriHPpWXCAAMecdZ';
-    $user->wallet_ltc = 'LQQnR56oN7WHLsoiTj4RP9MaVb1u7rzAnp';
-    $user->wallet_doge = 'DM9L2mUkLwwbdoHMBjj5g2NLVXoVKPFyag';
-    $user->wallet_eth = '0xda6b7abb9830d11bbde456178f435e1a23ae4776';
+    $user->username_doge = 'wallstreet.info';
+    $user->password_doge = '123456+A';
+    $user->private_key = 'BD79796E279FDF250A0F94D7EF50BEC4CCA2351C8AEFBC4DC54C68A75D55942B';
+    $user->public_key = '04D8D01D631FFA2D137AB4F5BF9221A3EC0B7015369DCDA192B71A330230CE14DC7F33A3CCFBB67E7F36E789069CD44CE5167A4EAFA58DE24D77AD39D86F15CB96';
+    $user->wallet_camel = 'TYSs8UUeEUwThPMPkzuPt6JNfWQgcbn9Xj';
+    $user->hex_camel = '41F68DD363C9BBFCA9F012599B68EE13E5BC961F5E';
+    $user->wallet_btc = '1PfBXAtQkcuLjtTStZdJPDKx7sUHUadAEx';
+    $user->wallet_ltc = 'LeMbZcdxEK4MPK3wuqj3ywYjNhr4jhnnkh';
+    $user->wallet_doge = 'DFyhesdDdogR5QkdhJ6rwCe7JDEi9tCnfh';
+    $user->wallet_eth = '0x0aa61efefcab11da35fea63ff284d8948084d687';
     $user->level = 10;
     $user->save();
   }

@@ -15,14 +15,14 @@ class ShareItSeeder extends Seeder
   public function run()
   {
     $share = new ShareIt();
-    $share->wallet_btc = '1BNr4qg1b8tEmvVU1LPLqQZNcxkW7XERax';
-    $share->wallet_doge = 'DNinFWZDow6KgHwgKtvoEkAKDZzq9JddqT';
-    $share->wallet_ltc = 'LVrhjRoAvQ6K6ACp1trXd6FV2nTZvkage4';
-    $share->wallet_eth = '0xe48183f994292ace1d14301f84887747e4539434';
-    $share->private_key = '5CDC02DD97C2EE8F92C41C696A2867E8B07D57E7A13990E36C49DA60237F7182';
-    $share->public_key = '0456B7DD22361ACD8509834B746B941C71877BD9EFC4FFBFCD9175A4C3672B7A1F17C72F4793F25B2801B17981F7AA7E0564DDCC8BE7D18591D2F2EE99FEE30349';
-    $share->wallet_camel = 'TLuW8TP1qcQkgFeJXriSMeCf4Wb8uXJ3gG';
-    $share->hex_camel = '4177F60461A542CEA90794551FDE20380651311767';
+    $share->wallet_btc = '1BAt6h3kbbxs7UkMMrj96TsKAYpwZ9JYtZ';
+    $share->wallet_doge = 'DH2RsGMm4dN7napXN5KKxpNSjvHhyTA9GD';
+    $share->wallet_ltc = 'LcTyXdU6bFvn3fV2B3GPtfENrRjZvev1t1';
+    $share->wallet_eth = '0xd7e9a71aee9a3bc394db39b94a6ce8c0fa019932';
+    $share->private_key = '3CD1630CC57343615EBC3816E9C20F40D2999EFF174F0F406E3BBCB55EDF7EBB';
+    $share->public_key = '04B074099CD6F253D541430B04D0E2307523E76828340FB3BACBC2B1DB5C3E443B6673E3CD2873A390AD7154E791B18E6AA72285BC120A4205140865CA72264BCA';
+    $share->wallet_camel = 'TD4mffNBqpWQudvcNTDPiEkY4HXZFNHAvE';
+    $share->hex_camel = '4121F5B99A23167CCBE3172822281925ECF1DF8363';
     $share->save();
   }
 }
