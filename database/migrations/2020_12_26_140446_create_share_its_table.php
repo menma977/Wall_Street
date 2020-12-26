@@ -19,7 +19,6 @@ class CreateShareItsTable extends Migration
       $table->string('wallet_doge');
       $table->string('wallet_ltc');
       $table->string('wallet_eth');
-      $table->string('wallet_eth');
       $table->string('private_key');
       $table->string('public_key');
       $table->string('wallet_camel');
