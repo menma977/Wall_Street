@@ -21,7 +21,6 @@ class CreateWalletAdminsTable extends Migration
       $table->text('wallet_doge');
       $table->text('wallet_ltc');
       $table->text('wallet_eth');
-      $table->text('wallet_camel');
       $table->timestamps();
       $table->softDeletes();
     });
