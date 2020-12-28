@@ -59,29 +59,13 @@ class QueueExecution extends Command
         $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->$targetBalance, 8, '', '');
         $value = $formatValue;
 
-        switch ($typeBalance) {
-          case "btc":
-            $wallet_class = BTC::class;
-            break;
-          case "ltc":
-            $wallet_class = LTC::class;
-            break;
-          case "eth":
-            $wallet_class = ETH::class;
-            break;
-          case "doge":
-            $wallet_class = Doge::class;
-            break;
-        }
-
         if ($typeBalance === 'level') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = User::find($queue->send)->$wallet;
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "level cut for " . $queue->send, $targetBalance);
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'buyWall') {
@@ -89,9 +73,8 @@ class QueueExecution extends Command
           $walletTarget = WalletAdmin::find($queue->send)->$wallet;
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "buy wall cut", $targetBalance);
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'it') {
@@ -99,26 +82,24 @@ class QueueExecution extends Command
           $walletTarget = ShareIt::find(1)->$wallet;
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "IT cut ", $targetBalance);
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else {
           $wallet = "wallet_" . $targetBalance;
-          $walletTarget = BankAccount::find($queue->send)->$wallet;
+          $walletTarget = BankAccount::find(1)->$wallet;
           if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
-            $this->updateFakeBalance($user->id, false, $wallet_class, "Share cut", $targetBalance);
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
         }
       } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
-        $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+        $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
         $queue->save();
       }
     }
@@ -238,7 +219,7 @@ class QueueExecution extends Command
       'Currency' => $type,
     ]);
     Log::info("====================================");
-    Log::info($value . " - " . $wallet);
+    Log::info(number_format($value / 10 ** 8, 8, '.', ',') . " - " . $wallet);
     Log::info("====================================");
 
     Log::info($withdraw->body());
@@ -263,30 +244,5 @@ class QueueExecution extends Command
     Log::info($getCookie->body());
 
     return $getCookie->json()['SessionCookie'];
-  }
-
-  /**
-   * @param $user_id
-   * @param $isDebit
-   * @param BTC|LTC|ETH|Doge $type
-   * @param $description
-   * @param $value
-   * @return object
-   */
-  private function updateFakeBalance($user_id, $isDebit, $type, $description, $value)
-  {
-    $fakeWallet = new $type([
-      'user_id' => $user_id,
-      'description' => $description,
-      'debit' => '0',
-      'credit' => '0',
-    ]);
-    if ($isDebit) {
-      $fakeWallet->debit = $value;
-    } else {
-      $fakeWallet->credit = $value;
-    }
-    $fakeWallet->save();
-    return $fakeWallet;
   }
 }

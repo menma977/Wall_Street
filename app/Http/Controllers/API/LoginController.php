@@ -69,9 +69,9 @@ class LoginController extends Controller
             'password' => $user->password_doge
           ]);
 
-          Log::info("Login" . $doge999->body());
+          Log::info("Login : " . $doge999->body());
 
-          if ($doge999->ok() && $doge999->successful()) {
+          if ($doge999->ok() && $doge999->successful() && str_contains($doge999->body(), 'LoginInvalid') === false) {
             $user->cookie = $doge999->json()['SessionCookie'];
             $user->save();
 
@@ -79,7 +79,7 @@ class LoginController extends Controller
 
             if ($user->id == 1) {
               $dollar = 10000;
-            } elseif($user->level > 0) {
+            } elseif ($user->level > 0) {
               $dollar = UpgradeList::find($user->level)->dollar;
             } else {
               $dollar = 0;
@@ -127,7 +127,6 @@ class LoginController extends Controller
             ]);
           }
 
-          Log::info($doge999);
           return response()->json(['message' => 'CODE:401 - user is invalid.'], 401);
         }
 

@@ -196,7 +196,7 @@ class RegisterController extends Controller
    */
   public function generateRandomString($length = 20)
   {
-    $characters = '0123456789WALLSTREET';
+    $characters = '0123456789WALLSTREETwallstreet';
     $charactersLength = strlen($characters);
     $randomString = '';
     for ($i = 0; $i < $length; $i++) {
@@ -216,11 +216,6 @@ class RegisterController extends Controller
     ]);
 
     $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");
-
-    Log::info("===================doge=camel=====================");
-    Log::info($doge);
-    Log::info($camel);
-    Log::info("=========================================");
 
     if ($doge->ok() && $doge->successful() && $camel->ok() && $camel->successful()) {
       return [
@@ -269,13 +264,6 @@ class RegisterController extends Controller
       'Currency' => "eth"
     ]);
 
-    Log::info("=================btc=doge=ltc=eth=====================");
-    Log::info($btc);
-    Log::info($doge);
-    Log::info($ltc);
-    Log::info($eth);
-    Log::info("=========================================");
-
     if ($btc->ok() && $btc->successful() && $doge->ok() && $doge->successful() && $ltc->ok() && $ltc->successful() && $eth->ok() && $eth->successful()) {
       return [
         'code' => 200,
@@ -300,10 +288,6 @@ class RegisterController extends Controller
       'Username' => $username,
       'Password' => $password,
     ]);
-
-    Log::info("==================createUser=======================");
-    Log::info($createUser);
-    Log::info("=========================================");
 
     if ($createUser->ok() && $createUser->successful()) {
       return [

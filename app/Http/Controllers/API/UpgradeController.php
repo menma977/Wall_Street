@@ -118,48 +118,18 @@ class UpgradeController extends Controller
           $userBinary = User::where("id", $binary->up_line)->first();
           $current = $userBinary->id ?? "";
         }
-        if ($userBinary->level >= $upgradeList->id) {
+        if ($userBinary->level >= $upgradeList->id && Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit')) {
           $balance_left -= $cut;
           $q = new Queue([
             "user_id" => Auth::id(),
             "send" => $userBinary->id,
-            "value" => $this->toFixed($this->toFixed($cut, 3), 3),
+            "value" => $this->toFixed($this->toFixed($cut, 2), 2),
             "type" => $request->type . "_level",
-            "total" => $this->toFixed($balance_left, 3),
+            "total" => $this->toFixed($balance_left, 2),
           ]);
           $q->save();
-          if ($request->type == "ltc") {
-            $shareBalance = new LTC([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else if ($request->type == "btc") {
-            $shareBalance = new BTC([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else if ($request->type == "eth") {
-            $shareBalance = new ETH([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->ltc, 8, '', '')
-            ]);
-          } else if ($request->type == "doge") {
-            $shareBalance = new ETH([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->doge, 8, '', '')
-            ]);
-          } else {
-            $shareBalance = new Doge([
-              "user_id" => $userBinary->id,
-              "description" => "bonus Level " . $c_level,
-              "debit" => number_format(($cut * $upgradeList->idr) / $upgradeList->camel, 8, '', '')
-            ]);
-          }
-          $shareBalance->save();
+
+          $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $level, $cut, $upgradeList);
         }
       }
 
@@ -167,9 +137,9 @@ class UpgradeController extends Controller
       $it_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 1,
-        "value" => $this->toFixed($wallet_it, 3),
+        "value" => $this->toFixed($wallet_it, 2),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 3),
+        "total" => $this->toFixed($balance_left, 2),
       ]);
       $it_queue->save();
 
@@ -181,9 +151,9 @@ class UpgradeController extends Controller
       $buy_wall_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 3),
+        "value" => $this->toFixed($buy_wall, 2),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 3),
+        "total" => $this->toFixed($balance_left, 2),
       ]);
       $buy_wall_queue->save();
 
@@ -192,17 +162,19 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share, 3),
+        "value" => $this->toFixed($total_random_share, 2),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed($balance_left, 3),
+        "total" => $this->toFixed($balance_left, 2),
       ]);
       $share_queue->save();
+
+      $this->cutFakeBalance($request->type, 1, "BuyWall|IT|Share", ($total_random_share + $buy_wall + $wallet_it), $upgradeList);
 
       $upgrade = new Upgrade([
         'from' => Auth::id(),
         'to' => Auth::id(),
         'description' => Auth::user()->username . " did an upgrade",
-        'debit' => $upList * 3,
+        'debit' => $upgradeList->dollar * 3,
         'credit' => 0,
         'level' => $upgradeList->id,
         'type' => $request->type
@@ -229,5 +201,67 @@ class UpgradeController extends Controller
   private function toFixed($number, $precision, $separator = ".")
   {
     return number_format($number, $precision, $separator, "");
+  }
+
+  private function cutFakeBalance($type, $upLine, $level, $cut, $package)
+  {
+    if ($type == "ltc") {
+      $shareBalance = new LTC([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->ltc, 8, '', '')
+      ]);
+      $cutBalance = new LTC([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->ltc, 8, '', '')
+      ]);
+    } else if ($type == "btc") {
+      $shareBalance = new BTC([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->btc, 8, '', '')
+      ]);
+      $cutBalance = new BTC([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->btc, 8, '', '')
+      ]);
+    } else if ($type == "eth") {
+      $shareBalance = new ETH([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->eth, 8, '', '')
+      ]);
+      $cutBalance = new ETH([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->eth, 8, '', '')
+      ]);
+    } else if ($type == "doge") {
+      $shareBalance = new ETH([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->doge, 8, '', '')
+      ]);
+      $cutBalance = new ETH([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->doge, 8, '', '')
+      ]);
+    } else {
+      $shareBalance = new Doge([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')
+      ]);
+      $cutBalance = new Doge([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')
+      ]);
+    }
+    $shareBalance->save();
+    $cutBalance->save();
   }
 }

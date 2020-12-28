@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
-    $schedule->command('upgradeList')->everyFiveMinutes()->withoutOverlapping();
+    $schedule->command('upgradeList')->everyThreeMinutes()->withoutOverlapping();
 
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
