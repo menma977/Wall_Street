@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\BTC;
+use App\Models\Camel;
 use App\Models\Doge;
 use App\Models\ETH;
 use App\Models\LTC;
@@ -19,7 +20,6 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Log;
 
 class UpgradeController extends Controller
 {
@@ -94,7 +94,7 @@ class UpgradeController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
-    $upgradeList = UpgradeList::where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->where("id", $request->upgrade_list)->first();
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->first();
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
@@ -129,7 +129,7 @@ class UpgradeController extends Controller
           ]);
           $q->save();
 
-          $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $level, $cut, $upgradeList);
+          $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
         }
       }
 
@@ -144,8 +144,6 @@ class UpgradeController extends Controller
       $it_queue->save();
 
       $wallet_admin = WalletAdmin::inRandomOrder()->first();
-
-      Log::info($wallet_admin);
 
       $balance_left -= $buy_wall;
       $buy_wall_queue = new Queue([
@@ -239,23 +237,23 @@ class UpgradeController extends Controller
         "credit" => number_format(($cut * $package->idr) / $package->eth, 8, '', '')
       ]);
     } else if ($type == "doge") {
-      $shareBalance = new ETH([
+      $shareBalance = new Doge([
         "user_id" => $upLine,
         "description" => $level,
         "debit" => number_format(($cut * $package->idr) / $package->doge, 8, '', '')
       ]);
-      $cutBalance = new ETH([
+      $cutBalance = new Doge([
         "user_id" => Auth::id(),
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->doge, 8, '', '')
       ]);
     } else {
-      $shareBalance = new Doge([
+      $shareBalance = new Camel([
         "user_id" => $upLine,
         "description" => $level,
         "debit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')
       ]);
-      $cutBalance = new Doge([
+      $cutBalance = new Camel([
         "user_id" => Auth::id(),
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')

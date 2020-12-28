@@ -72,6 +72,7 @@ class CamelController extends Controller
       'value' => 'required|numeric',
       'wallet' => 'required|string',
       'fake' => 'required|string',
+      'tron' => 'required|string'
     ]);
 
     if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
@@ -103,14 +104,23 @@ class CamelController extends Controller
       Log::info($request->input('wallet'));
       Log::info($request->input('value'));
       Log::info("=================================");
-      $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
-        'privkey' => Auth::user()->private_key,
-        'to' => $request->input('wallet'),
-        'amount' => $request->input('value'),
-      ]);
-      Log::info(Auth::user()->username . ' doge send ' . $request->input('value') . ' address ' . $request->input('wallet'));
+      if ($request->input("tron") == "true") {
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
+          'privkey' => Auth::user()->private_key,
+          'to' => $request->input('wallet'),
+          'amount' => $request->input('value'),
+        ]);
+      } else {
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+          'privkey' => Auth::user()->private_key,
+          'to' => $request->input('wallet'),
+          'amount' => $request->input('value'),
+        ]);
+      }
+      Log::info(Auth::user()->username . ' Camel send ' . $request->input('value') . ' address ' . $request->input('wallet'));
+      Log::info($withdraw);
 
-      if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
+      if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
         return response()->json(['message' => 'success transfer Camel']);
       }
 

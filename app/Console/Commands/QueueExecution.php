@@ -3,10 +3,6 @@
 namespace App\Console\Commands;
 
 use App\Models\BankAccount;
-use App\Models\BTC;
-use App\Models\Doge;
-use App\Models\ETH;
-use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\ShareIt;
 use App\Models\ShareQueue;
@@ -58,6 +54,7 @@ class QueueExecution extends Command
 
         $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->$targetBalance, 8, '', '');
         $value = $formatValue;
+        Log::info("Balance : $value");
 
         if ($typeBalance === 'level') {
           $wallet = "wallet_" . $targetBalance;
@@ -89,7 +86,7 @@ class QueueExecution extends Command
         } else {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = BankAccount::find(1)->$wallet;
-          if ($this->withdraw($user->cookie, $value, $walletTarget, $type)) {
+          if ($this->withdraw($user->cookie, $value, $walletTarget, $targetBalance)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
           } else {
@@ -219,7 +216,7 @@ class QueueExecution extends Command
       'Currency' => $type,
     ]);
     Log::info("====================================");
-    Log::info(number_format($value / 10 ** 8, 8, '.', ',') . " - " . $wallet);
+    Log::info(number_format($value / 10 ** 8, 8, '.', '') . " - " . $wallet . ' Type : ' . $type);
     Log::info("====================================");
 
     Log::info($withdraw->body());
