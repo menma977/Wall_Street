@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\CamelSetting;
+use App\Models\Queue;
+use App\Models\ShareQueue;
 use http\Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -27,7 +29,6 @@ class UpgradeList extends Command
   /**
    * Execute the console command.
    * @return void
-   * @todo target wallet change to camel
    */
   public function handle()
   {
@@ -52,6 +53,9 @@ class UpgradeList extends Command
       } else {
         Log::error($get);
       }
+
+      Queue::where('status', true)->delete();
+      ShareQueue::where('status', true)->delete();
     } catch (Exception $e) {
       Log::warning($e->getMessage() . " Update BTC LINE : " . $e->getLine());
     }

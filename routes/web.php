@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,8 +22,10 @@ Route::get('/valid', function () {
   return view('validate');
 })->name('validate');
 
-Route::get('/dashboard', function () {
-  return view('dashboard');
-})->middleware(['auth'])->name('dashboard');
+Route::middleware(['auth', 'verified'])->group(function () {
+  Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
+    Route::get("", [HomeController::class, 'index'])->name('index');
+  });
+});
 
 require __DIR__ . '/auth.php';

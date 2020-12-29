@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\User;
+use App\Notifications\AddUser;
 use http\Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -169,7 +170,7 @@ class RegisterController extends Controller
             $binary->down_line = $user->id;
             $binary->save();
 
-            event(new Registered($user));
+            $user->notify(new AddUser());
 
             return response()->json(['message' => "your registration successful. please confirmation your email address"]);
           }

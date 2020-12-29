@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
 use App\Models\CamelSetting;
+use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
@@ -125,10 +126,18 @@ class CamelController extends Controller
           'amount' => $request->input('value'),
         ]);
       }
+
       Log::info(Auth::user()->username . ' Camel send ' . $request->input('value') . ' address ' . $request->input('wallet'));
       Log::info($withdraw);
 
       if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
+        $history = new HistoryCamel();
+        $history->user_id = Auth::id();
+        $history->wallet = $request->input('wallet');
+        $history->value = $request->input('value');
+        $history->code = $withdraw->json()['txid'];
+        $history->save();
+
         return response()->json(['message' => 'success transfer Camel']);
       }
 

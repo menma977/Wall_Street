@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\CamelSetting;
+use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
@@ -66,7 +67,7 @@ class QueueCamelExecution extends Command
           }
           $queue->save();
         } else {
-          if ($this->withdraw($user->private_key, CamelSetting::find(1)->wallet_camel, $formatValue)) {
+          if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $formatValue)) {
             $this->share($queue->value);
             $queue->status = true;
           } else {
@@ -91,7 +92,7 @@ class QueueCamelExecution extends Command
    */
   private function level($user, $targetUser, $value, $rawValue)
   {
-    if ($this->withdraw($user->private_key, $targetUser->wallet_camel, $value)) {
+    if ($this->withdraw($user->id, $user->private_key, $targetUser->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
@@ -116,7 +117,7 @@ class QueueCamelExecution extends Command
    */
   private function buyWall($user, $targetUser, $value, $rawValue)
   {
-    if ($this->withdraw($user->private_key, $targetUser->wallet_camel, $value)) {
+    if ($this->withdraw($user->id, $user->private_key, $targetUser->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
@@ -140,7 +141,7 @@ class QueueCamelExecution extends Command
    */
   private function it($user, $value, $rawValue)
   {
-    if ($this->withdraw($user->private_key, CamelSetting::find(1)->wallet_camel, $value)) {
+    if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = 1;
@@ -172,12 +173,13 @@ class QueueCamelExecution extends Command
   }
 
   /**
+   * @param $id
    * @param $privateKey
    * @param $targetWallet
    * @param $value
    * @return bool
    */
-  private function withdraw($privateKey, $targetWallet, $value)
+  private function withdraw($id, $privateKey, $targetWallet, $value)
   {
     $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
       'privkey' => $privateKey,
@@ -189,6 +191,16 @@ class QueueCamelExecution extends Command
     Log::info($withdraw->body());
     Log::info("====================================");
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false;
+    if ($withdraw->successful() && str_contains($withdraw->body(), 'failed') === false) {
+      $history = new HistoryCamel();
+      $history->user_id = $id;
+      $history->wallet = $targetWallet;
+      $history->value = $value;
+      $history->code = $withdraw->json()['txid'];
+      $history->save();
+      return true;
+    }
+
+    return false;
   }
 }
