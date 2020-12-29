@@ -46,7 +46,7 @@ class UpgradeList extends Command
           $item->ltc = $ticker['ltc_idr']['buy'];
           $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
           $item->camel = CamelSetting::find(1)->to_dollar;
-          $item->camel_usd = number_format(($item->dollar * $item->idr) / $item->camel, 8, '', '');
+          $item->camel_usd = $item->dollar / $item->camel;
           $item->save();
         }
       } else {

@@ -86,6 +86,11 @@ class LTCController extends Controller
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
+        $currentBalance = LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit');
+        if ($request->input('value') > $currentBalance) {
+          return response()->json(['message' => 'your balance to small'], 500);
+        }
+
         $targetUser = User::where('wallet_ltc', $request->input('wallet'))->first();
 
         $formatLTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');

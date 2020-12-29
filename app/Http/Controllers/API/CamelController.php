@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
+use App\Models\CamelSetting;
 use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
@@ -79,11 +80,18 @@ class CamelController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
+    Log::info("value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - tron : " . $request->input('tron'));
+
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
+        $currentBalance = Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit');
+        if ($request->input('value') > $currentBalance) {
+          return response()->json(['message' => 'your balance to small'], 500);
+        }
+
         $targetUser = User::where('wallet_camel', $request->input('wallet'))->first();
 
-        $formatDoge = number_format($request->input('value'), 8, '.', '');
+        $formatDoge = $request->input('value') / CamelSetting::find(1)->to_dollar;
 
         $balance = new Camel();
         $balance->user_id = $targetUser->id;
@@ -105,13 +113,13 @@ class CamelController extends Controller
       Log::info($request->input('value'));
       Log::info("=================================");
       if ($request->input("tron") == "true") {
-        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),
         ]);
       } else {
-        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),

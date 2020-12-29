@@ -43,7 +43,7 @@ class QueueCamelExecution extends Command
       try {
         $user = User::find($queue->user_id);
         $upgradeList = UpgradeList::find(1);
-        $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->camel, 8, '.', '');
+        $formatValue = $queue->value / $upgradeList->camel;
         if ($queue->type === 'camel_level') {
           if ($this->level($user, User::find($queue->send), $formatValue, $queue->value)) {
             $queue->status = true;
@@ -75,7 +75,9 @@ class QueueCamelExecution extends Command
           $queue->save();
         }
       } catch (Exception $e) {
-
+        Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
+        $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
+        $queue->save();
       }
     }
   }
@@ -177,7 +179,7 @@ class QueueCamelExecution extends Command
    */
   private function withdraw($privateKey, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
       'privkey' => $privateKey,
       'to' => $targetWallet,
       'amount' => $value,
@@ -187,6 +189,6 @@ class QueueCamelExecution extends Command
     Log::info($withdraw->body());
     Log::info("====================================");
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'success') === true;
+    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false;
   }
 }

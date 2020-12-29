@@ -251,12 +251,12 @@ class UpgradeController extends Controller
       $shareBalance = new Camel([
         "user_id" => $upLine,
         "description" => $level,
-        "debit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')
+        "debit" => $cut / $package->camel
       ]);
       $cutBalance = new Camel([
         "user_id" => Auth::id(),
         "description" => $level,
-        "credit" => number_format(($cut * $package->idr) / $package->camel, 8, '', '')
+        "credit" => $cut / $package->camel
       ]);
     }
     $shareBalance->save();

@@ -83,6 +83,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
   });
 
+  Route::group(['prefix' => 'tron', 'as' => 'tron.'], function () {
+    Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
+  });
+
   Route::group(['prefix' => 'binary', 'as' => 'api.binary.'], function () {
     Route::get('', [BinaryController::class, 'index'])->name("index");
     Route::get('/show/{id}', [BinaryController::class, 'show'])->name("show");

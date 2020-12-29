@@ -86,6 +86,11 @@ class BTCController extends Controller
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
+        $currentBalance = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');
+        if ($request->input('value') > $currentBalance) {
+          return response()->json(['message' => 'your balance to small'], 500);
+        }
+
         $targetUser = User::where('wallet_btc', $request->input('wallet'))->first();
 
         $formatBTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');

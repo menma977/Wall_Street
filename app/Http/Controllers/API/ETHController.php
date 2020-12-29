@@ -86,6 +86,11 @@ class ETHController extends Controller
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
+        $currentBalance = ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit');
+        if ($request->input('value') > $currentBalance) {
+          return response()->json(['message' => 'your balance to small'], 500);
+        }
+
         $targetUser = User::where('wallet_eth', $request->input('wallet'))->first();
 
         $formatETH = number_format($request->input('value') / 10 ** 8, 8, '.', '');

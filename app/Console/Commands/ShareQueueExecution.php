@@ -37,14 +37,17 @@ class ShareQueueExecution extends Command
    */
   public function handle()
   {
-    $shareQueue = ShareQueue::where('status', false)->where('created_at', Carbon::now())->first();
+    $shareQueue = ShareQueue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
+    Log::info("=================GET===================");
+    Log::info($shareQueue);
+    Log::info("====================================");
     if ($shareQueue) {
       try {
         $user = User::find($shareQueue->user_id);
         $upgradeList = UpgradeList::find(1);
-        $formatValue = number_format(($shareQueue->value * $upgradeList->idr) / $upgradeList->camel, 8, '.', '');
+        $formatValue = $shareQueue->value / $upgradeList->camel;
 
-        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->camel_wallet, $formatValue)) {
+        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $formatValue)) {
           $upgrade = new Upgrade();
           $upgrade->from = 1;
           $upgrade->to = $user->id;
@@ -68,7 +71,7 @@ class ShareQueueExecution extends Command
         $shareQueue->save();
       } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
-        $shareQueue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+        $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
         $shareQueue->save();
       }
     }
@@ -82,16 +85,16 @@ class ShareQueueExecution extends Command
    */
   private function withdraw($privateKey, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
       'privkey' => $privateKey,
       'to' => $targetWallet,
       'amount' => $value,
     ]);
-    Log::info("====================================");
+    Log::info("=================SEND===================");
     Log::info($value . " - " . $targetWallet);
     Log::info($withdraw->body());
     Log::info("====================================");
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'success') === true;
+    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false;
   }
 }

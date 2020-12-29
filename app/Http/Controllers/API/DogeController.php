@@ -86,6 +86,11 @@ class DogeController extends Controller
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
+        $currentBalance = Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit');
+        if ($request->input('value') > $currentBalance) {
+          return response()->json(['message' => 'your balance to small'], 500);
+        }
+
         $targetUser = User::where('wallet_doge', $request->input('wallet'))->first();
 
         $formatDoge = number_format($request->input('value') / 10 ** 8, 8, '.', '');
