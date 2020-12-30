@@ -17,30 +17,34 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-4">
-        <div class="info-box bg-primary">
-          <span class="info-box-icon"><i class="fas fa-spinner"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Queue</b>
-            <span id="queueTarget" class="info-box-number">0</span>
-            <div class="progress">
-              <div id="queueProgress" class="progress-bar" style="width: 0"></div>
+        <a href="{{ route('queue.index') }}">
+          <div class="info-box bg-primary">
+            <span class="info-box-icon"><i class="fas fa-spinner"></i></span>
+            <div class="info-box-content">
+              <b class="info-box-text">Queue</b>
+              <span id="queueTarget" class="info-box-number">0</span>
+              <div class="progress">
+                <div id="queueProgress" class="progress-bar" style="width: 0"></div>
+              </div>
+              <div id="queueDescription" class="progress-description"></div>
             </div>
-            <div id="queueDescription" class="progress-description"></div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="col-md-4">
-        <div class="info-box bg-primary">
-          <span class="info-box-icon"><i class="far fa-sun"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Share Queue</b>
-            <span id="shareTarget" class="info-box-number">0</span>
-            <div class="progress">
-              <div id="shareProgress" class="progress-bar" style="width: 0"></div>
+        <a href="{{ route('queue.share.index') }}">
+          <div class="info-box bg-primary">
+            <span class="info-box-icon"><i class="far fa-sun"></i></span>
+            <div class="info-box-content">
+              <b class="info-box-text">Share Queue</b>
+              <span id="shareTarget" class="info-box-number">0</span>
+              <div class="progress">
+                <div id="shareProgress" class="progress-bar" style="width: 0"></div>
+              </div>
+              <div id="shareDescription" class="progress-description"></div>
             </div>
-            <div id="shareDescription" class="progress-description"></div>
           </div>
-        </div>
+        </a>
       </div>
       <div class="col-md-4">
         <div class="info-box bg-cyan">
