@@ -24,13 +24,13 @@ class HomeController extends Controller
 
     $countHistoryCamel = HistoryCamel::count();
 
-    $totalUser = ShareLevel::count() - 2;
+    $level = ShareLevel::count() - 2;
 
     $data = [
       'verifiedUser' => $verifiedUser,
       'verifiedProgress' => $verifiedProgress == 0 ? 0 : number_format(($verifiedProgress / $verifiedUser) * 100, 1),
       'countHistoryCamel' => $countHistoryCamel,
-      'totalUser' => $totalUser
+      'level' => $level
     ];
 
     return view('dashboard', $data);
