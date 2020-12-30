@@ -93,7 +93,7 @@
             <div class="progress">
               <div class="progress-bar" style="width: 100%"></div>
             </div>
-            <h4 class="info-box-number">{{ $totalUser }}</h4>
+            <h4 class="info-box-number">{{ $level }}</h4>
           </div>
         </div>
       </div>
