@@ -24,18 +24,19 @@ class VerifyEmailController extends Controller
    */
   public function __invoke($id, $hash)
   {
-
     $user = User::find($id);
-    $binary = Binary::where('down_line', $user->id)->first();
-    $binary->active = true;
-    $binary->save();
-
     if (!hash_equals((string)$hash, sha1($user->getEmailForVerification()))) {
       throw new AuthorizationException;
     }
 
     if ($user->markEmailAsVerified()) {
       event(new Verified($user));
+    }
+
+    $binary = Binary::where('down_line', $user->id)->first();
+    if ($binary) {
+      $binary->active = true;
+      $binary->save();
     }
 
     return redirect('/valid')->with('verified', true);

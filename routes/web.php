@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\QueueController;
+use App\Http\Controllers\ShareQueueController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -25,6 +27,18 @@ Route::get('/valid', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
   Route::group(['prefix' => 'dashboard', 'as' => 'dashboard.'], function () {
     Route::get("", [HomeController::class, 'index'])->name('index');
+    Route::get("queue", [HomeController::class, 'queue'])->name('queue');
+    Route::get("queue/share", [HomeController::class, 'shareQueue'])->name('queue.share');
+  });
+
+  Route::group(['prefix' => 'queue', 'as' => 'queue.'], function () {
+    Route::get("", [QueueController::class, 'index'])->name('index');
+    Route::get("find", [QueueController::class, 'show'])->name('show');
+
+    Route::group(['prefix' => 'share', 'as' => 'share.'], function () {
+      Route::get("", [ShareQueueController::class, 'index'])->name('index');
+      Route::get("find", [ShareQueueController::class, 'show'])->name('show');
+    });
   });
 });
 
