@@ -14,7 +14,6 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -92,7 +91,7 @@ class RegisterController extends Controller
               $binary->down_line = $user->id;
               $binary->save();
 
-              event(new Registered($user));
+              $user->notify(new AddUser());
 
               return response()->json(['message' => "your registration successful. please confirmation your email address"]);
             }

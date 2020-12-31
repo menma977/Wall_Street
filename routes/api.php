@@ -10,6 +10,7 @@ use App\Http\Controllers\API\LogoutController;
 use App\Http\Controllers\API\LTCController;
 use App\Http\Controllers\API\PasswordResetLinkController;
 use App\Http\Controllers\API\RegisterController;
+use App\Http\Controllers\API\SendVerifyEmailController;
 use App\Http\Controllers\API\UpgradeController;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\API\VersionController;
@@ -31,6 +32,7 @@ Route::get('/upgrade/packages', [UpgradeController::class, 'packages'])->middlew
 Route::post('/login', [LoginController::class, 'index'])->middleware(['throttle:3,1', 'guest']);
 Route::post('/registration', [RegisterController::class, 'out'])->middleware(['throttle:6,1', 'guest']);
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store'])->middleware(['throttle:3,1', 'guest']);
+Route::post('/email/verify', [SendVerifyEmailController::class, 'store'])->middleware(['throttle:1,1', 'guest']);
 
 Route::middleware(['auth:api', 'verified'])->group(function () {
   Route::get('/logout', [LogoutController::class, 'index']);

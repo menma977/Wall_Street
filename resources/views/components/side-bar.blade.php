@@ -26,19 +26,26 @@
           </a>
         </li>
 
-        <li class="nav-item has-treeview {{ request()->is(['project', 'project/*', 'issue/*']) ? 'menu-open' : '' }}">
-          <a href="#" class="nav-link {{ request()->is(['project', 'project/*', 'issue/*']) ? 'active' : '' }}">
-            <i class="nav-icon fa fa-archive"></i>
+        {{--List Queue--}}
+        <li class="nav-item has-treeview {{ request()->is(['queue', 'queue/*']) ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link {{ request()->is(['queue', 'queue/*']) ? 'active' : '' }}">
+            <i class="nav-icon fas fa-spinner"></i>
             <p>
-              Project
+              Queue
             </p>
             <i class="right fas fa-angle-left"></i>
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="#" class="nav-link {{ request()->is(['project', 'project/edit/*', 'issue/*']) ? 'active' : '' }}">
+              <a href="{{ route('queue.index') }}" class="nav-link {{ request()->is(['queue']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Index</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('queue.share.index') }}" class="nav-link {{ request()->is(['queue/share']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Share</p>
               </a>
             </li>
           </ul>
