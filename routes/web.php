@@ -6,6 +6,7 @@ use App\Http\Controllers\UpgradeListController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletAdminController;
 use App\Http\Controllers\QueueController;
+use App\Http\Controllers\ShareLevelController;
 use App\Http\Controllers\ShareQueueController;
 use Illuminate\Support\Facades\Route;
 
@@ -53,10 +54,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
       Route::post("/create", [UpgradeListController::class, "create"])->name("create");
     });
     Route::group(['prefix' => 'share-level', 'as' => 'share-level.'], function () {
-      Route::get("", [UpgradeListController::class, "show"])->name("index");
-      Route::post("/edit", [UpgradeListController::class, "update"])->name("edit");
-      Route::post("/delete", [UpgradeListController::class, "delete"])->name("delete");
-      Route::post("/create", [UpgradeListController::class, "create"])->name("create");
+      Route::get("", [ShareLevelController::class, "show"])->name("index");
+      Route::get("/push", [ShareLevelController::class, "push"])->name("push");
+      Route::get("/pop", [ShareLevelController::class, "pop"])->name("pop");
+      Route::post("/edit", [ShareLevelController::class, "update"])->name("update");
     });
     Route::group(['prefix' => 'camel', 'as' => 'camel.'], function () {
       Route::get("", [CamelSettingController::class, "show"])->name("index");

@@ -51,6 +51,43 @@
           </ul>
         </li>
 
+        {{-- Settings --}}
+        <li class="nav-item has-treeview {{ request()->is(['setting', 'setting/*']) ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link {{ request()->is(['setting', 'setting/*']) ? 'active' : '' }}">
+            <i class="nav-icon fas fa-cogs"></i>
+            <p>
+              Settings
+            </p>
+            <i class="right fas fa-angle-left"></i>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{{ route('setting.camel.index') }}" class="nav-link {{ request()->is(['camel']) ? 'active' : '' }}">
+                <i class="fas fa-coins nav-icon"></i>
+                <p>Camel Settings</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('setting.upgrade-list.index') }}" class="nav-link {{ request()->is(['upgrade-list']) ? 'active' : '' }}">
+                <i class="fas fa-money-bill-wave nav-icon"></i>
+                <p>Upgrades Setting</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('setting.share-level.index') }}" class="nav-link {{ request()->is(['share-level']) ? 'active' : '' }}">
+                <i class="fas fa-cubes nav-icon"></i>
+                <p>Share Level Settings</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('setting.wallet-admin.index') }}" class="nav-link {{ request()->is(['wallet-admin']) ? 'active' : '' }}">
+                <i class="fas fa-wallet nav-icon"></i>
+                <p>Wallet Admin</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         <li class="nav-item">
           <a href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();" class="nav-link">
             <i class="nav-icon fas fa-power-off"></i>
