@@ -29,7 +29,7 @@
             <div class="card-tools">
               <ul class="nav nav-pills ml-auto">
                 <li class="nav-item">
-                  <a href="edit-upgrade-container" class="nav-link active" data-toggle="tab">Edit</a>
+                  <a href="#edit-upgrade-container" class="nav-link active" data-toggle="tab">Edit</a>
                 </li>
                 <li class="nav-item">
                   <a href="#create-upgrade" class="nav-link" data-toggle="tab">Create</a>
