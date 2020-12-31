@@ -3,83 +3,88 @@
 namespace App\Http\Controllers;
 
 use App\Models\WalletAdmin;
+use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Log;
 
 class WalletAdminController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+  public function index()
+  {
+    $walletAdmin = WalletAdmin::all();
+    return view("setting.walletadmin.index", ["walletAdmin" => $walletAdmin]);
+  }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+  public function create()
+  {
+    return view("setting.walletadmin.add");
+  }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+  public function update(Request $request)
+  {
+    $request->validate([
+      "id" => "required|integer|exists:wallet_admins,id",
+      "name" => "required|string",
+      "camel" => "required|string",
+      "btc" => "required|string",
+      "doge" => "required|string",
+      "ltc" => "required|string",
+      "eth" => "required|string"
+    ]);
+    $walletAdmin = WalletAdmin::find($request->id);
+    $walletAdmin->name = $request->name;
+    $walletAdmin->wallet_camel = $request->camel;
+    $walletAdmin->wallet_btc = $request->btc;
+    $walletAdmin->wallet_ltc = $request->ltc;
+    $walletAdmin->wallet_eth = $request->eth;
+    $walletAdmin->wallet_doge = $request->doge;
+    $walletAdmin->save();
+    return redirect(route("setting.wallet-admin.index"))->withMessage($walletAdmin->name . " edited successfully");
+  }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\WalletAdmin  $walletAdmin
-     * @return \Illuminate\Http\Response
-     */
-    public function show(WalletAdmin $walletAdmin)
-    {
-        //
-    }
+  public function store(Request $request)
+  {
+    $request->validate([
+      "name" => "required|string",
+      "camel" => "required|string",
+      "btc" => "required|string",
+      "doge" => "required|string",
+      "ltc" => "required|string",
+      "eth" => "required|string"
+    ]);
+    $walletAdmin = new WalletAdmin();
+    $walletAdmin->name = $request->name;
+    $walletAdmin->wallet_camel = $request->camel;
+    $walletAdmin->wallet_btc = $request->btc;
+    $walletAdmin->wallet_ltc = $request->ltc;
+    $walletAdmin->wallet_eth = $request->eth;
+    $walletAdmin->wallet_doge = $request->doge;
+    $walletAdmin->save();
+    return redirect(route("setting.wallet-admin.index"))->with("message", $walletAdmin->name . " created");
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\WalletAdmin  $walletAdmin
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(WalletAdmin $walletAdmin)
-    {
-        //
+  public function edit($id)
+  {
+    try {
+      $id = Crypt::decrypt($id);
+      $wallet = WalletAdmin::find($id);
+      return view("setting.walletadmin.edit", ["wallet" => $wallet]);
+    } catch (DecryptException $e) {
+      Log::alert("failed decrypt " . $id . ", probably invalid");
+      return redirect()->back()->withErrors("failed decrypt " . $id . ", probably invalid");
     }
+  }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\WalletAdmin  $walletAdmin
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, WalletAdmin $walletAdmin)
-    {
-        //
+  public function destroy(Request $request, $id)
+  {
+    if (!$id) {
+      return redirect(route("setting.upgrade-list.index"));
     }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\WalletAdmin  $walletAdmin
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(WalletAdmin $walletAdmin)
-    {
-        //
-    }
+    $id = Crypt::decrypt($id);
+    $wallet = WalletAdmin::find($id);
+    $name = $wallet->name;
+    $wallet->delete();
+    return redirect()->back()->with("message", $name . " has been deleted");
+  }
 }

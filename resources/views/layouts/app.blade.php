@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,7 +9,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>WALL Street</title>
   <link rel="shortcut icon" href="{{ asset('logo.png') }}" type="image/x-icon">
-  <meta content='{{ asset('logo.png') }}' property='og:image'/>
+  <meta content='{{ asset('logo.png') }}' property='og:image' />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Favicon icon -->
   <link rel="shortcut icon" href="{{ asset('assets/dist/img/logo.jpg') }}" type="image/x-icon">
@@ -28,60 +29,61 @@
   <link rel="stylesheet" href="{{ asset('assets/plugins/toastr/toastr.min.css') }}">
   @yield('addCss')
 </head>
+
 <body class="sidebar-mini accent-primary">
-<div id="app" class="wrapper">
-  <!-- header -->
-  <x-header/>
-  <!-- /.header -->
+  <div id="app" class="wrapper">
+    <!-- header -->
+    <x-header />
+    <!-- /.header -->
 
-  <!-- sidebar -->
-  <x-side-bar/>
-  <!-- /sidebar -->
+    <!-- sidebar -->
+    <x-side-bar />
+    <!-- /sidebar -->
 
-  <div class="content-wrapper">
-    <section class="content-header">
-      <div class="container-fluid">
-        @yield('title')
-      </div>
-    </section>
+    <div class="content-wrapper">
+      <section class="content-header">
+        <div class="container-fluid">
+          @yield('title')
+        </div>
+      </section>
 
-    <section class="content">
-      @yield('content')
-    </section>
-  </div>
-
-  <footer class="main-footer text-sm">
-    <div class="float-right d-none d-sm-block">
-      <b>Version</b> 0.0.1 BETA
+      <section class="content">
+        @yield('content')
+      </section>
     </div>
-    <strong>Copyright &copy; 2020 <a href="#">SEO Catalog</a>.</strong> All rights reserved.
-  </footer>
+
+    <footer class="main-footer text-sm">
+      <div class="float-right d-none d-sm-block">
+        <b>Version</b> 0.0.1 BETA
+      </div>
+      <strong>Copyright &copy; 2020 <a href="#">SEO Catalog</a>.</strong> All rights reserved.
+    </footer>
 
 
-  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-    {{ csrf_field() }}
-  </form>
-</div>
-<!-- jQuery -->
-<script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
-<!-- Bootstrap 4 -->
-<script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-<!-- AdminLTE App -->
-<script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
-<!-- SweetAlert2 -->
-<script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-<!-- Toastr -->
-<script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
-@yield('addJs')
+    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+      {{ csrf_field() }}
+    </form>
+  </div>
+  <!-- jQuery -->
+  <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
+  <!-- Bootstrap 4 -->
+  <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+  <!-- AdminLTE App -->
+  <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+  <!-- SweetAlert2 -->
+  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+  <!-- Toastr -->
+  <script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
+  @yield('addJs')
 
-<script>
-  $(function () {
+  <script>
     const Toast = Swal.mixin({
       toast: true,
       position: 'top-end',
       showConfirmButton: false,
       timer: 6000
     });
+    $(function () {
 
     @if(session()->has('message'))
     Toast.fire({
@@ -99,6 +101,7 @@
     @endforeach
     @endif
   });
-</script>
+  </script>
 </body>
+
 </html>
