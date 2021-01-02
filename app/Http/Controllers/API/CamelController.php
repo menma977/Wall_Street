@@ -111,12 +111,23 @@ class CamelController extends Controller
 
         return response()->json(['message' => 'success transfer Camel Wall']);
       }
+
+      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
+      if ($camelResponse->ok() && $camelResponse->successful()) {
+        $tronBalance = $camelResponse->json()["balance"];
+        if ($tronBalance <= $request->input('value')) {
+          return response()->json(['message' => 'tron required'], 500);
+        }
+      } else {
+        return response()->json(['message' => 'failed load tron'], 500);
+      }
+
       Log::info("============WD===================");
       Log::info(Auth::user()->private_key);
       Log::info($request->input('wallet'));
       Log::info($request->input('value'));
       Log::info("=================================");
-      if ($request->input("tron") == "true") {
+      if ($request->input("tron") === "true") {
         $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
