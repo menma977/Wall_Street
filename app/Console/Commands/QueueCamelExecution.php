@@ -181,7 +181,7 @@ class QueueCamelExecution extends Command
    */
   private function withdraw($id, $privateKey, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
       'privkey' => $privateKey,
       'to' => $targetWallet,
       'amount' => $value,

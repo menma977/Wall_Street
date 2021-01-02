@@ -19,7 +19,7 @@ class ShareQueueExecution extends Command
   /**
    * The name and signature of the console command.
    *
-   * @var string1
+   * @var string
    */
   protected $signature = 'shareQueueExecution';
 
@@ -38,9 +38,6 @@ class ShareQueueExecution extends Command
   public function handle()
   {
     $shareQueue = ShareQueue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
-    Log::info("=================GET===================");
-    Log::info($shareQueue);
-    Log::info("====================================");
     if ($shareQueue) {
       try {
         $user = User::find($shareQueue->user_id);
@@ -85,7 +82,7 @@ class ShareQueueExecution extends Command
    */
   private function withdraw($privateKey, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
       'privkey' => $privateKey,
       'to' => $targetWallet,
       'amount' => $value,

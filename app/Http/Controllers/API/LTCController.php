@@ -92,6 +92,9 @@ class LTCController extends Controller
         }
 
         $targetUser = User::where('wallet_ltc', $request->input('wallet'))->first();
+        if (!$targetUser) {
+          return response()->json(['message' => 'wallet undefined'], 500);
+        }
 
         $formatLTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 

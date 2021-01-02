@@ -92,6 +92,9 @@ class DogeController extends Controller
         }
 
         $targetUser = User::where('wallet_doge', $request->input('wallet'))->first();
+        if (!$targetUser) {
+          return response()->json(['message' => 'wallet undefined'], 500);
+        }
 
         $formatDoge = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 

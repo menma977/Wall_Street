@@ -92,6 +92,9 @@ class ETHController extends Controller
         }
 
         $targetUser = User::where('wallet_eth', $request->input('wallet'))->first();
+        if (!$targetUser) {
+          return response()->json(['message' => 'wallet undefined'], 500);
+        }
 
         $formatETH = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 

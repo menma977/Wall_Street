@@ -91,6 +91,9 @@ class CamelController extends Controller
         }
 
         $targetUser = User::where('wallet_camel', $request->input('wallet'))->first();
+        if (!$targetUser) {
+          return response()->json(['message' => 'wallet undefined'], 500);
+        }
 
         $formatDoge = $request->input('value') / CamelSetting::find(1)->to_dollar;
 
@@ -114,13 +117,13 @@ class CamelController extends Controller
       Log::info($request->input('value'));
       Log::info("=================================");
       if ($request->input("tron") == "true") {
-        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),
         ]);
       } else {
-        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtrx', [
+        $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),
