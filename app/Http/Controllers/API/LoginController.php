@@ -85,16 +85,16 @@ class LoginController extends Controller
               $dollar = 0;
             }
 
-            $tronResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
+            $camelBalance = 0;
             $tronBalance = 0;
+            $tronResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
             if ($tronResponse->ok() && $tronResponse->successful()) {
-              $tronBalance = $tronResponse->json()["balance"];
+              $camelBalance = $tronResponse->json()["balance"];
             }
 
             $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $user->wallet_camel);
-            $camelBalance = 0;
             if ($camelResponse->ok() && $camelResponse->successful()) {
-              $camelBalance = $camelResponse->json()["balance"];
+              $tronBalance = $camelResponse->json()["balance"];
             }
 
             return response()->json([
