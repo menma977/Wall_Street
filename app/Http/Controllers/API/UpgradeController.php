@@ -20,6 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 class UpgradeController extends Controller
 {
@@ -94,7 +95,25 @@ class UpgradeController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
-    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->first();
+    if ($request->type === "camel") {
+      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
+      if ($camelResponse->ok() && $camelResponse->successful()) {
+        $tronBalance = $camelResponse->json()["balance"];
+      } else {
+        $tronBalance = 0;
+      }
+      $upgradeList = UpgradeList::where("id", $request->upgrade_list)
+        ->where($request->type . "_usd", "<=", $request->balance)
+        ->where($request->type . "_usd", "<=", $request->balance_fake)
+        ->where($request->type . "_usd", "<=", $tronBalance)
+        ->first();
+    } else {
+      $upgradeList = UpgradeList::where("id", $request->upgrade_list)
+        ->where($request->type . "_usd", "<=", $request->balance)
+        ->where($request->type . "_usd", "<=", $request->balance_fake)
+        ->first();
+    }
+
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
