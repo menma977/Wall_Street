@@ -49,7 +49,7 @@ class UpgradeList extends Command
           if ($tronResponse->ok() && $tronResponse->successful()) {
             $item->camel = $tronResponse->body();
           }
-          $item->camel_usd = $item->dollar / $item->camel;
+          $item->camel_usd = number_format($item->dollar / $item->camel, 8, '.', '');;
           $item->save();
         }
       } else {
