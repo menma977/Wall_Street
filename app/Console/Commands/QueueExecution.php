@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use App\Models\BankAccount;
+use App\Models\CamelSetting;
+use App\Models\Dice;
 use App\Models\Queue;
 use App\Models\ShareIt;
 use App\Models\ShareQueue;
@@ -144,7 +146,7 @@ class QueueExecution extends Command
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
-      $upgrade->description = 'BuyWall ' . $user->username;
+      $upgrade->description = 'BUY WALL ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue;
@@ -170,7 +172,7 @@ class QueueExecution extends Command
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = 1;
-      $upgrade->description = 'IT ' . $user->username;
+      $upgrade->description = 'FEE ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue;
@@ -188,11 +190,10 @@ class QueueExecution extends Command
    */
   private function share($type, $value)
   {
-    $balanceToShare = $value / 20;
-    for ($i = 0; $i < 20; $i++) {
+    for ($i = 0; $i < round($value); $i++) {
       $shareQueue = new ShareQueue();
-      $shareQueue->user_id = User::where('id', '!=', 2)->inRandomOrder()->first()->id;
-      $shareQueue->value = $balanceToShare;
+      $shareQueue->user_id = Dice::where('user_id', '!=', 2)->inRandomOrder()->first()->id;
+      $shareQueue->value = CamelSetting::find(1)->share_value;
       $shareQueue->type = $type;
       $shareQueue->save();
     }

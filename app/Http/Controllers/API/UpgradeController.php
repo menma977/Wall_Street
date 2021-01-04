@@ -96,16 +96,14 @@ class UpgradeController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
-    if ($request->type === "camel") {
-      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
-      if ($camelResponse->ok() && $camelResponse->successful()) {
-        $tronBalance = $camelResponse->json()["balance"];
-        if ($tronBalance == 0) {
-          return response()->json(["message" => "Required minimum 10 tron"], 500);
-        }
-      } else {
-        return response()->json(["message" => "Failed load tron "], 500);
+    $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
+    if ($camelResponse->ok() && $camelResponse->successful()) {
+      $tronBalance = $camelResponse->json()["balance"];
+      if ($tronBalance == 0) {
+        return response()->json(["message" => "Required minimum 10 tron"], 500);
       }
+    } else {
+      return response()->json(["message" => "Failed load tron"], 500);
     }
 
     $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", ($request->balance + $request->balance_fake))->first();
@@ -133,18 +131,34 @@ class UpgradeController extends Controller
           $userBinary = User::where("id", $binary->up_line)->first();
           $current = $userBinary->id ?? "";
         }
-        if (Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit')) {
-          $balance_left -= $cut;
-          $q = new Queue([
-            "user_id" => Auth::id(),
-            "send" => $userBinary->id,
-            "value" => $this->toFixed($this->toFixed($cut, 2), 2),
-            "type" => $request->type . "_level",
-            "total" => $this->toFixed($balance_left, 2),
-          ]);
-          $q->save();
+        $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit');
+        if ($sumUpLine) {
+          $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
+          if ($sumUpLineValue >= $cut) {
+            $balance_left -= $cut;
+            $q = new Queue([
+              "user_id" => Auth::id(),
+              "send" => $userBinary->id,
+              "value" => $this->toFixed($this->toFixed($cut, 2), 2),
+              "type" => $request->type . "_level",
+              "total" => $this->toFixed($balance_left, 2),
+            ]);
+            $q->save();
 
-          $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
+            $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
+          } else {
+            $balance_left -= $sumUpLineValue;
+            $q = new Queue([
+              "user_id" => Auth::id(),
+              "send" => $userBinary->id,
+              "value" => $this->toFixed($this->toFixed($sumUpLineValue, 2), 2),
+              "type" => $request->type . "_level",
+              "total" => $this->toFixed($balance_left, 2),
+            ]);
+            $q->save();
+
+            $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $sumUpLineValue, $upgradeList);
+          }
         }
       }
 
@@ -181,7 +195,7 @@ class UpgradeController extends Controller
       ]);
       $share_queue->save();
 
-      $this->cutFakeBalance($request->type, 1, "BuyWall|IT|Share", ($total_random_share + $balance_left + $buy_wall + $wallet_it), $upgradeList);
+      $this->cutFakeBalance($request->type, 1, "BUY WALL|FEE|SHARE", ($total_random_share + $balance_left + $buy_wall + $wallet_it), $upgradeList);
 
       $upgrade = new Upgrade([
         'from' => Auth::id(),

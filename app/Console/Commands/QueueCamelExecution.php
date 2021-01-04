@@ -124,7 +124,7 @@ class QueueCamelExecution extends Command
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
-      $upgrade->description = 'BuyWall ' . $user->username;
+      $upgrade->description = 'BUY WALL ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue;
@@ -148,7 +148,7 @@ class QueueCamelExecution extends Command
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = 1;
-      $upgrade->description = 'IT ' . $user->username;
+      $upgrade->description = 'FEE ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue;
