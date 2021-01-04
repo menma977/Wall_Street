@@ -26,8 +26,6 @@ class RegisterController extends Controller
   {
     if (filter_var($request->input('username'), FILTER_VALIDATE_EMAIL)) {
       $type = 'email';
-    } else if (filter_var($request->input('username'), FILTER_VALIDATE_INT)) {
-      $type = 'phone';
     } else {
       $type = 'username';
     }
