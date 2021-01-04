@@ -96,17 +96,17 @@ class ETHController extends Controller
           return response()->json(['message' => 'wallet undefined'], 500);
         }
 
-        $formatETH = number_format($request->input('value') / 10 ** 8, 8, '.', '');
+        $formatBalance = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $balance = new ETH();
         $balance->user_id = $targetUser->id;
-        $balance->description = "receive eth " . $formatETH . " from " . Auth::user()->username;
+        $balance->description = "receive eth " . $formatBalance . " from " . Auth::user()->username;
         $balance->debit = $request->input('value');
         $balance->save();
 
         $balance = new ETH();
         $balance->user_id = Auth::id();
-        $balance->description = "send eth " . $formatETH . " to " . $targetUser->username;
+        $balance->description = "send eth " . $formatBalance . " to " . $targetUser->username;
         $balance->credit = $request->input('value');
         $balance->save();
 

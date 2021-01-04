@@ -131,7 +131,7 @@ class UpgradeController extends Controller
           $userBinary = User::where("id", $binary->up_line)->first();
           $current = $userBinary->id ?? "";
         }
-        $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit');
+        $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') > Upgrade::where('to', $userBinary->id)->sum('credit');
         if ($sumUpLine) {
           $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
           if ($sumUpLineValue >= $cut) {

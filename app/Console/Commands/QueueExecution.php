@@ -56,7 +56,7 @@ class QueueExecution extends Command
 
         $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->$targetBalance, 8, '', '');
         $value = $formatValue;
-        Log::info("Balance : $value");
+        Log::info("{$queue->value} * {$upgradeList->idr} / {$upgradeList->$targetBalance} = $value");
 
         if ($typeBalance === 'level') {
           $wallet = "wallet_" . $targetBalance;

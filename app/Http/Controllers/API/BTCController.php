@@ -96,17 +96,17 @@ class BTCController extends Controller
           return response()->json(['message' => 'wallet undefined'], 500);
         }
 
-        $formatBTC = number_format($request->input('value') / 10 ** 8, 8, '.', '');
+        $formatBalance = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $balance = new BTC();
         $balance->user_id = $targetUser->id;
-        $balance->description = "receive btc " . $formatBTC . " from " . Auth::user()->username;
+        $balance->description = "receive btc " . $formatBalance . " from " . Auth::user()->username;
         $balance->debit = $request->input('value');
         $balance->save();
 
         $balance = new BTC();
         $balance->user_id = Auth::id();
-        $balance->description = "send btc " . $formatBTC . " to " . $targetUser->username;
+        $balance->description = "send btc " . $formatBalance . " to " . $targetUser->username;
         $balance->credit = $request->input('value');
         $balance->save();
 

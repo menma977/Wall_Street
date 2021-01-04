@@ -71,7 +71,7 @@ class CamelController extends Controller
   {
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
-      'value' => 'required|numeric',
+      'value' => 'required|numeric|min:1',
       'wallet' => 'required|string',
       'fake' => 'required|string',
       'tron' => 'required|string'
@@ -95,18 +95,18 @@ class CamelController extends Controller
           return response()->json(['message' => 'wallet undefined'], 500);
         }
 
-        $formatDoge = $request->input('value') / CamelSetting::find(1)->to_dollar;
+        $formatBalance = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $balance = new Camel();
         $balance->user_id = $targetUser->id;
-        $balance->description = "receive camel " . $formatDoge . " from " . Auth::user()->username;
-        $balance->debit = $formatDoge;
+        $balance->description = "receive camel " . $formatBalance . " from " . Auth::user()->username;
+        $balance->debit = $request->input('value');
         $balance->save();
 
         $balance = new Camel();
         $balance->user_id = Auth::id();
-        $balance->description = "send camel " . $formatDoge . " to " . $targetUser->username;
-        $balance->credit = $formatDoge;
+        $balance->description = "send camel " . $formatBalance . " to " . $targetUser->username;
+        $balance->credit = $request->input('value');
         $balance->save();
 
         return response()->json(['message' => 'success transfer Camel Wall']);

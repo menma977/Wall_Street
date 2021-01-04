@@ -96,17 +96,17 @@ class DogeController extends Controller
           return response()->json(['message' => 'wallet undefined'], 500);
         }
 
-        $formatDoge = number_format($request->input('value') / 10 ** 8, 8, '.', '');
+        $formatBalance = number_format($request->input('value') / 10 ** 8, 8, '.', '');
 
         $balance = new Doge();
         $balance->user_id = $targetUser->id;
-        $balance->description = "receive doge " . $formatDoge . " from " . Auth::user()->username;
+        $balance->description = "receive doge " . $formatBalance . " from " . Auth::user()->username;
         $balance->debit = $request->input('value');
         $balance->save();
 
         $balance = new Doge();
         $balance->user_id = Auth::id();
-        $balance->description = "send doge " . $formatDoge . " to " . $targetUser->username;
+        $balance->description = "send doge " . $formatBalance . " to " . $targetUser->username;
         $balance->credit = $request->input('value');
         $balance->save();
 
