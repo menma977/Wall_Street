@@ -22,7 +22,6 @@ class ShareQueueController extends Controller
     $shareQueue = ShareQueue::simplePaginate(20);
     $shareQueue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
-      $item->send = User::find($item->send);
 
       return $item;
     });

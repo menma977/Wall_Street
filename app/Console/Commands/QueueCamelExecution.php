@@ -3,8 +3,10 @@
 namespace App\Console\Commands;
 
 use App\Models\CamelSetting;
+use App\Models\Dice;
 use App\Models\HistoryCamel;
 use App\Models\Queue;
+use App\Models\ShareIt;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
@@ -68,6 +70,7 @@ class QueueCamelExecution extends Command
           $queue->save();
         } else {
           if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $formatValue)) {
+
             $this->share($queue->value);
             $queue->status = true;
           } else {
@@ -141,7 +144,7 @@ class QueueCamelExecution extends Command
    */
   private function it($user, $value, $rawValue)
   {
-    if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $value)) {
+    if ($this->withdraw($user->id, $user->private_key, ShareIt::find(1)->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = 1;
@@ -162,11 +165,10 @@ class QueueCamelExecution extends Command
    */
   private function share($value)
   {
-    $balanceToShare = $value / 20;
-    for ($i = 0; $i < 20; $i++) {
+    for ($i = 0; $i < round($value); $i++) {
       $shareQueue = new ShareQueue();
-      $shareQueue->user_id = User::where('id', '!=', 2)->inRandomOrder()->first()->id;
-      $shareQueue->value = $balanceToShare;
+      $shareQueue->user_id = Dice::where('user_id', '!=', 2)->inRandomOrder()->first()->id;
+      $shareQueue->value = CamelSetting::find(1)->share_value;
       $shareQueue->type = "camel";
       $shareQueue->save();
     }

@@ -6,7 +6,6 @@ use App\Models\Camel;
 use App\Models\CamelSetting;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
-use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -41,10 +40,8 @@ class ShareQueueExecution extends Command
     if ($shareQueue) {
       try {
         $user = User::find($shareQueue->user_id);
-        $upgradeList = UpgradeList::find(1);
-        $formatValue = $shareQueue->value / $upgradeList->camel;
 
-        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $formatValue)) {
+        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareQueue->value)) {
           $upgrade = new Upgrade();
           $upgrade->from = 1;
           $upgrade->to = $user->id;
@@ -56,7 +53,7 @@ class ShareQueueExecution extends Command
 
           $camel = new Camel();
           $camel->user_id = $user->id;
-          $camel->debit = $formatValue;
+          $camel->debit = $shareQueue->value;
           $camel->description = 'Random Share ' . $user->username;
           $camel->save();
 
@@ -87,7 +84,7 @@ class ShareQueueExecution extends Command
       'to' => $targetWallet,
       'amount' => $value,
     ]);
-    Log::info("=================SEND===================");
+    Log::info("=================SEND RANDOM===================");
     Log::info($value . " - " . $targetWallet);
     Log::info($withdraw->body());
     Log::info("====================================");

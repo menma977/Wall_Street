@@ -37,7 +37,7 @@ class RegisterController extends Controller
       'name' => 'required|string',
       'username' => 'required|string|unique:users',
       'email' => 'required|email|unique:users',
-      'phone' => 'required|numeric|min:10|unique:users',
+      'phone' => 'required|numeric|min:10',
       'password' => 'required|same:confirmation_password|min:6',
       'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
     ]);
@@ -117,7 +117,7 @@ class RegisterController extends Controller
       'name' => 'required|string',
       'username' => 'required|string|unique:users',
       'email' => 'required|email|unique:users',
-      'phone' => 'required|numeric|min:10|unique:users',
+      'phone' => 'required|numeric|min:10',
     ]);
 
     try {

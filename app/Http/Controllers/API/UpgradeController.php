@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\BTC;
 use App\Models\Camel;
+use App\Models\Dice;
 use App\Models\Doge;
 use App\Models\ETH;
 use App\Models\LTC;
@@ -99,20 +100,15 @@ class UpgradeController extends Controller
       $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
       if ($camelResponse->ok() && $camelResponse->successful()) {
         $tronBalance = $camelResponse->json()["balance"];
+        if ($tronBalance == 0) {
+          return response()->json(["message" => "Required minimum 10 tron"], 500);
+        }
       } else {
-        $tronBalance = 0;
+        return response()->json(["message" => "Failed load tron "], 500);
       }
-      $upgradeList = UpgradeList::where("id", $request->upgrade_list)
-        ->where($request->type . "_usd", "<=", $request->balance)
-        ->where($request->type . "_usd", "<=", $request->balance_fake)
-        ->where($request->type . "_usd", "<=", $tronBalance)
-        ->first();
-    } else {
-      $upgradeList = UpgradeList::where("id", $request->upgrade_list)
-        ->where($request->type . "_usd", "<=", $request->balance)
-        ->where($request->type . "_usd", "<=", $request->balance_fake)
-        ->first();
     }
+
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", ($request->balance + $request->balance_fake))->first();
 
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
@@ -137,7 +133,7 @@ class UpgradeController extends Controller
           $userBinary = User::where("id", $binary->up_line)->first();
           $current = $userBinary->id ?? "";
         }
-        if ($userBinary->level >= $upgradeList->id && Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit')) {
+        if (Upgrade::where('to', $userBinary->id)->sum('debit') >= Upgrade::where('to', $userBinary->id)->sum('credit')) {
           $balance_left -= $cut;
           $q = new Queue([
             "user_id" => Auth::id(),
@@ -179,13 +175,13 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share, 2),
+        "value" => $this->toFixed($total_random_share + $balance_left, 2),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed($balance_left, 2),
+        "total" => $this->toFixed(0, 2),
       ]);
       $share_queue->save();
 
-      $this->cutFakeBalance($request->type, 1, "BuyWall|IT|Share", ($total_random_share + $buy_wall + $wallet_it), $upgradeList);
+      $this->cutFakeBalance($request->type, 1, "BuyWall|IT|Share", ($total_random_share + $balance_left + $buy_wall + $wallet_it), $upgradeList);
 
       $upgrade = new Upgrade([
         'from' => Auth::id(),
@@ -200,13 +196,49 @@ class UpgradeController extends Controller
 
       Binary::where('down_line', Auth::id())->update(['active' => true]);
       $user = User::find(Auth::id());
-      ++$user->level;
+      $user->level = $request->upgrade_list;
       $user->save();
+
+      for ($i = 0; $i < ($upgradeList->dollar / 10); $i++) {
+        $setDice = new Dice();
+        $setDice->user_id = Auth::id();
+        $setDice->save();
+      }
 
       return response()->json(["message" => "Upgrade now queued"]);
     }
 
-    return response()->json(["message" => "Insufficient balance amount"], 400);
+    if ($request->type == "camel") {
+      return response()->json([
+        "message" => "Insufficient balance amount. balance must " . UpgradeList::where("id", $request->upgrade_list)->first()->camel_usd
+      ], 500);
+    }
+
+    if ($request->type == "doge") {
+      $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->doge_usd / 10 ** 8, 8, '.', '');
+      return response()->json([
+        "message" => "Insufficient balance amount. balance must " . $value
+      ], 500);
+    }
+
+    if ($request->type == "btc") {
+      $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->btc_usd / 10 ** 8, 8, '.', '');
+      return response()->json([
+        "message" => "Insufficient balance amount. balance must " . $value
+      ], 500);
+    }
+
+    if ($request->type == "ltc") {
+      $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->ltc_usd / 10 ** 8, 8, '.', '');
+      return response()->json([
+        "message" => "Insufficient balance amount. balance must " . $value
+      ], 500);
+    }
+
+    $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->eth_usd / 10 ** 8, 8, '.', '');
+    return response()->json([
+      "message" => "Insufficient balance amount. balance must " . $value
+    ], 500);
   }
 
   public function packages()
@@ -226,7 +258,7 @@ class UpgradeController extends Controller
       $shareBalance = new LTC([
         "user_id" => $upLine,
         "description" => $level,
-        "debit" => number_format(($cut * $package->idr) / $package->ltc, 8, '', '')
+        "debit" => number_format((($cut * $package->idr) / $package->ltc), 8, '', '')
       ]);
       $cutBalance = new LTC([
         "user_id" => Auth::id(),
@@ -270,12 +302,12 @@ class UpgradeController extends Controller
       $shareBalance = new Camel([
         "user_id" => $upLine,
         "description" => $level,
-        "debit" => $cut / $package->camel
+        "debit" => number_format($cut / $package->camel, 8, '', '')
       ]);
       $cutBalance = new Camel([
         "user_id" => Auth::id(),
         "description" => $level,
-        "credit" => $cut / $package->camel
+        "credit" => number_format($cut / $package->camel, 8, '', '')
       ]);
     }
     $shareBalance->save();
