@@ -34,7 +34,7 @@ class UpgradeController extends Controller
     $target = Upgrade::where('to', Auth::id())->sum('debit');
 
     $data = [
-      'progress' => $progress > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
+      'progress' => $progress > 0 && $target > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
       'progress_value' => $progress,
       'target' => $target,
     ];
