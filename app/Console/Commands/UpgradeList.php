@@ -2,7 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\CamelSetting;
 use App\Models\Queue;
 use App\Models\ShareQueue;
 use http\Exception;
@@ -34,6 +33,7 @@ class UpgradeList extends Command
   {
     try {
       $get = Http::get("https://indodax.com/api/summaries");
+      $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
       if ($get->ok() || $get->status() === 200 || str_contains($get->body(), 'ticker')) {
         $ticker = $get->json()['tickers'];
         $upgradeList = \App\Models\UpgradeList::all();
@@ -46,7 +46,9 @@ class UpgradeList extends Command
           $item->eth_usd = number_format(($item->dollar * $item->idr) / $item->eth, 8, '', '');
           $item->ltc = $ticker['ltc_idr']['buy'];
           $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
-          $item->camel = CamelSetting::find(1)->to_dollar;
+          if ($tronResponse->ok() && $tronResponse->successful()) {
+            $item->camel = $tronResponse->body();
+          }
           $item->camel_usd = $item->dollar / $item->camel;
           $item->save();
         }
