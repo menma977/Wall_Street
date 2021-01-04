@@ -126,7 +126,7 @@ class UpgradeController extends Controller
         $cut = $upList * $level->firstWhere("level", "Level " . $c_level)->percent;
         $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
         if ($c_level++ === 1) {
-          $userBinary = User::where("id", $binary->sponsor)->first();
+          $userBinary = User::where("id", $binary->up_line)->first();
         } else {
           $userBinary = User::where("id", $binary->up_line)->first();
           $current = $userBinary->id ?? "";
