@@ -167,7 +167,7 @@ class QueueCamelExecution extends Command
   {
     for ($i = 0; $i < round($value); $i++) {
       $shareQueue = new ShareQueue();
-      $shareQueue->user_id = Dice::where('user_id', '!=', 2)->inRandomOrder()->first()->id;
+      $shareQueue->user_id = Dice::where('user_id', '!=', 2)->inRandomOrder()->first()->user_id;
       $shareQueue->value = CamelSetting::find(1)->share_value;
       $shareQueue->type = "camel";
       $shareQueue->save();
