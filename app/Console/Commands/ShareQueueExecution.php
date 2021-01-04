@@ -50,10 +50,12 @@ class ShareQueueExecution extends Command
           $upgrade->level = $user->level;
           $upgrade->credit = $shareQueue->value;
           $upgrade->save();
+          
+          $formatBalanceTrue = number_format($shareQueue->value / 10 ** 8, 8, '', '');
 
           $camel = new Camel();
           $camel->user_id = $user->id;
-          $camel->debit = $shareQueue->value;
+          $camel->debit = $formatBalanceTrue;
           $camel->description = 'Random Share ' . $user->username;
           $camel->save();
 
