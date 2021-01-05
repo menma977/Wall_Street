@@ -84,6 +84,8 @@ class BTCController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
+    Log::info("BTC value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - wallet : " . $request->input('wallet'));
+
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
         $currentBalance = BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit');

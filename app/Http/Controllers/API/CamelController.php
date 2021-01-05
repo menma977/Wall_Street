@@ -80,7 +80,7 @@ class CamelController extends Controller
       return response()->json(['message' => 'your are on queue'], 500);
     }
 
-    Log::info("value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - tron : " . $request->input('tron'));
+    Log::info("CAMEL/TRON value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - tron : " . $request->input('tron') . " - wallet : " . $request->input('wallet'));
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
       if ($request->input('fake') == 'true') {
