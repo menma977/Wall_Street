@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
-use App\Models\CamelSetting;
 use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\UpgradeList;

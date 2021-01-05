@@ -37,6 +37,10 @@ class QueueController extends Controller
     return view('queue.index', $data);
   }
 
+  /**
+   * @param Request $request
+   * @return Application|Factory|View
+   */
   public function show(Request $request)
   {
     $idUser = User::where('username', 'like', $request->input('search'))->first();

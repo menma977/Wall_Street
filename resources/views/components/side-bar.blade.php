@@ -26,6 +26,26 @@
           </a>
         </li>
 
+        {{--user--}}
+        <li class="nav-item">
+          <a href="{{ route('users.index') }}" class="nav-link {{ request()->is('users') ? 'active' : '' }}">
+            <i class="nav-icon fa fa-users"></i>
+            <p>
+              users
+            </p>
+          </a>
+        </li>
+
+        {{--binary--}}
+        <li class="nav-item">
+          <a href="{{ route('binary.index') }}" class="nav-link {{ request()->is('binary') ? 'active' : '' }}">
+            <i class="nav-icon fa fa-network-wired"></i>
+            <p>
+              Network
+            </p>
+          </a>
+        </li>
+
         {{--List Queue--}}
         <li class="nav-item has-treeview {{ request()->is(['queue', 'queue/*']) ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is(['queue', 'queue/*']) ? 'active' : '' }}">
@@ -62,25 +82,25 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="{{ route('setting.camel.index') }}" class="nav-link {{ request()->is(['camel']) ? 'active' : '' }}">
+              <a href="{{ route('setting.camel.index') }}" class="nav-link {{ request()->is(['setting/camel']) ? 'active' : '' }}">
                 <i class="fas fa-coins nav-icon"></i>
-                <p>Camel Settings</p>
+                <p>BANK Settings</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.upgrade-list.index') }}" class="nav-link {{ request()->is(['upgrade-list']) ? 'active' : '' }}">
+              <a href="{{ route('setting.upgrade-list.index') }}" class="nav-link {{ request()->is(['setting/upgrade-list']) ? 'active' : '' }}">
                 <i class="fas fa-money-bill-wave nav-icon"></i>
                 <p>Upgrades Setting</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.share-level.index') }}" class="nav-link {{ request()->is(['share-level']) ? 'active' : '' }}">
+              <a href="{{ route('setting.share-level.index') }}" class="nav-link {{ request()->is(['setting/share-level']) ? 'active' : '' }}">
                 <i class="fas fa-cubes nav-icon"></i>
                 <p>Share Level Settings</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.wallet-admin.index') }}" class="nav-link {{ request()->is(['wallet-admin']) ? 'active' : '' }}">
+              <a href="{{ route('setting.wallet-admin.index') }}" class="nav-link {{ request()->is(['setting/wallet-admin']) ? 'active' : '' }}">
                 <i class="fas fa-wallet nav-icon"></i>
                 <p>Wallet Admin</p>
               </a>

@@ -27,7 +27,7 @@ class UpgradeListController extends Controller
       "idr" => $upgrade->dollar,
     ]);
     $newUpgrade->save();
-    return redirect()->back();;
+    return redirect()->back();
   }
 
   public function update(Request $request)
@@ -39,7 +39,7 @@ class UpgradeListController extends Controller
         }
       }]
     ]);
-    if ($request->method == "idrPerDollar") {
+    if ($request->input('method') == "idrPerDollar") {
       $request->validate([
         "value" => "required|integer"
       ]);

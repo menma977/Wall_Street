@@ -4,7 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
-use App\Models\UpgradeList;
+use App\Models\Upgrade;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,15 +15,11 @@ class BinaryController extends Controller
   {
     $token = $request->bearerToken();
     $binary = Binary::where('up_line', Auth::user()->id)->get();
+    $dollar = Upgrade::where('to', Auth::id())->where('from', Auth::id())->sum('debit');
+    $packageUser = "$" . number_format($dollar / 3, 2, ',', '.');
     $binary->map(function ($item) {
       $item->userDownLine = User::find($item->down_line);
-      if ($item->userDownLine->level == 0) {
-        $dollar = 0;
-      } elseif ($item->userDownLine->level == 10) {
-        $dollar = 10000;
-      } else {
-        $dollar = UpgradeList::find($item->userDownLine->level)->dollar;
-      }
+      $dollar = Upgrade::where('to', $item->userDownLine->id)->where('from', $item->userDownLine->id)->sum('debit');
       $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
 
       return $item;
@@ -31,6 +27,7 @@ class BinaryController extends Controller
 
     $data = [
       'binary' => $binary,
+      'packageUser' => $packageUser,
       'token' => $token
     ];
 
@@ -42,13 +39,7 @@ class BinaryController extends Controller
     $binary = Binary::where('up_line', $id)->get();
     $binary->map(function ($item) {
       $item->userDownLine = User::find($item->down_line);
-      if ($item->userDownLine->level == 0) {
-        $dollar = 0;
-      } elseif ($item->userDownLine->level == 10) {
-        $dollar = 10000;
-      } else {
-        $dollar = UpgradeList::find($item->userDownLine->level)->dollar;
-      }
+      $dollar = Upgrade::where('to', $item->userDownLine->id)->where('from', $item->userDownLine->id)->sum('debit');
       $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
 
       return $item;

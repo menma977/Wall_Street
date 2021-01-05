@@ -1,4 +1,4 @@
-@extends('layouts.guest')
+@extends('layouts.app')
 
 @section('title')
   <div class="row mb-2">
@@ -89,14 +89,13 @@
         document.getElementById('caret-' + user).className = "fa fa-plus-circle";
       } else {
         document.getElementById('caret-' + user).className = "fa fa-minus-circle";
-        let url = "{{ route('api.binary.show', '%data%') }}";
+        let url = "{{ route('binary.show', '%data%') }}";
         url = url.replace('%data%', user);
         fetch(url, {
           method: 'GET',
           headers: new Headers({
             'Content-Type': 'application/x-www-form-urlencoded',
             "X-CSRF-TOKEN": $("input[name='_token']").val(),
-            "Authorization": "Bearer {{ $token }}",
             "Access-Control-Allow-Origin": "*",
           }),
         }).then((response) => response.json()).then((responseData) => {

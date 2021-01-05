@@ -83,6 +83,10 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('/show', [CamelController::class, 'show']);
     Route::get('/create', [CamelController::class, 'create']);
     Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
+
+    Route::group(['prefix' => 'history', 'as' => 'history.'], function () {
+      Route::post('', [CamelController::class, 'index']);
+    });
   });
 
   Route::group(['prefix' => 'tron', 'as' => 'tron.'], function () {

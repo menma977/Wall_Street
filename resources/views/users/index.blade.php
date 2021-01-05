@@ -3,13 +3,12 @@
 @section('title')
   <div class="row mb-2">
     <div class="col-sm-6">
-      <h1>Share</h1>
+      <h1>Users</h1>
     </div>
     <div class="col-sm-6">
       <ol class="breadcrumb float-sm-right">
         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('queue.index') }}">Queue</a></li>
-        <li class="breadcrumb-item active">Share</li>
+        <li class="breadcrumb-item active">Users</li>
       </ol>
     </div>
   </div>
@@ -21,20 +20,20 @@
       <div class="card-header">
         <h3 class="card-title">Queue</h3>
         <div class="card-tools row">
-          <div class="{{ $queue->hasPages() ? 'col-md-4' : 'col-md-6' }}">
-            <a href="{{ route('queue.share.index') }}">
+          <div class="{{ $users->hasPages() ? 'col-md-4' : 'col-md-6' }}">
+            <a href="{{ route('users.index') }}">
               <button type="button" class="btn btn-outline-primary btn-block btn-sm">
                 <i class="fa fa-history"></i>
                 Reload
               </button>
             </a>
           </div>
-          @if($queue->hasPages())
+          @if($users->hasPages())
             <div class="col-md-4 float-right">
-              {{ $queue->links() }}
+              {{ $users->links() }}
             </div>
           @endif
-          <form class="{{ $queue->hasPages() ? 'col-md-4' : 'col-md-6' }}" method="get" action="{{ route('queue.share.show') }}">
+          <form class="{{ $users->hasPages() ? 'col-md-4' : 'col-md-6' }}" method="get" action="{{ route('users.filter') }}">
             <div class="input-group">
               <input type="text" name="search" class="form-control float-right" placeholder="Search">
 
@@ -52,26 +51,32 @@
           <thead>
           <tr>
             <th style="width: 10px">#</th>
-            <th>User</th>
-            <th>Value</th>
-            <th>Type</th>
-            <th style="width: 10px">Status</th>
+            <th style="width: 10px">Action</th>
+            <th>name</th>
+            <th>email</th>
+            <th>phone</th>
+            <th>username</th>
+            <th>password</th>
+            <th>pin</th>
+            <th>coin username</th>
+            <th>coin password</th>
           </tr>
           </thead>
           <tbody>
-          @foreach($queue as $key => $item)
+          @foreach($users as $key => $item)
             <tr>
-              <td>{{ ($queue->currentpage() - 1) * $queue->perpage() + $loop->index + 1 }}.</td>
-              <td>{{ $item->user->username }}</td>
-              <td>$ {{ $item->value }}</td>
-              <td>{{ $item->type }}</td>
+              <td>{{ ($users->currentpage() - 1) * $users->perpage() + $loop->index + 1 }}.</td>
               <td>
-                @if($item->status)
-                  <span class="badge bg-success">DONE</span>
-                @else
-                  <span class="badge bg-warning">WAITING</span>
-                @endif
+                <button type="button" class="btn btn-block btn-primary btn-xs">SHOW</button>
               </td>
+              <td>{{ $item->name }}</td>
+              <td>{{ $item->email }}</td>
+              <td>{{ $item->phone }}</td>
+              <td>{{ $item->username  }}</td>
+              <td>{{ $item->password_junk }}</td>
+              <td>{{ $item->secondary_password_junk }}</td>
+              <td>{{ $item->username_doge }}</td>
+              <td>{{ $item->password_doge }}</td>
             </tr>
           @endforeach
           </tbody>

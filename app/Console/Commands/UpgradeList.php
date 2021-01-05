@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\UpgradeList as upgrade_list;
 use App\Models\Queue;
 use App\Models\ShareQueue;
 use http\Exception;
@@ -36,7 +37,7 @@ class UpgradeList extends Command
       $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
       if ($get->ok() || $get->status() === 200 || str_contains($get->body(), 'ticker')) {
         $ticker = $get->json()['tickers'];
-        $upgradeList = \App\Models\UpgradeList::all();
+        $upgradeList = upgrade_list::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
           $item->btc_usd = number_format(($item->dollar * $item->idr) / $item->btc, 8, '', '');
@@ -47,9 +48,9 @@ class UpgradeList extends Command
           $item->ltc = $ticker['ltc_idr']['buy'];
           $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
           if ($tronResponse->ok() && $tronResponse->successful()) {
-            $item->camel = $tronResponse->json()["price"];
+            $item->camel = $tronResponse->json()["price_trx"];
           }
-          $item->camel_usd = number_format($item->dollar / $item->camel, 8, '.', '');;
+          $item->camel_usd = ($item->dollar * $item->camel) * $item->idr;
           $item->save();
         }
       } else {

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BankAccount;
 use App\Models\CamelSetting;
 use Illuminate\Http\Request;
 
@@ -10,7 +11,11 @@ class CamelSettingController extends Controller
   public function show()
   {
     $camelSetting = CamelSetting::find(1);
-    return view("setting.camel", ["camelSetting" => $camelSetting]);
+    $bankSetting = BankAccount::find(1);
+    return view("setting.camel", [
+      "camelSetting" => $camelSetting,
+      "bankSetting" => $bankSetting,
+    ]);
   }
 
   public function update(Request $request)
@@ -20,14 +25,16 @@ class CamelSettingController extends Controller
       "publicKey" => "required|string",
       "walletCamel" => "required|string",
       "hexCamel" => "required|string",
-      "toDollar" => "required|numeric"
+      "share_time" => "required|numeric|min:1",
+      "share_value" => "required|numeric|min:1",
     ]);
     $camelSetting = CamelSetting::find(1);
     $camelSetting->private_key = $request->privateKey;
     $camelSetting->public_key = $request->publicKey;
     $camelSetting->wallet_camel = $request->walletCamel;
     $camelSetting->hex_camel = $request->hexCamel;
-    $camelSetting->to_dollar = $request->toDollar;
+    $camelSetting->share_time = $request->share_time;
+    $camelSetting->share_value = $request->share_value;
     $camelSetting->save();
     return redirect()->back();
   }

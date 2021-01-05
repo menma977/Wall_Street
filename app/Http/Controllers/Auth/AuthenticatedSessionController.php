@@ -10,45 +10,49 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthenticatedSessionController extends Controller
 {
-    /**
-     * Display the login view.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function create()
-    {
-        return view('auth.login');
+  /**
+   * Display the login view.
+   *
+   * @return \Illuminate\View\View
+   */
+  public function create()
+  {
+    return view('auth.login');
+  }
+
+  /**
+   * Handle an incoming authentication request.
+   *
+   * @param \App\Http\Requests\Auth\LoginRequest $request
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function store(LoginRequest $request)
+  {
+    $request->authenticate();
+
+    $request->session()->regenerate();
+
+    if (Auth::user()->role != 1) {
+      Auth::logout();
     }
 
-    /**
-     * Handle an incoming authentication request.
-     *
-     * @param  \App\Http\Requests\Auth\LoginRequest  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function store(LoginRequest $request)
-    {
-        $request->authenticate();
+    return redirect(RouteServiceProvider::HOME);
+  }
 
-        $request->session()->regenerate();
+  /**
+   * Destroy an authenticated session.
+   *
+   * @param \Illuminate\Http\Request $request
+   * @return \Illuminate\Http\RedirectResponse
+   */
+  public function destroy(Request $request)
+  {
+    Auth::logout();
 
-        return redirect(RouteServiceProvider::HOME);
-    }
+    $request->session()->invalidate();
 
-    /**
-     * Destroy an authenticated session.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function destroy(Request $request)
-    {
-        Auth::logout();
+    $request->session()->regenerateToken();
 
-        $request->session()->invalidate();
-
-        $request->session()->regenerateToken();
-
-        return redirect('/');
-    }
+    return redirect('/');
+  }
 }

@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\BankAccountController;
+use App\Http\Controllers\BinaryController;
 use App\Http\Controllers\CamelSettingController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UpgradeListController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WalletAdminController;
@@ -47,6 +50,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
   });
 
   Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
+    Route::get("/balance", [SettingController::class, "balance"])->name("balance");
+
+    Route::group(['prefix' => 'bank/coin', 'as' => 'bank.'], function () {
+      Route::post("/edit", [BankAccountController::class, "update"])->name("edit");
+    });
+
     Route::group(['prefix' => 'upgrade-list', 'as' => 'upgrade-list.'], function () {
       Route::get("", [UpgradeListController::class, "show"])->name("index");
       Route::post("/edit", [UpgradeListController::class, "update"])->name("edit");
@@ -75,7 +84,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
   });
 
   Route::group(['prefix' => 'users', 'as' => 'users.'], function () {
-    Route::get("", [UserController::class, "show"])->name("list");
+    Route::get("", [UserController::class, "index"])->name("index");
+    Route::get("filter", [UserController::class, "filter"])->name("filter");
+    Route::get("/{id}/show", [UserController::class, "show"])->name("show");
+  });
+
+  Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {
+    Route::get("", [BinaryController::class, "index"])->name("index");
+    Route::get('/{id}/show', [BinaryController::class, 'show'])->name("show");
   });
 });
 

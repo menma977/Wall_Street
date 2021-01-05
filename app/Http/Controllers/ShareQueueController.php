@@ -19,7 +19,7 @@ class ShareQueueController extends Controller
    */
   public function index()
   {
-    $shareQueue = ShareQueue::simplePaginate(20);
+    $shareQueue = ShareQueue::paginate(20);
     $shareQueue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
 

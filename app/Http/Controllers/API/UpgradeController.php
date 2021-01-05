@@ -31,7 +31,7 @@ class UpgradeController extends Controller
   public function index()
   {
     $progress = Upgrade::where('to', Auth::id())->sum('credit');
-    $target = Upgrade::where('to', Auth::id())->sum('debit');
+    $target = Upgrade::where('to', Auth::id())->where('from', Auth::id())->sum('debit');
 
     $data = [
       'progress' => $progress > 0 && $target > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
@@ -128,6 +128,7 @@ class UpgradeController extends Controller
         $userBinary = User::where("id", $binary->up_line)->first();
         $current = $userBinary->id ?? "";
         $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') > Upgrade::where('to', $userBinary->id)->sum('credit');
+        $c_level++;
         if ($sumUpLine) {
           $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
           if ($sumUpLineValue >= $cut) {
@@ -156,7 +157,6 @@ class UpgradeController extends Controller
             $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $sumUpLineValue, $upgradeList);
           }
         }
-        $c_level++;
       }
 
       $balance_left -= $wallet_it;

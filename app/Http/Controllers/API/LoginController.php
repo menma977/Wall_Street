@@ -64,7 +64,7 @@ class LoginController extends Controller
 
           $doge999 = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
             'a' => 'Login',
-            'key' => 'f3023b66b9304852abddc71ccd8237e9',
+            'key' => 'ec01af0702f3467a808ba52679e1ee61',
             'username' => $user->username_doge,
             'password' => $user->password_doge
           ]);
