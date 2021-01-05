@@ -254,7 +254,7 @@ class UpgradeController extends Controller
 
   public function packages()
   {
-    $packages = UpgradeList::select(["id", "dollar"])->get();
+    $packages = UpgradeList::select(["id", "dollar", "camel_usd", "btc_usd", "ltc_usd", "doge_usd", "eth_usd"])->get();
     return response()->json(["packages" => $packages]);
   }
 
