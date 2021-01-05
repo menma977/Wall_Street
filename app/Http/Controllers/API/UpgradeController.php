@@ -106,7 +106,10 @@ class UpgradeController extends Controller
       return response()->json(["message" => "Failed load tron"], 500);
     }
 
-    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", ($request->balance + $request->balance_fake))->first();
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)
+      ->where($request->type . "_usd", "<=", $request->balance)
+      ->where($request->type . "_usd", "<=", $request->balance_fake)
+      ->first();
 
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
@@ -219,36 +222,37 @@ class UpgradeController extends Controller
       return response()->json(["message" => "Upgrade now queued"]);
     }
 
-    if ($request->type == "camel") {
+    if ($request->type === "camel") {
+      $value = UpgradeList::where("id", $request->upgrade_list)->first()->camel_usd;
       return response()->json([
-        "message" => "Insufficient balance amount. balance must " . UpgradeList::where("id", $request->upgrade_list)->first()->camel_usd
+        "message" => "Insufficient balance amount. you need camel : $value and camel wall : $value"
       ], 500);
     }
 
-    if ($request->type == "doge") {
+    if ($request->type === "doge") {
       $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->doge_usd / 10 ** 8, 8, '.', '');
       return response()->json([
-        "message" => "Insufficient balance amount. balance must " . $value
+        "message" => "Insufficient balance amount. you need doge : $value and doge wall : $value"
       ], 500);
     }
 
-    if ($request->type == "btc") {
+    if ($request->type === "btc") {
       $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->btc_usd / 10 ** 8, 8, '.', '');
       return response()->json([
-        "message" => "Insufficient balance amount. balance must " . $value
+        "message" => "Insufficient balance amount. you need btc : $value and btc wall : $value"
       ], 500);
     }
 
-    if ($request->type == "ltc") {
+    if ($request->type === "ltc") {
       $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->ltc_usd / 10 ** 8, 8, '.', '');
       return response()->json([
-        "message" => "Insufficient balance amount. balance must " . $value
+        "message" => "Insufficient balance amount. you need ltc : $value and ltc wall : $value"
       ], 500);
     }
 
     $value = number_format(UpgradeList::where("id", $request->upgrade_list)->first()->eth_usd / 10 ** 8, 8, '.', '');
     return response()->json([
-      "message" => "Insufficient balance amount. balance must " . $value
+      "message" => "Insufficient balance amount. you need eth : $value and eth wall : $value"
     ], 500);
   }
 

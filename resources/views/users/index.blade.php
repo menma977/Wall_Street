@@ -67,7 +67,9 @@
             <tr>
               <td>{{ ($users->currentpage() - 1) * $users->perpage() + $loop->index + 1 }}.</td>
               <td>
-                <button type="button" class="btn btn-block btn-primary btn-xs">SHOW</button>
+                <a href="{{ route('users.show', $item->id) }}">
+                  <button type="button" class="btn btn-block btn-primary btn-xs">SHOW</button>
+                </a>
               </td>
               <td>{{ $item->name }}</td>
               <td>{{ $item->email }}</td>

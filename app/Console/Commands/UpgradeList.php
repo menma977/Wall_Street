@@ -40,13 +40,13 @@ class UpgradeList extends Command
         $upgradeList = upgrade_list::all();
         foreach ($upgradeList as $item) {
           $item->btc = $ticker['btc_idr']['buy'];
-          $item->btc_usd = number_format(($item->dollar * $item->idr) / $item->btc, 8, '', '');
+          $item->btc_usd = number_format((($item->dollar * $item->idr) / $item->btc) / 2, 8, '', '');
           $item->doge = $ticker['doge_idr']['buy'];
-          $item->doge_usd = number_format(($item->dollar * $item->idr) / $item->doge, 8, '', '');
+          $item->doge_usd = number_format((($item->dollar * $item->idr) / $item->doge) / 2, 8, '', '');
           $item->eth = $ticker['eth_idr']['buy'];
-          $item->eth_usd = number_format(($item->dollar * $item->idr) / $item->eth, 8, '', '');
+          $item->eth_usd = number_format((($item->dollar * $item->idr) / $item->eth) / 2, 8, '', '');
           $item->ltc = $ticker['ltc_idr']['buy'];
-          $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
+          $item->ltc_usd = number_format((($item->dollar * $item->idr) / $item->ltc) / 2, 8, '', '');
           if ($tronResponse->ok() && $tronResponse->successful()) {
             $item->camel = $tronResponse->json()["price_trx"];
           }
