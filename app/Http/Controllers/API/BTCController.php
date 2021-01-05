@@ -83,7 +83,7 @@ class BTCController extends Controller
     if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
       return response()->json(['message' => 'your are on queue'], 500);
     }
-
+    
     Log::info("BTC value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - wallet : " . $request->input('wallet'));
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {

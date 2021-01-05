@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
+use App\Models\CamelSetting;
 use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\UpgradeList;
@@ -144,7 +145,7 @@ class CamelController extends Controller
         return response()->json(['message' => 'success transfer Camel']);
       }
 
-      return response()->json(['message' => 'connection has a problem or value to small or tron to small'], 500);
+      return response()->json(['message' => 'connection has a problem/value to small/tron to small'], 500);
     }
 
     return response()->json(['message' => 'your secondary password is incorrect'], 500);
