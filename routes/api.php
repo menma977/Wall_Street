@@ -5,6 +5,7 @@ use App\Http\Controllers\API\BTCController;
 use App\Http\Controllers\API\CamelController;
 use App\Http\Controllers\API\DogeController;
 use App\Http\Controllers\API\ETHController;
+use App\Http\Controllers\API\HistoryCamelController;
 use App\Http\Controllers\API\LoginController;
 use App\Http\Controllers\API\LogoutController;
 use App\Http\Controllers\API\LTCController;
@@ -85,7 +86,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
 
     Route::group(['prefix' => 'history', 'as' => 'history.'], function () {
-      Route::post('', [CamelController::class, 'index']);
+      Route::post('', [HistoryCamelController::class, 'index']);
     });
   });
 
