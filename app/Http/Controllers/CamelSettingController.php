@@ -26,7 +26,7 @@ class CamelSettingController extends Controller
       "walletCamel" => "required|string",
       "hexCamel" => "required|string",
       "share_time" => "required|numeric|min:1",
-      "share_value" => "required|numeric|min:1",
+      "share_value" => "required|numeric",
     ]);
     $camelSetting = CamelSetting::find(1);
     $camelSetting->private_key = $request->privateKey;
