@@ -47,7 +47,7 @@ class UpgradeList extends Command
           $item->ltc = $ticker['ltc_idr']['buy'];
           $item->ltc_usd = number_format(($item->dollar * $item->idr) / $item->ltc, 8, '', '');
           if ($tronResponse->ok() && $tronResponse->successful()) {
-            $item->camel = $tronResponse->body();
+            $item->camel = $tronResponse->json()["price"];
           }
           $item->camel_usd = number_format($item->dollar / $item->camel, 8, '.', '');;
           $item->save();
