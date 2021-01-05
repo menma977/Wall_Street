@@ -4,7 +4,6 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Camel;
-use App\Models\CamelSetting;
 use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\UpgradeList;
@@ -112,16 +111,6 @@ class CamelController extends Controller
         return response()->json(['message' => 'success transfer Camel Wall']);
       }
 
-      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
-      if ($camelResponse->ok() && $camelResponse->successful()) {
-        $tronBalance = $camelResponse->json()["balance"];
-        if ($tronBalance <= $request->input('value')) {
-          return response()->json(['message' => 'tron required'], 500);
-        }
-      } else {
-        return response()->json(['message' => 'failed load tron'], 500);
-      }
-
       Log::info("============WD===================");
       Log::info(Auth::user()->private_key);
       Log::info($request->input('wallet'));
@@ -155,7 +144,7 @@ class CamelController extends Controller
         return response()->json(['message' => 'success transfer Camel']);
       }
 
-      return response()->json(['message' => 'connection has a problem or value to small'], 500);
+      return response()->json(['message' => 'connection has a problem or value to small or tron to small'], 500);
     }
 
     return response()->json(['message' => 'your secondary password is incorrect'], 500);
