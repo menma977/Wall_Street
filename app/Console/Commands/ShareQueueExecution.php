@@ -40,18 +40,19 @@ class ShareQueueExecution extends Command
     if ($shareQueue) {
       try {
         $user = User::find($shareQueue->user_id);
+        $shareValue = CamelSetting::find(1)->share_value;
 
-        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareQueue->value)) {
+        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
           $upgrade = new Upgrade();
           $upgrade->from = 1;
           $upgrade->to = $user->id;
           $upgrade->description = 'Random Share ' . $user->username;
           $upgrade->type = "camel";
           $upgrade->level = $user->level;
-          $upgrade->credit = $shareQueue->value;
+          $upgrade->credit = $shareValue;
           $upgrade->save();
 
-          $formatBalanceTrue = number_format($shareQueue->value * 10 ** 8, 8, '', '');
+          $formatBalanceTrue = number_format($shareValue * 10 ** 8, 8, '', '');
 
           $camel = new Camel();
           $camel->user_id = $user->id;
