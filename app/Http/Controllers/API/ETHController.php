@@ -34,7 +34,7 @@ class ETHController extends Controller
    */
   public function show()
   {
-    $list = ETH::where('user_id', Auth::id())->simplePaginate(20);
+    $list = ETH::where('user_id', Auth::id())->orderBy('id', 'DESC')->simplePaginate(20);
     $list->getCollection()->transform(function ($item) {
       $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
       $item->date = Carbon::parse($item->created_at)->format("d-M-Y");
