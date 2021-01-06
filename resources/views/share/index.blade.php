@@ -20,32 +20,32 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Queue</h3>
-        <div class="card-tools row">
-          <div class="{{ $queue->hasPages() ? 'col-md-4' : 'col-md-6' }}">
-            <a href="{{ route('queue.share.index') }}">
-              <button type="button" class="btn btn-outline-primary btn-block btn-sm">
-                <i class="fa fa-history"></i>
-                Reload
-              </button>
-            </a>
-          </div>
-          @if($queue->hasPages())
-            <div class="col-md-4 float-right">
-              {{ $queue->links() }}
-            </div>
-          @endif
-          <form class="{{ $queue->hasPages() ? 'col-md-4' : 'col-md-6' }}" method="get" action="{{ route('queue.share.show') }}">
-            <div class="input-group">
-              <input type="text" name="search" class="form-control float-right" placeholder="Search">
-
-              <div class="input-group-append">
-                <button type="submit" class="btn btn-default">
-                  <i class="fas fa-search"></i>
-                </button>
-              </div>
-            </div>
-          </form>
+        <div class="card-tools">
+          <a href="{{ route('queue.share.index') }}">
+            <button type="button" class="btn btn-outline-primary btn-block btn-sm">
+              <i class="fa fa-history"></i>
+              Reload
+            </button>
+          </a>
         </div>
+      </div>
+      <div class="card-header">
+        @if($queue->hasPages())
+          <div class="float-right">
+            {{ $queue->links() }}
+          </div>
+        @endif
+        <form method="get" action="{{ route('queue.share.show') }}">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control float-right" placeholder="Search">
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
       <div class="card-body p-0 table-responsive">
         <table class="table text-center">
@@ -53,7 +53,6 @@
           <tr>
             <th style="width: 10px">#</th>
             <th>User</th>
-            <th>Value</th>
             <th>Type</th>
             <th style="width: 10px">Status</th>
           </tr>
@@ -63,7 +62,6 @@
             <tr>
               <td>{{ ($queue->currentpage() - 1) * $queue->perpage() + $loop->index + 1 }}.</td>
               <td>{{ $item->user->username }}</td>
-              <td>$ {{ $item->value }}</td>
               <td>{{ $item->type }}</td>
               <td>
                 @if($item->status)

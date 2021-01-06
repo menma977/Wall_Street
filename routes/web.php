@@ -50,6 +50,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
   });
 
   Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
+    Route::get("/delete/user/{id}/dice", [SettingController::class, "deleteDice"])->name("delete.dice");
     Route::get("/balance", [SettingController::class, "balance"])->name("balance");
 
     Route::group(['prefix' => 'bank/coin', 'as' => 'bank.'], function () {
@@ -87,6 +88,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("", [UserController::class, "index"])->name("index");
     Route::get("filter", [UserController::class, "filter"])->name("filter");
     Route::get("/{id}/show", [UserController::class, "show"])->name("show");
+    Route::get("/{id}/balance", [UserController::class, "balance"])->name("balance");
   });
 
   Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {
