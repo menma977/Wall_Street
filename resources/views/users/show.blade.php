@@ -17,64 +17,110 @@
 
 @section('content')
   <div class="container-fluid">
-    <div class="col-md-12">
-      <button id="load_balance" type="button" class="btn btn-primary btn-block elevation-1 shadow mb-2">
-        <i class="fas fa-sync"></i>
-        Load Balance
-      </button>
-      <div class="row">
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="fab fa-btc"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">BTC</span>
-              <span id="btc" class="info-box-number">0</span>
-            </div>
+    <button id="load_balance" type="button" class="btn btn-primary btn-block elevation-1 shadow mb-2">
+      <i class="fas fa-sync"></i>
+      Load Balance
+    </button>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fab fa-btc"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">BTC</span>
+            <span id="btc" class="info-box-number">0</span>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="fab fa-ethereum"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">ETH</span>
-              <span id="eth" class="info-box-number">0</span>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fab fa-ethereum"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">ETH</span>
+            <span id="eth" class="info-box-number">0</span>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">LTC</span>
-              <span id="ltc" class="info-box-number">0</span>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">LTC</span>
+            <span id="ltc" class="info-box-number">0</span>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="far fa-money-bill-alt"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">DOGE</span>
-              <span id="doge" class="info-box-number">0</span>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="far fa-money-bill-alt"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">DOGE</span>
+            <span id="doge" class="info-box-number">0</span>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="	fas fa-money-bill"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">CAMEL</span>
-              <span id="camel" class="info-box-number">0</span>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="	fas fa-money-bill"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">CAMEL</span>
+            <span id="camel" class="info-box-number">0</span>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="info-box shadow bg-primary">
-            <span class="info-box-icon bg-primary"><i class="	fas fa-money-bill"></i></span>
-            <div class="info-box-content">
-              <span class="info-box-text">TRON</span>
-              <span id="tron" class="info-box-number">0</span>
-            </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="	fas fa-money-bill"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">TRON</span>
+            <span id="tron" class="info-box-number">0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fab fa-btc"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">BTC Wall</span>
+            <span class="info-box-number">{{ $btcBalance }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fab fa-ethereum"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">ETH Wall</span>
+            <span class="info-box-number">{{ $ethBalance }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="fas fa-money-check-alt"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">LTC Wall</span>
+            <span class="info-box-number">{{ $ltcBalance }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="far fa-money-bill-alt"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">DOGE Wall</span>
+            <span class="info-box-number">{{ $dogeBalance }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="info-box shadow bg-primary">
+          <span class="info-box-icon bg-primary"><i class="	fas fa-money-bill"></i></span>
+          <div class="info-box-content">
+            <span class="info-box-text">CAMEL Wall</span>
+            <span class="info-box-number">{{ $camelBalance }}</span>
           </div>
         </div>
       </div>
