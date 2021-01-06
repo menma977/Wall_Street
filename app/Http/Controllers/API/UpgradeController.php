@@ -22,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class UpgradeController extends Controller
 {
@@ -106,10 +107,12 @@ class UpgradeController extends Controller
       return response()->json(["message" => "Failed load tron"], 500);
     }
 
-    $upgradeList = UpgradeList::where("id", $request->upgrade_list)
-      ->where($request->type . "_usd", "<=", $request->balance)
-      ->where($request->type . "_usd", "<=", $request->balance_fake)
-      ->first();
+    if ($request->type === "camel") {
+      $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
+    }
+
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", ">=", $request->balance)->where($request->type . "_usd", ">=", $request->balance_fake)->first();
+    Log::info("{$request->upgrade_list} - $upgradeList");
 
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
@@ -131,7 +134,6 @@ class UpgradeController extends Controller
         $userBinary = User::where("id", $binary->up_line)->first();
         $current = $userBinary->id ?? "";
         $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') > Upgrade::where('to', $userBinary->id)->sum('credit');
-        $c_level++;
         if ($sumUpLine) {
           $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
           if ($sumUpLineValue >= $cut) {
@@ -159,6 +161,7 @@ class UpgradeController extends Controller
 
             $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $sumUpLineValue, $upgradeList);
           }
+          $c_level++;
         }
       }
 
