@@ -19,32 +19,32 @@
     <div class="card">
       <div class="card-header">
         <h3 class="card-title">Queue</h3>
-        <div class="card-tools row">
-          <div class="{{ $users->hasPages() ? 'col-md-4' : 'col-md-6' }}">
-            <a href="{{ route('users.index') }}">
-              <button type="button" class="btn btn-outline-primary btn-block btn-sm">
-                <i class="fa fa-history"></i>
-                Reload
-              </button>
-            </a>
-          </div>
-          @if($users->hasPages())
-            <div class="col-md-4 float-right">
-              {{ $users->links() }}
-            </div>
-          @endif
-          <form class="{{ $users->hasPages() ? 'col-md-4' : 'col-md-6' }}" method="get" action="{{ route('users.filter') }}">
-            <div class="input-group">
-              <input type="text" name="search" class="form-control float-right" placeholder="Search">
-
-              <div class="input-group-append">
-                <button type="submit" class="btn btn-default">
-                  <i class="fas fa-search"></i>
-                </button>
-              </div>
-            </div>
-          </form>
+        <div class="card-tools">
+          <a href="{{ route('users.index') }}">
+            <button type="button" class="btn btn-outline-primary btn-block btn-sm">
+              <i class="fa fa-history"></i>
+              Reload
+            </button>
+          </a>
         </div>
+      </div>
+      <div class="card-header">
+        @if($users->hasPages())
+          <div class="float-right">
+            {{ $users->links() }}
+          </div>
+        @endif
+        <form method="get" action="{{ route('users.filter') }}">
+          <div class="input-group">
+            <input type="text" name="search" class="form-control float-right" placeholder="Search">
+
+            <div class="input-group-append">
+              <button type="submit" class="btn btn-default">
+                <i class="fas fa-search"></i>
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
       <div class="card-body p-0 table-responsive">
         <table class="table text-center">
