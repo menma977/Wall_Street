@@ -44,8 +44,12 @@ class Kernel extends ConsoleKernel
     $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
 
-     $camelSetting = CamelSetting::find(1)->share_time;
-     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    $camelSetting = CamelSetting::find(1)->share_time;
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
   }
 
   /**
