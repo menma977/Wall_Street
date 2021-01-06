@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BTC;
+use App\Models\Camel;
+use App\Models\Doge;
+use App\Models\ETH;
+use App\Models\LTC;
 use App\Models\Upgrade;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
@@ -69,6 +74,11 @@ class UserController extends Controller
       'progress' => $progress > 0 && $debit > 0 ? (int)number_format(($progress / $debit) * 100, 2, '.', '') : 0,
       'debit' => $debit,
       'credit' => $credit,
+      'camelBalance' => number_format((Camel::where('user_id', $id)->sum('debit') - Camel::where('user_id', $id)->sum('credit')) / 10 ** 8, 8),
+      'dogeBalance' => number_format((Doge::where('user_id', $id)->sum('debit') - Doge::where('user_id', $id)->sum('credit')) / 10 ** 8, 8),
+      'ethBalance' => number_format((ETH::where('user_id', $id)->sum('debit') - ETH::where('user_id', $id)->sum('credit')) / 10 ** 8, 8),
+      'ltcBalance' => number_format((LTC::where('user_id', $id)->sum('debit') - LTC::where('user_id', $id)->sum('credit')) / 10 ** 8, 8),
+      'btcBalance' => number_format((BTC::where('user_id', $id)->sum('debit') - BTC::where('user_id', $id)->sum('credit')) / 10 ** 8, 8),
     ];
 
     return view('users.show', $data);

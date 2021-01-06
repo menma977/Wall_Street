@@ -6,6 +6,7 @@ use App\Models\Camel;
 use App\Models\CamelSetting;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
+use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
 use Exception;
@@ -41,6 +42,7 @@ class ShareQueueExecution extends Command
       try {
         $user = User::find($shareQueue->user_id);
         $shareValue = CamelSetting::find(1)->share_value;
+        $camelValue = $shareValue * UpgradeList::find(1)->camel;
 
         if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
           $upgrade = new Upgrade();
@@ -49,10 +51,10 @@ class ShareQueueExecution extends Command
           $upgrade->description = 'Random Share ' . $user->username;
           $upgrade->type = "camel";
           $upgrade->level = $user->level;
-          $upgrade->credit = $shareValue;
+          $upgrade->credit = $camelValue;
           $upgrade->save();
 
-          $formatBalanceTrue = number_format($shareValue * 10 ** 8, 8, '', '');
+          $formatBalanceTrue = number_format($shareValue, 8, '', '');
 
           $camel = new Camel();
           $camel->user_id = $user->id;
@@ -67,7 +69,7 @@ class ShareQueueExecution extends Command
         }
         $shareQueue->save();
       } catch (Exception $e) {
-        Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
+        Log::error($e->getMessage() . ' | Queue Share Line : ' . $e->getLine());
         $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
         $shareQueue->save();
       }
