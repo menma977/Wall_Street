@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BankAccount;
 use App\Models\CamelSetting;
 use App\Models\Dice;
+use App\Models\ShareQueue;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
@@ -14,6 +15,7 @@ class SettingController extends Controller
   public function deleteDice($id)
   {
     Dice::where('user_id', $id)->delete();
+    ShareQueue::where('user_id', $id)->delete();
 
     return redirect()->back()->with(['message' => 'success delete dice']);
   }
