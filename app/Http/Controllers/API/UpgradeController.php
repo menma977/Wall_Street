@@ -109,7 +109,6 @@ class UpgradeController extends Controller
     }
 
     if ($request->type === "camel") {
-      $request->balance = number_format($request->balance / 10 ** 8, 8, '.', '');
       $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
     }
 
