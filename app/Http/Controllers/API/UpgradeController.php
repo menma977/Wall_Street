@@ -23,7 +23,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use phpDocumentor\Reflection\Types\Boolean;
 
 class UpgradeController extends Controller
 {
@@ -121,8 +120,6 @@ class UpgradeController extends Controller
     Log::info($request->balance_fake);
     Log::info($result);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
-
-    return response()->json(["message" => "please wait 1 minute"], 500);
 
     if ($result) {
       $upList = $upgradeList->dollar / 2;
