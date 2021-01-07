@@ -111,8 +111,13 @@ class UpgradeController extends Controller
       $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
     }
 
-    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", ">=", $request->balance)->where($request->type . "_usd", ">=", $request->balance_fake)->first();
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->first();
+    Log::info("==================Upgrade+++++++++++++++++++++++++++");
     Log::info("{$request->upgrade_list} - $upgradeList");
+    Log::info($request->type);
+    Log::info($request->balance);
+    Log::info($request->balance_fake);
+    Log::info("==================Upgrade+++++++++++++++++++++++++++");
 
     if ($upgradeList) {
       $upList = $upgradeList->dollar / 2;
@@ -272,7 +277,7 @@ class UpgradeController extends Controller
 
   private function cutFakeBalance($type, $upLine, $level, $cut, $package)
   {
-    if ($type == "ltc") {
+    if ($type === "ltc") {
       $shareBalance = new LTC([
         "user_id" => $upLine,
         "description" => $level,
@@ -283,7 +288,7 @@ class UpgradeController extends Controller
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->ltc, 8, '', '')
       ]);
-    } else if ($type == "btc") {
+    } else if ($type === "btc") {
       $shareBalance = new BTC([
         "user_id" => $upLine,
         "description" => $level,
@@ -294,7 +299,7 @@ class UpgradeController extends Controller
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->btc, 8, '', '')
       ]);
-    } else if ($type == "eth") {
+    } else if ($type === "eth") {
       $shareBalance = new ETH([
         "user_id" => $upLine,
         "description" => $level,
@@ -305,7 +310,7 @@ class UpgradeController extends Controller
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->eth, 8, '', '')
       ]);
-    } else if ($type == "doge") {
+    } else if ($type === "doge") {
       $shareBalance = new Doge([
         "user_id" => $upLine,
         "description" => $level,

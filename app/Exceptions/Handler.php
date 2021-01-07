@@ -51,7 +51,7 @@ class Handler extends ExceptionHandler
   public function render($request, $e)
   {
     if ($e instanceof ThrottleRequestsException) {
-      return response()->json(['message' => 'to many request please slow down and wait 1 minute'], 500);
+      return response()->json(['message' => 'please slow down and wait 1 minute'], 500);
     }
 
     return parent::render($request, $e);
