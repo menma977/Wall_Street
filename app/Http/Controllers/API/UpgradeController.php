@@ -111,15 +111,17 @@ class UpgradeController extends Controller
       $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
     }
 
-    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->where($request->type . "_usd", "<=", $request->balance)->where($request->type . "_usd", "<=", $request->balance_fake)->first();
+    $upgradeList = UpgradeList::where("id", $request->upgrade_list)->first();
+    $result = $this->converter($request->type, $request->balance, $request->balance_fake, $upgradeList);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
     Log::info("{$request->upgrade_list} - $upgradeList");
     Log::info($request->type);
     Log::info($request->balance);
     Log::info($request->balance_fake);
+    Log::info($result);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
 
-    if ($upgradeList) {
+    if ($result) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
       $level = ShareLevel::all();
@@ -335,5 +337,37 @@ class UpgradeController extends Controller
     }
     $shareBalance->save();
     $cutBalance->save();
+  }
+
+  /**
+   * @param $type
+   * @param $balance
+   * @param $fakeBalance
+   * @param $package
+   * @return bool
+   */
+  private function converter($type, $balance, $fakeBalance, $package)
+  {
+    if ($type === "doge") {
+      return $package->doge_usd <= $balance && $package->doge_usd <= $fakeBalance;
+    }
+
+    if ($type === "camel") {
+      return $package->camel_usd <= $balance && $package->camel_usd <= $fakeBalance;
+    }
+
+    if ($type === "btc") {
+      return $package->btc_usd <= $balance && $package->btc_usd <= $fakeBalance;
+    }
+
+    if ($type === "ltc") {
+      return $package->ltc_usd <= $balance && $package->ltc_usd <= $fakeBalance;
+    }
+
+    if ($type === "eth") {
+      return $package->eth_usd <= $balance && $package->eth_usd <= $fakeBalance;
+    }
+
+    return false;
   }
 }
