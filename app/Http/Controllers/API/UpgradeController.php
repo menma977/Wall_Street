@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use phpDocumentor\Reflection\Types\Boolean;
 
 class UpgradeController extends Controller
 {
@@ -108,6 +109,7 @@ class UpgradeController extends Controller
     }
 
     if ($request->type === "camel") {
+      $request->balance = number_format($request->balance / 10 ** 8, 8, '.', '');
       $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
     }
 
@@ -344,9 +346,9 @@ class UpgradeController extends Controller
    * @param $balance
    * @param $fakeBalance
    * @param $package
-   * @return bool
+   * @return Boolean
    */
-  private function converter($type, $balance, $fakeBalance, $package)
+  private function converter($type, $balance, $fakeBalance, $package): Boolean
   {
     if ($type === "doge") {
       return $package->doge_usd <= $balance && $package->doge_usd <= $fakeBalance;
