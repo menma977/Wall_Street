@@ -46,7 +46,7 @@ class QueueCamelExecution extends Command
       try {
         $user = User::find($queue->user_id);
         $upgradeList = UpgradeList::find(1);
-        $formatValue = number_format($queue->value / $upgradeList->camel, 8, '', '');
+        $formatValue = number_format($queue->value / $upgradeList->camel, 6, '.', '');
         if ($queue->type === 'camel_level') {
           if ($this->level($user, User::find($queue->send), $formatValue, $queue->value)) {
             $queue->status = true;
