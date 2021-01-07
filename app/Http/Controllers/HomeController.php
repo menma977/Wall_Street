@@ -6,6 +6,7 @@ use App\Models\HistoryCamel;
 use App\Models\Queue;
 use App\Models\ShareLevel;
 use App\Models\ShareQueue;
+use App\Models\Upgrade;
 use App\Models\User;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
@@ -26,11 +27,14 @@ class HomeController extends Controller
 
     $level = ShareLevel::count() - 2;
 
+    $upgrade = Upgrade::whereColumn('from', 'to')->whereNotNull('debit')->count();
+
     $data = [
       'verifiedUser' => $verifiedUser,
       'verifiedProgress' => $verifiedProgress == 0 ? 0 : number_format(($verifiedProgress / $verifiedUser) * 100, 1),
       'countHistoryCamel' => $countHistoryCamel,
-      'level' => $level
+      'level' => $level,
+      'upgrade' => $upgrade
     ];
 
     return view('dashboard', $data);
