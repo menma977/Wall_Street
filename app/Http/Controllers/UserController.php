@@ -85,6 +85,7 @@ class UserController extends Controller
   }
 
   /**
+   * @param $id
    * @return JsonResponse
    */
   public function balance($id)
@@ -137,7 +138,7 @@ class UserController extends Controller
    */
   private function camel($wallet): Response
   {
-    return Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $wallet);
+    return Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $wallet);
   }
 
   /**
@@ -146,6 +147,6 @@ class UserController extends Controller
    */
   private function tron($wallet): Response
   {
-    return Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $wallet);
+    return Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $wallet);
   }
 }
