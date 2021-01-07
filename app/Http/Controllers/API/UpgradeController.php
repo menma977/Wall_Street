@@ -123,6 +123,8 @@ class UpgradeController extends Controller
     Log::info($result);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
 
+    return response()->json(["message" => "please wait 1 minute"], 500);
+
     if ($result) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
@@ -346,9 +348,9 @@ class UpgradeController extends Controller
    * @param $balance
    * @param $fakeBalance
    * @param $package
-   * @return Boolean
+   * @return bool
    */
-  private function converter($type, $balance, $fakeBalance, $package): Boolean
+  private function converter($type, $balance, $fakeBalance, $package)
   {
     if ($type === "doge") {
       return $package->doge_usd <= $balance && $package->doge_usd <= $fakeBalance;
