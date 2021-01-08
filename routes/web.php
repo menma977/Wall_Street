@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdvancedSettingController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BinaryController;
 use App\Http\Controllers\CamelSettingController;
@@ -52,6 +53,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::group(['prefix' => 'setting', 'as' => 'setting.'], function () {
     Route::get("/delete/user/{id}/dice", [SettingController::class, "deleteDice"])->name("delete.dice");
     Route::get("/balance", [SettingController::class, "balance"])->name("balance");
+
+    Route::group(['prefix' => 'advanced', 'as' => 'advanced.'], function () {
+      Route::get("", [AdvancedSettingController::class, "show"])->name("index");
+      Route::post("/version", [AdvancedSettingController::class, "version"])->name("version");
+      Route::post("/maintenance", [AdvancedSettingController::class, "maintenance"])->name("maintenance");
+    });
 
     Route::group(['prefix' => 'bank/coin', 'as' => 'bank.'], function () {
       Route::post("/edit", [BankAccountController::class, "update"])->name("edit");

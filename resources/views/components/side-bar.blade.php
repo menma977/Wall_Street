@@ -1,7 +1,8 @@
 <aside class="main-sidebar sidebar-light-primary elevation-4">
   <!-- Brand Logo -->
   <a href="#" class="brand-link">
-    <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-1" style="opacity: .8">
+    <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-1"
+      style="opacity: .8">
     <div class="brand-text font-weight-light"><strong>SEO</strong> <small>Catalog</small></div>
   </a>
 
@@ -16,7 +17,8 @@
     </div>
 
     <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu" data-accordion="false">
+      <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu"
+        data-accordion="false">
         <li class="nav-item">
           <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
             <i class="nav-icon fa fa-home"></i>
@@ -28,7 +30,8 @@
 
         {{--user--}}
         <li class="nav-item">
-          <a href="{{ route('users.index') }}" class="nav-link {{ request()->is(['users', 'users/*']) ? 'active' : '' }}">
+          <a href="{{ route('users.index') }}"
+            class="nav-link {{ request()->is(['users', 'users/*']) ? 'active' : '' }}">
             <i class="nav-icon fa fa-users"></i>
             <p>
               users
@@ -63,7 +66,8 @@
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('queue.share.index') }}" class="nav-link {{ request()->is(['queue/share']) ? 'active' : '' }}">
+              <a href="{{ route('queue.share.index') }}"
+                class="nav-link {{ request()->is(['queue/share']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Share</p>
               </a>
@@ -82,34 +86,46 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
-              <a href="{{ route('setting.camel.index') }}" class="nav-link {{ request()->is(['setting/camel']) ? 'active' : '' }}">
+              <a href="{{ route('setting.camel.index') }}"
+                class="nav-link {{ request()->is(['setting/camel']) ? 'active' : '' }}">
                 <i class="fas fa-coins nav-icon"></i>
                 <p>BANK Settings</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.upgrade-list.index') }}" class="nav-link {{ request()->is(['setting/upgrade-list']) ? 'active' : '' }}">
+              <a href="{{ route('setting.upgrade-list.index') }}"
+                class="nav-link {{ request()->is(['setting/upgrade-list']) ? 'active' : '' }}">
                 <i class="fas fa-money-bill-wave nav-icon"></i>
                 <p>Upgrades Setting</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.share-level.index') }}" class="nav-link {{ request()->is(['setting/share-level']) ? 'active' : '' }}">
+              <a href="{{ route('setting.share-level.index') }}"
+                class="nav-link {{ request()->is(['setting/share-level']) ? 'active' : '' }}">
                 <i class="fas fa-cubes nav-icon"></i>
                 <p>Share Level Settings</p>
               </a>
             </li>
             <li class="nav-item">
-              <a href="{{ route('setting.wallet-admin.index') }}" class="nav-link {{ request()->is(['setting/wallet-admin']) ? 'active' : '' }}">
+              <a href="{{ route('setting.wallet-admin.index') }}"
+                class="nav-link {{ request()->is(['setting/wallet-admin']) ? 'active' : '' }}">
                 <i class="fas fa-wallet nav-icon"></i>
                 <p>Wallet Admin</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('setting.advanced.index') }}"
+                class="nav-link {{ request()->is(['setting/advanced']) ? 'active' : '' }}">
+                <i class="fas fa-tools nav-icon"></i>
+                <p>Advanced Settings</p>
               </a>
             </li>
           </ul>
         </li>
 
         <li class="nav-item">
-          <a href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();" class="nav-link">
+          <a href="{{ route('logout') }}"
+            onclick="event.preventDefault();document.getElementById('logout-form').submit();" class="nav-link">
             <i class="nav-icon fas fa-power-off"></i>
             <p>
               Logout
