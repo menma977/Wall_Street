@@ -157,9 +157,9 @@ class UpgradeController extends Controller
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($this->toFixed($cut, 3), 3),
+              "value" => $this->toFixed($cut, 8),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 3),
+              "total" => $this->toFixed($balance_left, 8),
             ]);
             $q->save();
 
@@ -170,9 +170,9 @@ class UpgradeController extends Controller
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($this->toFixed($sumUpLineValue, 3), 3),
+              "value" => $this->toFixed($sumUpLineValue, 8),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 3),
+              "total" => $this->toFixed($balance_left, 8),
             ]);
             $q->save();
 
@@ -187,9 +187,9 @@ class UpgradeController extends Controller
       $it_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 1,
-        "value" => $this->toFixed($wallet_it, 3),
+        "value" => $this->toFixed($wallet_it, 8),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 3),
+        "total" => $this->toFixed($balance_left, 8),
       ]);
       $it_queue->save();
 
@@ -199,9 +199,9 @@ class UpgradeController extends Controller
       $buy_wall_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 3),
+        "value" => $this->toFixed($buy_wall, 8),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 3),
+        "total" => $this->toFixed($balance_left, 8),
       ]);
       $buy_wall_queue->save();
 
@@ -210,9 +210,9 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share + $balance_left, 3),
+        "value" => $this->toFixed($total_random_share + $balance_left, 8),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed(0, 3),
+        "total" => $this->toFixed(0, 8),
       ]);
       $share_queue->save();
 
