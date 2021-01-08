@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Binary;
 use App\Models\BTC;
 use App\Models\Camel;
 use App\Models\Doge;
@@ -10,7 +11,9 @@ use App\Models\ETH;
 use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\Setting;
+use App\Models\Upgrade;
 use App\Models\UpgradeList;
+use App\Models\User;
 use http\Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -97,6 +100,11 @@ class LoginController extends Controller
               $tronBalance = $camelResponse->json()["balance"];
             }
 
+            $totalMember = User::whereNotNull('email_verified_at')->count();
+            $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
+            $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
+            $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+
             return response()->json([
               'token' => $user->token,
               'cookie' => $user->cookie,
@@ -124,6 +132,9 @@ class LoginController extends Controller
               'fake_eth_balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
               'fake_btc_balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit'),
               'fake_camel_balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit'),
+              'totalMember' => $totalMember,
+              'totalDollar' => $totalDollar,
+              'topSponsor' => $topSponsor
             ]);
           }
 

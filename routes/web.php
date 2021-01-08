@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
     Route::group(['prefix' => 'camel', 'as' => 'camel.'], function () {
       Route::get("", [CamelSettingController::class, "show"])->name("index");
+      Route::post("/store", [CamelSettingController::class, "store"])->name("store");
       Route::post("/edit", [CamelSettingController::class, "update"])->name("edit");
     });
     Route::group(['prefix' => 'wallet-admin', 'as' => 'wallet-admin.'], function () {

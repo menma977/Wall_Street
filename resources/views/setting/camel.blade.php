@@ -89,6 +89,38 @@
       </div>
     </div>
 
+    <div class="card card-outline card-primary">
+      <div class="card-header">
+        <h3 class="card-title">Withdraw Camel/TRON</h3>
+      </div>
+      <form method="POST" action="{{ route('setting.camel.store') }}">
+        @csrf
+        <div class="card-body">
+          <div class="form-group">
+            <div class="custom-control custom-radio">
+              <input class="custom-control-input" type="radio" id="type_wallet1" name="type_wallet" value="camel" checked>
+              <label for="type_wallet1" class="custom-control-label">Camel</label>
+            </div>
+            <div class="custom-control custom-radio">
+              <input class="custom-control-input" type="radio" id="type_wallet2" name="type_wallet" value="tron">
+              <label for="type_wallet2" class="custom-control-label">Tron</label>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Wallet</label>
+            <input type="text" class="form-control @error("wallet") is-invalid @enderror" name="wallet" value="{{ old('wallet') }}"/>
+          </div>
+          <div class="form-group">
+            <label>Amount</label>
+            <input type="text" class="form-control @error("amount") is-invalid @enderror" name="amount" value="{{ old('amount') }}"/>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-primary" type="submit">Submit</button>
+        </div>
+      </form>
+    </div>
+
     <div class="card card-primary">
       <div class="card-header">
         <h3 class="card-title">Edit BANK CAMEL</h3>

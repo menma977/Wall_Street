@@ -122,15 +122,15 @@ class CamelController extends Controller
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),
         ]);
+        Log::info(Auth::user()->username . ' TRON send ' . $request->input('value') . ' address ' . $request->input('wallet'));
       } else {
         $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
           'privkey' => Auth::user()->private_key,
           'to' => $request->input('wallet'),
           'amount' => $request->input('value'),
         ]);
+        Log::info(Auth::user()->username . ' Camel send ' . $request->input('value') . ' address ' . $request->input('wallet'));
       }
-
-      Log::info(Auth::user()->username . ' Camel send ' . $request->input('value') . ' address ' . $request->input('wallet'));
       Log::info($withdraw);
 
       if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
