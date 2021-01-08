@@ -34,10 +34,18 @@ class UpgradeController extends Controller
     $progress = Upgrade::where('to', Auth::id())->sum('credit');
     $target = Upgrade::where('to', Auth::id())->where('from', Auth::id())->sum('debit');
 
+    $totalMember = User::whereNotNull('email_verified_at')->count();
+    $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
+    $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
+    $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+
     $data = [
       'progress' => $progress > 0 && $target > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
       'progress_value' => $progress,
       'target' => $target,
+      'totalMember' => $totalMember,
+      'totalDollar' => $totalDollar,
+      'topSponsor' => $topSponsor
     ];
 
     return response()->json($data);
@@ -141,8 +149,8 @@ class UpgradeController extends Controller
         $userBinary = User::where("id", $binary->up_line)->first();
         $current = $userBinary->id ?? "";
         $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') > Upgrade::where('to', $userBinary->id)->sum('credit');
-        if ($sumUpLine) {
-          $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
+        $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
+        if ($sumUpLine && $sumUpLineValue != 0 && $cut != 0) {
           if ($sumUpLineValue >= $cut) {
             $balance_left -= $cut;
             $q = new Queue([
