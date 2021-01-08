@@ -141,7 +141,7 @@ class CamelController extends Controller
         $history->code = $withdraw->json()['txid'];
         $history->save();
 
-        return response()->json(['message' => 'success transfer Camel']);
+        return response()->json(['message' => 'success transfer Camel/tron']);
       }
 
       return response()->json(['message' => 'connection has a problem/value to small/tron to small'], 500);

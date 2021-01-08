@@ -129,6 +129,7 @@ class UpgradeController extends Controller
     Log::info($result);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
 
+    Log::info("==================Upgrade--------------------------------");
     if ($result) {
       $upList = $upgradeList->dollar / 2;
       $balance_left = $upList;
@@ -148,29 +149,30 @@ class UpgradeController extends Controller
         $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
         $userBinary = User::where("id", $binary->up_line)->first();
         $current = $userBinary->id ?? "";
-        $sumUpLine = Upgrade::where('to', $userBinary->id)->sum('debit') > Upgrade::where('to', $userBinary->id)->sum('credit');
-        $sumUpLineValue = Upgrade::where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
-        if ($sumUpLine && $sumUpLineValue != 0 && $cut != 0) {
+        $sumUpLineValue = Upgrade::where('from', $userBinary->id)->where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
+        if ($sumUpLineValue > 0 && $cut > 0) {
           if ($sumUpLineValue >= $cut) {
+            Log::info("idU: {$userBinary->id} cut : $cut  | $sumUpLineValue");
             $balance_left -= $cut;
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($this->toFixed($cut, 2), 2),
+              "value" => $this->toFixed($this->toFixed($cut, 3), 3),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 2),
+              "total" => $this->toFixed($balance_left, 3),
             ]);
             $q->save();
 
             $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
           } else {
             $balance_left -= $sumUpLineValue;
+            Log::info("idU: {$userBinary->id} sumUpLineValue : $sumUpLineValue | $sumUpLineValue");
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($this->toFixed($sumUpLineValue, 2), 2),
+              "value" => $this->toFixed($this->toFixed($sumUpLineValue, 3), 3),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 2),
+              "total" => $this->toFixed($balance_left, 3),
             ]);
             $q->save();
 
@@ -179,14 +181,15 @@ class UpgradeController extends Controller
           $c_level++;
         }
       }
+      Log::info("==================Upgrade--------------------------------");
 
       $balance_left -= $wallet_it;
       $it_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 1,
-        "value" => $this->toFixed($wallet_it, 2),
+        "value" => $this->toFixed($wallet_it, 3),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 2),
+        "total" => $this->toFixed($balance_left, 3),
       ]);
       $it_queue->save();
 
@@ -196,9 +199,9 @@ class UpgradeController extends Controller
       $buy_wall_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 2),
+        "value" => $this->toFixed($buy_wall, 3),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 2),
+        "total" => $this->toFixed($balance_left, 3),
       ]);
       $buy_wall_queue->save();
 
@@ -207,9 +210,9 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share + $balance_left, 2),
+        "value" => $this->toFixed($total_random_share + $balance_left, 3),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed(0, 2),
+        "total" => $this->toFixed(0, 3),
       ]);
       $share_queue->save();
 

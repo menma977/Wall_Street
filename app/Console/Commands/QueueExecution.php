@@ -208,6 +208,14 @@ class QueueExecution extends Command
    */
   private function withdraw($cookie, $value, $wallet, $type)
   {
+    Log::info("====================================");
+    Log::info(number_format($value / 10 ** 8, 8, '.', '') . " - " . $wallet . ' Type : ' . $type);
+    Log::info("====================================");
+
+    if ($value == 0) {
+      return true;
+    }
+
     $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
       'a' => 'Withdraw',
       's' => $cookie,
@@ -216,9 +224,6 @@ class QueueExecution extends Command
       'Totp ' => '',
       'Currency' => $type,
     ]);
-    Log::info("====================================");
-    Log::info(number_format($value / 10 ** 8, 8, '.', '') . " - " . $wallet . ' Type : ' . $type);
-    Log::info("====================================");
 
     Log::info($withdraw->body());
 
