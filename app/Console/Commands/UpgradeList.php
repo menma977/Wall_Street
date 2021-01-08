@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\UpgradeList as upgrade_list;
 use App\Models\Queue;
 use App\Models\ShareQueue;
+use Carbon\Carbon;
 use http\Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
@@ -57,8 +58,8 @@ class UpgradeList extends Command
         Log::error($get);
       }
 
-      Queue::where('status', true)->delete();
-      ShareQueue::where('status', true)->delete();
+      Queue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
+      ShareQueue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
     } catch (Exception $e) {
       Log::warning($e->getMessage() . " Update BTC LINE : " . $e->getLine());
     }

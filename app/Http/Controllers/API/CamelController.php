@@ -134,12 +134,23 @@ class CamelController extends Controller
       Log::info($withdraw);
 
       if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
-        $history = new HistoryCamel();
-        $history->user_id = Auth::id();
-        $history->wallet = $request->input('wallet');
-        $history->value = $request->input('value');
-        $history->code = $withdraw->json()['txid'];
-        $history->save();
+        if ($request->input("tron") === "true") {
+          $history = new HistoryCamel();
+          $history->user_id = Auth::id();
+          $history->wallet = $request->input('wallet');
+          $history->value = $request->input('value');
+          $history->code = $withdraw->json()['txid'];
+          $history->type = "tron";
+          $history->save();
+        } else {
+          $history = new HistoryCamel();
+          $history->user_id = Auth::id();
+          $history->wallet = $request->input('wallet');
+          $history->value = $request->input('value');
+          $history->code = $withdraw->json()['txid'];
+          $history->type = "camel";
+          $history->save();
+        }
 
         return response()->json(['message' => 'success transfer Camel/tron']);
       }

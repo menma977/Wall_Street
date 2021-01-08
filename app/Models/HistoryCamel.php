@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer wallet
  * @property string code
  * @property string value
+ * @property string type
  */
 class HistoryCamel extends Model
 {
@@ -28,5 +29,6 @@ class HistoryCamel extends Model
     'wallet',
     'code',
     'value',
+    'type',
   ];
 }

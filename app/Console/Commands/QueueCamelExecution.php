@@ -204,6 +204,7 @@ class QueueCamelExecution extends Command
       $history->wallet = $targetWallet;
       $history->value = $value;
       $history->code = $withdraw->json()['txid'];
+      $history->type = "usd";
       $history->save();
       return true;
     }

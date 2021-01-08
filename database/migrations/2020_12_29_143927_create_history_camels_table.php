@@ -19,6 +19,7 @@ class CreateHistoryCamelsTable extends Migration
       $table->text('wallet');
       $table->text('code');
       $table->string('value');
+      $table->string('type');
       $table->timestamps();
     });
   }

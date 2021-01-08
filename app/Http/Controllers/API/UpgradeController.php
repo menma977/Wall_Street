@@ -142,6 +142,9 @@ class UpgradeController extends Controller
       $c_level = 1;
       while (true) {
         $binary = Binary::where("down_line", $current)->first();
+        if ($request->upgrade_list == 1 && $c_level > 1) {
+          break;
+        }
         if (!$binary || $c_level >= 9) {
           break;
         }
