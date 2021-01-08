@@ -19,7 +19,7 @@ class ShareQueueController extends Controller
    */
   public function index()
   {
-    $shareQueue = ShareQueue::paginate(20);
+    $shareQueue = ShareQueue::orderBy('id', 'desc')->paginate(20);
     $shareQueue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
 
@@ -43,9 +43,9 @@ class ShareQueueController extends Controller
   {
     $idUser = User::where('username', 'like', $request->input('search'))->first();
     if ($idUser) {
-      $queue = ShareQueue::where('user_id', $idUser->id)->paginate(20);
+      $queue = ShareQueue::where('user_id', $idUser->id)->orderBy('id', 'desc')->paginate(20);
     } else {
-      $queue = ShareQueue::where('type', 'like', $request->input('search'))->orWhere('value', 'like', $request->input('search'))->paginate(20);
+      $queue = ShareQueue::where('type', 'like', $request->input('search'))->orWhere('value', 'like', $request->input('search'))->orderBy('id', 'desc')->paginate(20);
     }
     $queue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
