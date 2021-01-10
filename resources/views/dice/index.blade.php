@@ -3,12 +3,12 @@
 @section('title')
   <div class="row mb-2">
     <div class="col-sm-6">
-      <h1>Queue</h1>
+      <h1>Dice</h1>
     </div>
     <div class="col-sm-6">
       <ol class="breadcrumb float-sm-right">
         <li class="breadcrumb-item"><a href="{{ route('dashboard.index') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Queue</li>
+        <li class="breadcrumb-item active">Dice List</li>
       </ol>
     </div>
   </div>
@@ -53,7 +53,7 @@
       <div class="col-md-6">
         <div class="card card-outline card-primary">
           <div class="card-header">
-            <h3 class="card-title">Queue</h3>
+            <h3 class="card-title">Dice List</h3>
             <div class="card-tools">
               <a href="{{ route('dice.index') }}">
                 <button type="button" class="btn btn-outline-primary btn-block btn-sm">
