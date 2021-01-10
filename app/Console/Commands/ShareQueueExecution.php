@@ -38,11 +38,12 @@ class ShareQueueExecution extends Command
   public function handle()
   {
     $shareQueue = ShareQueue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
-    if ($shareQueue) {
+    $user = User::find($shareQueue->user_id);
+    $sumUpLineValue = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') - Upgrade::where('to', $user->id)->sum('credit');
+    if ($shareQueue && $sumUpLineValue > 0) {
       try {
-        $user = User::find($shareQueue->user_id);
         $shareValue = CamelSetting::find(1)->share_value;
-        $camelValue = $shareValue * UpgradeList::find(1)->camel;
+        $camelValue = ($shareValue * UpgradeList::find(1)->camel) * 2;
 
         if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
           $upgrade = new Upgrade();
@@ -73,6 +74,8 @@ class ShareQueueExecution extends Command
         $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
         $shareQueue->save();
       }
+    } else {
+      ShareQueue::where('user_id', $user->id)->delete();
     }
   }
 
