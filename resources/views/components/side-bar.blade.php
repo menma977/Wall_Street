@@ -41,7 +41,7 @@
 
         {{--dice--}}
         <li class="nav-item">
-          <a href="{{ route('users.index') }}"
+          <a href="{{ route('dice.index') }}"
              class="nav-link {{ request()->is(['dice', 'dice/*']) ? 'active' : '' }}">
             <i class="nav-icon fa fa-dice"></i>
             <p>
