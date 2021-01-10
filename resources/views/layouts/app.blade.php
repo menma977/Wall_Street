@@ -9,7 +9,7 @@
   <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>WALL Street</title>
   <link rel="shortcut icon" href="{{ asset('logo.png') }}" type="image/x-icon">
-  <meta content='{{ asset('logo.png') }}' property='og:image' />
+  <meta content='{{ asset('logo.png') }}' property='og:image'/>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <!-- Favicon icon -->
   <link rel="shortcut icon" href="{{ asset('assets/dist/img/logo.jpg') }}" type="image/x-icon">
@@ -31,59 +31,59 @@
 </head>
 
 <body class="sidebar-mini accent-primary">
-  <div id="app" class="wrapper">
-    <!-- header -->
-    <x-header />
-    <!-- /.header -->
+<div id="app" class="wrapper">
+  <!-- header -->
+  <x-header/>
+  <!-- /.header -->
 
-    <!-- sidebar -->
-    <x-side-bar />
-    <!-- /sidebar -->
+  <!-- sidebar -->
+  <x-side-bar/>
+  <!-- /sidebar -->
 
-    <div class="content-wrapper">
-      <section class="content-header">
-        <div class="container-fluid">
-          @yield('title')
-        </div>
-      </section>
-
-      <section class="content">
-        @yield('content')
-      </section>
-    </div>
-
-    <footer class="main-footer text-sm">
-      <div class="float-right d-none d-sm-block">
-        <b>Version</b> 0.0.1 BETA
+  <div class="content-wrapper">
+    <section class="content-header">
+      <div class="container-fluid">
+        @yield('title')
       </div>
-      <strong>Copyright &copy; 2020 <a href="#">SEO Catalog</a>.</strong> All rights reserved.
-    </footer>
+    </section>
 
-
-    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-      {{ csrf_field() }}
-    </form>
+    <section class="content">
+      @yield('content')
+    </section>
   </div>
-  <!-- jQuery -->
-  <script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
-  <!-- Bootstrap 4 -->
-  <script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-  <!-- AdminLTE App -->
-  <script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
-  <!-- SweetAlert2 -->
-  <script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
-  <!-- Toastr -->
-  <script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
-  @yield('addJs')
 
-  <script>
-    const Toast = Swal.mixin({
-      toast: true,
-      position: 'top-end',
-      showConfirmButton: false,
-      timer: 6000
-    });
-    $(function () {
+  <footer class="main-footer text-sm">
+    <div class="float-right d-none d-sm-block">
+      <b>Version</b> 0.0.1 BETA
+    </div>
+    <strong>Copyright &copy; 2020 <a href="#">SEO Catalog</a>.</strong> All rights reserved.
+  </footer>
+
+
+  <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+    {{ csrf_field() }}
+  </form>
+</div>
+<!-- jQuery -->
+<script src="{{ asset('assets/plugins/jquery/jquery.min.js') }}"></script>
+<!-- Bootstrap 4 -->
+<script src="{{ asset('assets/plugins/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<!-- AdminLTE App -->
+<script src="{{ asset('assets/dist/js/adminlte.min.js') }}"></script>
+<!-- SweetAlert2 -->
+<script src="{{ asset('assets/plugins/sweetalert2/sweetalert2.min.js') }}"></script>
+<!-- Toastr -->
+<script src="{{ asset('assets/plugins/toastr/toastr.min.js') }}"></script>
+@yield('addJs')
+
+<script>
+  const Toast = Swal.mixin({
+    toast: true,
+    position: 'top-end',
+    showConfirmButton: false,
+    timer: 6000
+  });
+  $(function () {
 
     @if(session()->has('message'))
     Toast.fire({
@@ -101,7 +101,7 @@
     @endforeach
     @endif
   });
-  </script>
+</script>
 </body>
 
 </html>

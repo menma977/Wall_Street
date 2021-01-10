@@ -4,6 +4,7 @@ use App\Http\Controllers\AdvancedSettingController;
 use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BinaryController;
 use App\Http\Controllers\CamelSettingController;
+use App\Http\Controllers\DiceController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UpgradeListController;
@@ -42,11 +43,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'queue', 'as' => 'queue.'], function () {
     Route::get("", [QueueController::class, 'index'])->name('index');
-    Route::get("find", [QueueController::class, 'show'])->name('show');
+    Route::get("filter", [QueueController::class, 'show'])->name('show');
 
     Route::group(['prefix' => 'share', 'as' => 'share.'], function () {
       Route::get("", [ShareQueueController::class, 'index'])->name('index');
-      Route::get("find", [ShareQueueController::class, 'show'])->name('show');
+      Route::get("filter", [ShareQueueController::class, 'show'])->name('show');
     });
   });
 
@@ -102,6 +103,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {
     Route::get("", [BinaryController::class, "index"])->name("index");
     Route::get('/{id}/show', [BinaryController::class, 'show'])->name("show");
+  });
+
+  Route::group(['prefix' => 'dice', 'as' => 'dice.'], function () {
+    Route::get("", [DiceController::class, "index"])->name("index");
+    Route::get("filter", [DiceController::class, "show"])->name("show");
+    Route::post("update", [DiceController::class, "update"])->name("update");
   });
 });
 

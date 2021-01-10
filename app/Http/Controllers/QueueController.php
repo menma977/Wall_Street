@@ -21,7 +21,7 @@ class QueueController extends Controller
   public function index($queue = null)
   {
     if (!$queue) {
-      $queue = Queue::orderBy('id', 'desc')->paginate(20)->withQueryString();
+      $queue = Queue::orderBy('id', 'desc')->paginate(20);
     }
     $queue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
@@ -55,6 +55,8 @@ class QueueController extends Controller
 
       return $item;
     });
+
+    $queue->appends(['search' => $request->input('search')]);
 
     $data = [
       'queue' => $queue

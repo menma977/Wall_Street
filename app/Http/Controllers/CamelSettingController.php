@@ -53,10 +53,10 @@ class CamelSettingController extends Controller
     }
 
     if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
-      return redirect()->back()->withInput(['success' => "camel/tron has been send"]);
+      return redirect()->back()->with(['message' => "camel/tron has been send"]);
     }
 
-    return redirect()->back()->withInput(['success' => "failed to send camel/tron"]);
+    return redirect()->back()->with(['message' => "failed to send camel/tron"]);
   }
 
   /**
@@ -82,6 +82,6 @@ class CamelSettingController extends Controller
     $camelSetting->share_value = $request->share_value;
     $camelSetting->save();
 
-    return redirect()->back()->withInput(['success' => "setting has been updated"]);
+    return redirect()->back()->with(['message' => "setting has been updated"]);
   }
 }

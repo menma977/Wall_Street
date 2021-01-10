@@ -53,6 +53,8 @@ class ShareQueueController extends Controller
       return $item;
     });
 
+    $queue->appends(['search' => $request->input('search')]);
+
     $data = [
       'queue' => $queue
     ];

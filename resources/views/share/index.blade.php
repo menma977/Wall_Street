@@ -35,7 +35,7 @@
             {{ $queue->links() }}
           </div>
         @endif
-        <form method="get" action="{{ route('queue.share.show') }}">
+        <form method="get" action="{{ route('queue.share.show', 'search') }}">
           <div class="input-group">
             <input type="text" name="search" class="form-control float-right" placeholder="Search">
 

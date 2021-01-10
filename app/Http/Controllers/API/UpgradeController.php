@@ -237,10 +237,18 @@ class UpgradeController extends Controller
       $user->level = $request->upgrade_list;
       $user->save();
 
-      for ($i = 0; $i < ($upgradeList->dollar / 10); $i++) {
-        $setDice = new Dice();
-        $setDice->user_id = Auth::id();
-        $setDice->save();
+      if ($upgradeList->dollar) {
+        for ($i = 0; $i < (50 / 10); $i++) {
+          $setDice = new Dice();
+          $setDice->user_id = Auth::id();
+          $setDice->save();
+        }
+      } else {
+        for ($i = 0; $i < ($upgradeList->dollar / 10); $i++) {
+          $setDice = new Dice();
+          $setDice->user_id = Auth::id();
+          $setDice->save();
+        }
       }
 
       return response()->json(["message" => "Upgrade now queued"]);
