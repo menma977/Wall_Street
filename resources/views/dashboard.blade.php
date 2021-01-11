@@ -15,85 +15,129 @@
 
 @section('content')
   <div class="container-fluid">
-    <div class="row">
-      <div class="col-md-4">
-        <a href="{{ route('queue.index') }}">
-          <div class="info-box bg-primary">
-            <span class="info-box-icon"><i class="fas fa-spinner"></i></span>
-            <div class="info-box-content">
-              <b class="info-box-text">Queue</b>
-              <span id="queueTarget" class="info-box-number">0</span>
-              <div class="progress">
-                <div id="queueProgress" class="progress-bar" style="width: 0"></div>
-              </div>
-              <div id="queueDescription" class="progress-description"></div>
+    <div class="card card-outline card-primary">
+      <div class="card-body">
+        <div class="progress-group">
+          <span class="progress-text">Queue</span>
+          <span class="float-right"><b id="queueRemaining">0</b>/<b id="queueTarget">0</b></span>
+          <div class="progress progress-sm">
+            <div id="queueProgress" class="progress-bar bg-primary" style="width: 0"></div>
+          </div>
+        </div>
+
+        <div class="progress-group">
+          <span class="progress-text">Share Queue</span>
+          <span class="float-right"><b id="shareRemaining">0</b>/<b id="shareTarget">0</b></span>
+          <div class="progress progress-sm">
+            <div id="shareProgress" class="progress-bar bg-danger" style="width: 0"></div>
+          </div>
+        </div>
+
+        <div class="progress-group">
+          <span class="progress-text">Not Verified User</span>
+          <span class="float-right"><b>{{ $verifiedRemaining }}</b>/<b>{{ $verifiedUser }}</b></span>
+          <div class="progress progress-sm">
+            <div class="progress-bar bg-success" style="width: {{ $verifiedProgress }}%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card card-outline card-primary">
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="userChart" height="180" style="height: 180px;"></canvas>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="description-block border-right">
+              <span class="description-percentage">
+                <i class="fa fa-users"></i>
+              </span>
+              <h5 class="description-header">{{ $total_member }}</h5>
+              <span class="description-text">Total Member</span>
             </div>
           </div>
-        </a>
-      </div>
-      <div class="col-md-4">
-        <a href="{{ route('queue.share.index') }}">
-          <div class="info-box bg-primary">
-            <span class="info-box-icon"><i class="far fa-sun"></i></span>
-            <div class="info-box-content">
-              <b class="info-box-text">Share Queue</b>
-              <span id="shareTarget" class="info-box-number">0</span>
-              <div class="progress">
-                <div id="shareProgress" class="progress-bar" style="width: 0"></div>
-              </div>
-              <div id="shareDescription" class="progress-description"></div>
-            </div>
-          </div>
-        </a>
-      </div>
-      <div class="col-md-4">
-        <div class="info-box bg-cyan">
-          <span class="info-box-icon"><i class="fas fa-sync"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Not Verified User</b>
-            <span class="info-box-number">{{ $verifiedUser }}</span>
-            <div class="progress">
-              <div class="progress-bar" style="width: {{ $verifiedProgress }}%"></div>
-            </div>
-            <div class="progress-description">
-              {{ $verifiedProgress }}% has Verified
+          <div class="col-sm-6">
+            <div class="description-block border-right">
+              <span class="description-percentage {{ $total_member_today > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_member_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+                {{ number_format(($total_member_today / $total_member) * 100, 2) }}%
+              </span>
+              <h5 class="description-header">{{ $total_member_today }}</h5>
+              <span class="description-text">Member Today</span>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="info-box bg-orange">
-          <span class="info-box-icon"><i class="fab fa-ethereum"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Total Upgrade</b>
-            <div class="progress">
-              <div class="progress-bar" style="width: 100%"></div>
+    </div>
+    <div class="card card-outline card-primary">
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="profileChart" height="180" style="height: 180px;"></canvas>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-sm-6">
+            <div class="description-block">
+              <span class="description-percentage">
+                <i class="fas fa-balance-scale"></i>
+              </span>
+              <h5 class="description-header">${{ $turnover }}</h5>
+              <span class="description-text">Turnover</span>
             </div>
-            <h4 class="info-box-number">{{ $upgrade }}</h4>
+          </div>
+          <div class="col-sm-6">
+            <div class="description-block">
+              <span class="description-percentage {{ $turnover_today > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $turnover_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+                {{ number_format(($turnover_today / $turnover) * 100, 2) }}%
+              </span>
+              <h5 class="description-header">${{ $turnover_today }}</h5>
+              <span class="description-text">Turnover Today</span>
+            </div>
           </div>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="info-box bg-teal">
-          <span class="info-box-icon"><i class="far fa-chart-bar"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Total Transaction Camel</b>
-            <div class="progress">
-              <div class="progress-bar" style="width: 100%"></div>
-            </div>
-            <h4 class="info-box-number">{{ $countHistoryCamel }}</h4>
-          </div>
+    </div>
+    <div class="card card-outline card-primary">
+      <div class="card-body">
+        <div class="chart">
+          <canvas id="camelChart" height="180" style="height: 180px;"></canvas>
         </div>
       </div>
-      <div class="col-md-4">
-        <div class="info-box bg-info">
-          <span class="info-box-icon"><i class="far fa-chart-bar"></i></span>
-          <div class="info-box-content">
-            <b class="info-box-text">Total Level</b>
-            <div class="progress">
-              <div class="progress-bar" style="width: 100%"></div>
+      <div class="card-footer">
+        <div class="row">
+          <div class="col-sm-4 col-6">
+            <div class="description-block border-right">
+              <span class="description-percentage">
+                <i class="fas fa-balance-scale"></i>
+              </span>
+              <h5 class="description-header">{{ $total_random_share }} CAMEL</h5>
+              <span class="description-text">Total Share</span>
             </div>
-            <h4 class="info-box-number">{{ $level }}</h4>
+          </div>
+          <div class="col-sm-4 col-6">
+            <div class="description-block border-right">
+              <span class="description-percentage {{ $total_random_share_send > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_random_share_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+                {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
+              </span>
+              <h5 class="description-header">{{ $total_random_share_send }} CAMEL</h5>
+              <span class="description-text">camel sent</span>
+            </div>
+          </div>
+          <div class="col-sm-4 col-6">
+            <div class="description-block">
+              <span class="description-percentage {{ $turnover_today > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $turnover_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+                {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
+              </span>
+              <h5 class="description-header">{{ $total_random_share_not_send }} CAMEL</h5>
+              <span class="description-text">Camel Waiting</span>
+            </div>
           </div>
         </div>
       </div>
@@ -102,8 +146,11 @@
 @endsection
 
 @section('addJs')
+  <script src="{{ asset('assets/plugins/chart.js/Chart.min.js') }}"></script>
   <script>
     $(function () {
+      chartUser();
+      chartProfit();
       getQueue();
       getShareQueue();
 
@@ -122,10 +169,10 @@
         }),
       }).then((response) => response.json()).then((result) => {
         $('#queueTarget').html(result.target);
-        $('#queueProgress').css('width', result.progress + '%');
-        $('#queueDescription').html(result.progress + '% waiting to send');
+        $('#queueRemaining').html(result.remaining);
+        $('#queueProgress').css('width', (100 - result.progress) + '%');
       }).catch((error) => {
-        $('#queueDescription').html(error);
+        $('#queueTarget').html(error);
       });
     }
 
@@ -138,11 +185,101 @@
         }),
       }).then((response) => response.json()).then((result) => {
         $('#shareTarget').html(result.target);
-        $('#shareProgress').css('width', result.progress + '%');
-        $('#shareDescription').html(result.progress + '% waiting to send');
+        $('#shareRemaining').html(result.remaining);
+        $('#shareProgress').css('width', (100 - result.progress) + '%');
       }).catch((error) => {
-        $('#shareDescription').html(error);
+        $('#shareTarget').html(error);
       });
+    }
+
+    function chartUser() {
+      let data = {
+        labels: @json($chartUser->keys()),
+        datasets: [
+          {
+            label: 'Users',
+            backgroundColor: '#007bff',
+            borderColor: '#007bff',
+            pointRadius: false,
+            pointColor: '#007bff',
+            pointStrokeColor: '#007bff',
+            pointHighlightFill: '#007bff',
+            pointHighlightStroke: '#007bff',
+            data: @json($chartUser->flatten())
+          },
+        ]
+      }
+
+      let option = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+      };
+
+      let chart = $('#userChart').get(0).getContext('2d')
+      let chartData = jQuery.extend(true, {}, data)
+
+      new Chart(chart, {
+        type: 'bar',
+        data: chartData,
+        options: option
+      })
+    }
+
+    function chartProfit() {
+      let data = {
+        labels: @json($chartUpgradeTotal->keys()),
+        datasets: [
+          {
+            label: 'Income',
+            backgroundColor: '#28a745',
+            borderColor: '#28a745',
+            pointRadius: false,
+            pointColor: '#28a745',
+            pointStrokeColor: '#28a745',
+            pointHighlightFill: '#28a745',
+            pointHighlightStroke: '#28a745',
+            data: @json($chartUpgradeDebit->flatten())
+          },
+          {
+            label: 'Outcome',
+            backgroundColor: '#dc3545',
+            borderColor: '#dc3545',
+            pointRadius: false,
+            pointColor: '#dc3545',
+            pointStrokeColor: '#dc3545',
+            pointHighlightFill: '#dc3545',
+            pointHighlightStroke: '#dc3545',
+            data: @json($chartUpgradeCredit->flatten())
+          },
+          {
+            label: 'Total',
+            backgroundColor: '#007bff',
+            borderColor: '#007bff',
+            pointRadius: false,
+            pointColor: '#007bff',
+            pointStrokeColor: '#007bff',
+            pointHighlightFill: '#007bff',
+            pointHighlightStroke: '#007bff',
+            data: @json($chartUpgradeTotal->flatten())
+          },
+        ]
+      }
+
+      let option = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+      };
+
+      let chart = $('#profileChart').get(0).getContext('2d')
+      let chartData = jQuery.extend(true, {}, data)
+
+      new Chart(chart, {
+        type: 'bar',
+        data: chartData,
+        options: option
+      })
     }
   </script>
 @endsection
