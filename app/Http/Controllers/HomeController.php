@@ -53,7 +53,7 @@ class HomeController extends Controller
 
     $turnover = $upgradeIn->sum('debit') / 3;
     $turnover_today = $upgradeIn->filter(function ($item) {
-        return Carbon::parse($item->created_at)->format("Y-m-d") == Carbon::now()->format("Y-m-d");
+        return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
       })->sum('debit') / 3;
 
     $total_random_share = number_format(($share->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
@@ -105,8 +105,8 @@ class HomeController extends Controller
    */
   public function queue()
   {
-    $target = $this->queue->count();
-    $progress = $this->queue->where('status', false)->count();
+    $target = Queue::count();
+    $progress = Queue::where('status', false)->count();
 
     $data = [
       'progress' => $progress == 0 ? 0 : number_format(($progress / $target) * 100, 1),
@@ -122,8 +122,8 @@ class HomeController extends Controller
    */
   public function shareQueue()
   {
-    $target = $this->share->count();
-    $progress = $this->share->where('status', false)->count();
+    $target = ShareQueue::count();
+    $progress = ShareQueue::where('status', false)->count();
 
     $data = [
       'progress' => $progress == 0 ? 0 : number_format(($progress / $target) * 100, 1),
