@@ -13,6 +13,7 @@ use App\Http\Controllers\WalletAdminController;
 use App\Http\Controllers\QueueController;
 use App\Http\Controllers\ShareLevelController;
 use App\Http\Controllers\ShareQueueController;
+use App\Http\Controllers\StatsController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,6 +41,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("queue", [HomeController::class, 'queue'])->name('queue');
     Route::get("queue/share", [HomeController::class, 'shareQueue'])->name('queue.share');
   });
+
+  Route::get("/stats/{route}", [StatsController::class, 'index'])->name("stats");
+  Route::get("/stats/{route}/source", [StatsController::class, 'source'])->name("stats.source");
 
   Route::group(['prefix' => 'queue', 'as' => 'queue.'], function () {
     Route::get("", [QueueController::class, 'index'])->name('index');
