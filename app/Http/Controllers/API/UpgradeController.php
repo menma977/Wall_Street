@@ -35,7 +35,7 @@ class UpgradeController extends Controller
     $target = Upgrade::where('to', Auth::id())->where('from', Auth::id())->sum('debit');
 
     $totalMember = User::whereNotNull('email_verified_at')->count();
-    $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
+    $totalDollar = "$ " . number_format(Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->sum('debit') - Upgrade:: whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->sum('credit'), 3);
     $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
     $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
 

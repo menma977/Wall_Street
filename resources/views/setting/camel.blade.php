@@ -163,7 +163,7 @@
               <div class="form-group">
                 <label>Share Time</label>
                 <select class="form-control @error("hexCamel") is-invalid @enderror" name="share_time">
-                  @for($i = 1; $i <= 120; $i++)
+                  @for($i = 1; $i <= 1440; $i++)
                     <option value="{{ $i }}" {{ $i == $camelSetting->share_time ? 'selected' : '' }}>{{ $i }} Minute</option>
                   @endfor
                 </select>
