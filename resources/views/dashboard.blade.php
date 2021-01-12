@@ -151,13 +151,14 @@
     $(function () {
       chartUser();
       chartProfit();
+      chartCamel();
       getQueue();
       getShareQueue();
 
       setInterval(function () {
         getQueue();
         getShareQueue();
-      }, 1000);
+      }, 10000);
     });
 
     function getQueue() {
@@ -277,6 +278,41 @@
 
       new Chart(chart, {
         type: 'bar',
+        data: chartData,
+        options: option
+      })
+    }
+
+    function chartCamel() {
+      let data = {
+        labels: @json($chartCamel->keys()),
+        datasets: [
+          {
+            label: 'Users',
+            backgroundColor: 'transparent',
+            borderColor: '#17a2b8',
+            pointRadius: 3,
+            pointHoverRadius: 2,
+            pointColor: '#17a2b8',
+            pointStrokeColor: '#17a2b8',
+            pointHighlightFill: '#17a2b8',
+            pointHighlightStroke: '#17a2b8',
+            data: @json($chartCamel->flatten())
+          },
+        ]
+      }
+
+      let option = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+      };
+
+      let chart = $('#camelChart').get(0).getContext('2d')
+      let chartData = jQuery.extend(true, {}, data)
+
+      new Chart(chart, {
+        type: 'line',
         data: chartData,
         options: option
       })
