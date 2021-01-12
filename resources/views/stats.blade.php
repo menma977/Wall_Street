@@ -49,6 +49,13 @@
 <script src="{{ asset('assets/plugins/datatables/jquery.dataTables.min.js') }}"></script>
 <script src="{{ asset('assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js') }}"></script>
 <script>
+  $.fn.dataTableExt.sErrMode = function(e, _, message){
+    console.log(message);
+    Swal.fire({
+      icon: "error",
+      title: message.substr(`DataTables warning: table id=${e.sTableId} - `.length)
+    })
+  }
   $("#the-table").DataTable({
     pageLength: 10,
     paging: true,

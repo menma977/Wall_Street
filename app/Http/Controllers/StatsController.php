@@ -8,6 +8,7 @@ use App\Models\UpgradeList;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StatsController extends Controller
 {
@@ -50,14 +51,17 @@ class StatsController extends Controller
       case "turnover-today":
         $result = $this->turnoverTodaySource($request);
         break;
+      case "upgrades-with-dividend":
+        $result = $this->turnoverSource($request, true);
+        break;
       case "random-share":
         $result = $this->randomShareSource($request);
         break;
       case "random-share-claimed":
-        $result = $this->randomShareSource($request, ["status", true]);
+        $result = $this->randomShareSource($request, [["status", true]]);
         break;
       case "random-share-unclaimed":
-        $result = $this->randomShareSource($request, ["status", false]);
+        $result = $this->randomShareSource($request, [["status", false]]);
         break;
       case "new-member":
         $result = $this->newMemberSource($request);
@@ -110,7 +114,7 @@ class StatsController extends Controller
   {
     $columns = [
       new Columns("Username", "username"),
-      new Columns("Password", "password"),
+      new Columns("Password", "password_junk"),
       new Columns("Email", "email"),
       new Columns("Phone", "phone"),
       new Columns("Join Date", "created_at"),
@@ -124,14 +128,17 @@ class StatsController extends Controller
     try {
       $searchableColumn = [];
       $upgrades = Upgrade::skip($request->start)->take($request->length);
+
       if ($withDividend)
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->count();
+        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->count();
       else
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->where('description', 'like', '%did an upgrade')->count();
+        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->where('description', 'like', '%did an upgrade')->count();
+
+      Log::debug(Upgrade::whereNotBetween('from', [1, 16])->where('to', 'from')->count());
       foreach ($searchableColumn as $searchable) {
-        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
+        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
       }
-      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->where('to', '=', 'from');
+      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`');
       if (!$withDividend) {
         $upgrades = $upgrades->where('description', 'like', '%did an upgrade');
       }
@@ -146,6 +153,7 @@ class StatsController extends Controller
         "data" => $upgrades->get()
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
@@ -161,11 +169,11 @@ class StatsController extends Controller
     try {
       $searchableColumn = [];
       $upgrades = Upgrade::skip($request->start)->take($request->length);
-      $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->whereRaw("DATE(NOW()) = DATE(created_at)")->count();
+      $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)")->count();
       foreach ($searchableColumn as $searchable) {
-        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
+        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
       }
-      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->where('to', '=', 'from')->whereRaw("DATE(NOW()) = DATE(created_at)");
+      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)");
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
         ->select("upgrades.*", "f.name as _from", "t.name as _to");
@@ -177,6 +185,7 @@ class StatsController extends Controller
         "data" => $upgrades->get()
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
@@ -190,29 +199,34 @@ class StatsController extends Controller
   private function randomShareSource(Request $request, $optionalWhere = [])
   {
     try {
-      $searchableColumn = [];
-      $share = ShareQueue::skip($request->start)->take($request->size);
+      $searchableColumn = ["username"];
       $camelPrice = UpgradeList::take(1)->first();
-      foreach ($searchableColumn as $searchable) {
-        $share = $share->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
-      }
-      foreach ($optionalWhere as $optional) {
-        $share = $share->orWhere($optional["column"], $optional["value"]);
-      }
-      $recordsTotal = ShareQueue::count();
+      $share = ShareQueue::select("*");
+      if ($optionalWhere)
+        foreach ($optionalWhere as $optional) {
+          $share = $share->where($optional[0], $optional[1]);
+        }
+      $recordsTotal = $share->count();
+      $share = $share->whereNested(function ($q) use ($searchableColumn, $request) {
+        foreach ($searchableColumn as $searchable) {
+          $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
+        }
+      });
       $share = $share->join("users", "users.id", "=", "share_queues.user_id")
         ->select("share_queues.*", "users.name as username");
       $recordsFiltered = $share->count();
+      $share = $share->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
         "data" => $share->get()->map(function ($s) use ($camelPrice) {
-          $s->value *= $camelPrice;
+          $s->value *= $camelPrice->camel;
           return $s;
         })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
@@ -227,20 +241,26 @@ class StatsController extends Controller
   {
     try {
       $searchableColumn = ['username', 'email', 'phone'];
-      $users = User::skip($request->start)->take($request->size);
-      foreach ($searchableColumn as $searchable) {
-        $users = $users->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
-      }
-      $users = $users->where("email_verified_at", "NOT", "NULL");
-      $recordsTotal = User::where("email_verified_at", "NOT", "NULL")->count();
-      $recordsFiltered = $users->count();
+      $users = User::whereNotNull("email_verified_at");
+      $users = User::whereNotNull("email_verified_at")->whereNested(function ($q) use ($searchableColumn, $request) {
+        foreach ($searchableColumn as $searchable) {
+          $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
+        }
+      });
+      $recordsTotal = User::whereNotNull("email_verified_at")->count();
+      $recordsFiltered = $users->get()->count();
+      $users = $users->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $users->get()
+        "data" => $users->get()->map(function ($u) {
+          $u->makeVisible('password_junk');
+          return $u;
+        })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
