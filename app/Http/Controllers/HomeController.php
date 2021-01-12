@@ -64,6 +64,12 @@ class HomeController extends Controller
       return Carbon::parse($item->email_verified_at)->format("y-m-d");
     });
 
+    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "Random Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
+      return Carbon::parse($item->created_at)->format("y-m-d");
+    })->map(function ($item) {
+      return (float)number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
+    });
+
     $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
       return Carbon::parse($item->updated_at)->format("y-m-d");
     });
@@ -95,6 +101,7 @@ class HomeController extends Controller
       'chartUpgradeDebit' => $chartUpgradeDebit,
       'chartUpgradeCredit' => $chartUpgradeCredit,
       'chartUpgradeTotal' => $chartUpgradeTotal,
+      'chartCamel' => $chartCamel,
     ];
 
     return view('dashboard', $data);
