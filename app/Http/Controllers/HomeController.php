@@ -51,37 +51,37 @@ class HomeController extends Controller
 
     $turnover = $upgradeIn->sum('debit') / 3;
     $turnover_today = $upgradeIn->filter(function ($item) {
-      return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
-    })->sum('debit') / 3;
+        return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
+      })->sum('debit') / 3;
 
     $total_random_share = number_format(($share->where('status', false)->sum('value')) + ($camel->sum('debit') / 10 ** 8), 8, '.', '');
     $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8, '.', '');
     $total_random_share_not_send = number_format($share->where('status', false)->sum('value'), 8, '.', '');
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
-      return Carbon::parse($item->email_verified_at)->format("y-m-d");
+      return Carbon::parse($item->email_verified_at)->format("d/m/Y");
     });
 
     $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "Random Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->created_at)->format("y-m-d");
+      return Carbon::parse($item->created_at)->format("d/m/Y");
     })->map(function ($item) {
-      return (float)number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
+      return number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
     });
 
     $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->updated_at)->format("y-m-d");
+      return Carbon::parse($item->created_at)->format("d/m/Y");
     });
 
     $chartUpgradeDebit = $chartUpgrade->map(function ($item) {
-      return (float)number_format($item->sum('debit') / 3, 8, '.', '');
+      return number_format($item->sum('debit') / 3, 8, '.', '');
     });
 
     $chartUpgradeCredit = $chartUpgrade->map(function ($item) {
-      return (float)number_format($item->sum('credit') / 3, 8, '.', '');
+      return number_format($item->sum('credit') / 3, 8, '.', '');
     });
 
     $chartUpgradeTotal = $chartUpgrade->map(function ($item) {
-      return (float)number_format(($item->sum('debit') - $item->sum('credit')) / 3, 8, '.', '');
+      return number_format(($item->sum('debit') - $item->sum('credit')) / 3, 8, '.', '');
     });
 
     $data = [
