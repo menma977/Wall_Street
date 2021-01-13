@@ -21,9 +21,8 @@
       <li>
         <div class="fa fa-minus-circle" style="min-width: 200px">
           {{ Auth::user()->username }}
-          <i class="text-danger" style="font-size: 10px;">
-            {{ $packageUser }} | Turnover : {{ $profit }}
-          </i>
+          <span class="text-danger">{{ $packageUser }}</span>
+          <span class="text-dark" style="font-size: 10px;"> | OMSET : {{ $profit }}</span>
         </div>
         <ul class="nested">
           @foreach ($binary as $item)
@@ -32,9 +31,8 @@
                 <a href="#" id="caret-{{ $item->down_line }}" class="fa fa-plus-circle" onclick="addCaret('{{ $item->down_line }}')" style="min-width: 200px">
                   @if ($item->userDownLine)
                     {{ $item->userDownLine->username }}
-                    <i class="text-danger" style="font-size: 10px;">
-                      {{ $item->userDownLine->level }} + {{ $item->userDownLine->profit }} = {{ $item->userDownLine->total }}
-                    </i>
+                    <span class="text-danger">{{ $item->userDownLine->level }}</span>
+                    <span class="text-dark" style="font-size: 10px;"> | OMSET : {{ $item->userDownLine->profit }}</span>
                   @endif
                 </a>
                 <div id="{{ $item->down_line }}"></div>
@@ -112,15 +110,9 @@
                 + element.down_line
                 + '" class="fa fa-plus-circle" onclick="addCaret(`%data%`)" style="min-width: 200px"> '
                 + element.userDownLine.username
-                + '<i class="text-danger" style="font-size: 10px;"> '
-                + element.userDownLine.level
-                + ' + '
-                + element.userDownLine.profit
-                + ' = '
-                + element.userDownLine.total
-                + ' </i>'
-                + '</a> <div id="'
-                + element.down_line + '"></div>'
+                + '<span class="text-danger"> ' + element.userDownLine.level + '</span>'
+                + '<span class="text-dark" style="font-size: 10px;"> | OMSET : ' + element.userDownLine.profit + '</span>'
+                + '</a> <div id="' + element.down_line + '"></div>'
                 + '</li>';
               user = user.replace('%data%', element.down_line);
               htmlBody += '<ul class="nested active">' + user + '</ul>';
