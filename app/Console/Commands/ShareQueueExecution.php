@@ -38,44 +38,46 @@ class ShareQueueExecution extends Command
   public function handle()
   {
     $shareQueue = ShareQueue::where('status', false)->where('created_at', '<=', Carbon::now())->first();
-    $user = User::find($shareQueue->user_id);
-    $sumUpLineValue = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') - Upgrade::where('to', $user->id)->sum('credit');
-    if ($shareQueue && $sumUpLineValue > 0) {
+    if ($shareQueue) {
       try {
-        $shareValue = CamelSetting::find(1)->share_value;
-        $camelValue = ($shareValue * UpgradeList::find(1)->camel) * 2;
+        $user = User::find($shareQueue->user_id);
+        $sumUpLineValue = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') - Upgrade::where('to', $user->id)->sum('credit');
+        if ($shareQueue && $sumUpLineValue > 0) {
+          $shareValue = CamelSetting::find(1)->share_value;
+          $camelValue = ($shareValue * UpgradeList::find(1)->camel) * 2;
 
-        if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
-          $upgrade = new Upgrade();
-          $upgrade->from = 1;
-          $upgrade->to = $user->id;
-          $upgrade->description = 'Random Share ' . $user->username;
-          $upgrade->type = "camel";
-          $upgrade->level = $user->level;
-          $upgrade->credit = $camelValue;
-          $upgrade->save();
+          if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
+            $upgrade = new Upgrade();
+            $upgrade->from = 1;
+            $upgrade->to = $user->id;
+            $upgrade->description = 'Random Share ' . $user->username;
+            $upgrade->type = "camel";
+            $upgrade->level = $user->level;
+            $upgrade->credit = $camelValue;
+            $upgrade->save();
 
-          $formatBalanceTrue = number_format($shareValue, 8, '', '');
+            $formatBalanceTrue = number_format($shareValue, 8, '', '');
 
-          $camel = new Camel();
-          $camel->user_id = $user->id;
-          $camel->debit = $formatBalanceTrue;
-          $camel->description = 'Random Share ' . $user->username;
-          $camel->save();
+            $camel = new Camel();
+            $camel->user_id = $user->id;
+            $camel->debit = $formatBalanceTrue;
+            $camel->description = 'Random Share ' . $user->username;
+            $camel->save();
 
-          $shareQueue->status = true;
+            $shareQueue->status = true;
 
+          } else {
+            $shareQueue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+          }
+          $shareQueue->save();
         } else {
-          $shareQueue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
+          ShareQueue::where('user_id', $user->id)->delete();
         }
-        $shareQueue->save();
       } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Share Line : ' . $e->getLine());
         $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
         $shareQueue->save();
       }
-    } else {
-      ShareQueue::where('user_id', $user->id)->delete();
     }
   }
 
