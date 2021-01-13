@@ -52,17 +52,15 @@
           <thead>
           <tr>
             <th style="width: 10px">#</th>
+            <th style="width: 10px">Status</th>
             <th>User</th>
             <th>Type</th>
-            <th style="width: 10px">Status</th>
           </tr>
           </thead>
           <tbody>
           @foreach($queue as $key => $item)
             <tr>
               <td>{{ ($queue->currentpage() - 1) * $queue->perpage() + $loop->index + 1 }}.</td>
-              <td>{{ $item->user->username }}</td>
-              <td>{{ $item->type }}</td>
               <td>
                 @if($item->status)
                   <span class="badge bg-success">DONE</span>
@@ -70,6 +68,9 @@
                   <span class="badge bg-warning">WAITING</span>
                 @endif
               </td>
+              <td>{{ $item->user->username }}</td>
+              <td>{{ $item->type }}</td>
+              <td>{{ $item->date }}</td>
             </tr>
           @endforeach
           </tbody>
