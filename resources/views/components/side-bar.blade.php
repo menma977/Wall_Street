@@ -62,7 +62,7 @@
         {{--History--}}
         <li class="nav-item has-treeview {{ request()->is(['stats', 'stats/*']) ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is(['stats', 'stats/*']) ? 'active' : '' }}">
-            <i class="nav-icon fas fa-spinner"></i>
+            <i class="nav-icon fas fa-scroll"></i>
             <p>
               History
             </p>
