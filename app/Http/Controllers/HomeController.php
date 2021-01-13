@@ -56,7 +56,7 @@ class HomeController extends Controller
         return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
       })->sum('debit') / 3;
 
-    $total_random_share = number_format(($share->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share = number_format(($share->where('status', false)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
     $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8);
     $total_random_share_not_send = number_format($share->where('status', false)->sum('value') * $camelPrice, 8);
 
