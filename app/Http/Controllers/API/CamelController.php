@@ -70,7 +70,7 @@ class CamelController extends Controller
   {
     $this->validate($request, [
       'secondary_password' => 'required|digits:6|exists:users,secondary_password_junk',
-      'value' => 'required|numeric|min:1',
+      'value' => 'required|numeric',
       'wallet' => 'required|string',
       'fake' => 'required|string',
       'tron' => 'required|string'
