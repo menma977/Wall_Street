@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property integer up_line
  * @property integer down_line
  * @property boolean active
+ * @property string profit
  */
 class Binary extends Model
 {
-    use HasFactory, SoftDeletes;
+  use HasFactory, SoftDeletes;
 
   /**
    * The attributes that are mass assignable.
@@ -29,5 +30,6 @@ class Binary extends Model
     'up_line',
     'down_line',
     'active',
+    'profit',
   ];
 }

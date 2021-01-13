@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use phpDocumentor\Reflection\Types\Boolean;
 
 /**
  * Class Upgrade
@@ -17,6 +18,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string credit
  * @property integer level
  * @property string type
+ * @property Boolean status
  */
 class Upgrade extends Model
 {
@@ -35,5 +37,6 @@ class Upgrade extends Model
     'credit',
     'level',
     'type',
+    'status',
   ];
 }

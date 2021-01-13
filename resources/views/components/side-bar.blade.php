@@ -138,7 +138,7 @@
             </li>
             <li class="nav-item">
               <a href="{{ route('queue.share.index') }}"
-                 class="nav-link {{ request()->is(['queue/share/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['queue/share' , 'queue/share/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Share</p>
               </a>
