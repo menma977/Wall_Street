@@ -129,10 +129,12 @@ class StatsController extends Controller
       $searchableColumn = [];
       $upgrades = Upgrade::skip($request->start)->take($request->length);
 
-      if ($withDividend)
+      if ($withDividend) {
         $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->count();
-      else
+      }
+      else {
         $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->where('description', 'like', '%did an upgrade')->count();
+      }
 
       Log::debug(Upgrade::whereNotBetween('from', [1, 16])->where('to', 'from')->count());
       foreach ($searchableColumn as $searchable) {
