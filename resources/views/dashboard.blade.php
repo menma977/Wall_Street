@@ -121,8 +121,8 @@
           </div>
           <div class="col-sm-4 col-6">
             <div class="description-block border-right">
-              <span class="description-percentage {{ $total_random_share_send > 0 ? "text-success" : "text-info" }}">
-                <i class="fas {{ $total_random_share_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+              <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
                 {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
               </span>
               <h5 class="description-header">{{ $total_random_share_send }} CAMEL</h5>
@@ -131,8 +131,8 @@
           </div>
           <div class="col-sm-4 col-6">
             <div class="description-block">
-              <span class="description-percentage {{ $turnover_today > 0 ? "text-success" : "text-info" }}">
-                <i class="fas {{ $turnover_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+              <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
                 {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
               </span>
               <h5 class="description-header">{{ $total_random_share_not_send }} CAMEL</h5>
@@ -288,7 +288,7 @@
         labels: @json($chartCamel->keys()),
         datasets: [
           {
-            label: 'Users',
+            label: 'Camel',
             backgroundColor: 'transparent',
             borderColor: '#17a2b8',
             pointRadius: 3,
