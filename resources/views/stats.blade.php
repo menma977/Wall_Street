@@ -64,7 +64,7 @@
     columnDefs: @json($columnDef, JSON_PRETTY_PRINT),
     processing: true,
     serverSide: true,
-    ajax: "{{ route('stats.source', [$page]) }}",
+    ajax: "{{ route('history.stats.source', [$page]) }}",
     columns: [
       @foreach ($columns as $column)
       { data: "{{ $column->label }}" },

@@ -6,6 +6,7 @@ use App\Models\Camel;
 use App\Models\HistoryCamel;
 use App\Models\ShareQueue;
 use App\Models\UpgradeList;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
@@ -18,9 +19,9 @@ class HistoryCamelController extends Controller
     $this->share = ShareQueue::whereNotBetween('user_id', [1, 16]);
     $this->camel = Camel::where('description', 'like', 'Random Share%')
       ->whereNotBetween('user_id', [1, 16]);
-    $total_random_share = number_format(($this->share->where('status', false)->sum('value') * $this->camelPrice) + ($this->camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_send = number_format(($this->camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_not_send = number_format($this->share->where('status', false)->sum('value') * $this->camelPrice, 8);
+    $total_random_share = number_format(($this->share->where('status', false)->sum('value') * $this->camelPrice) + ($this->camel->sum('debit') / 10 ** 8), 8, '.', '');
+    $total_random_share_send = number_format(($this->camel->sum('debit') / 10 ** 8), 8, '.', '');
+    $total_random_share_not_send = number_format($this->share->where('status', false)->sum('value') * $this->camelPrice, 8, '.', '');
 
     $this->common = [
       "total_random_share" => $total_random_share,
@@ -93,90 +94,119 @@ class HistoryCamelController extends Controller
 
   private function allSource($start, $length, $search)
   {
-    // SENT ==================================================
-    $camel = $this->camel
-      ->join("users", "users.id", "=", "camels.user_id")
-      ->select("camels.*", "users.username as username");
-    $total = $camel->count();
-    $camel = $camel->whereNested(function ($q) use ($search) {
-      $q->orWhere("username", "LIKE", "%" . $search . "%")
-        ->orWhere("description", "LIKE", "%" . $search . "%");
-    });
-    $filtered = $camel->count();
-    $camel = $camel->get()->map(function ($item) {
-      $item->income = $item->debit / 10 ** 8;
-      $item->desc = $item->description;
-      return $item;
-    });
-    // NOT SENT ==============================================
-    $share = $this->share
-      ->where('status', false)
-      ->join("users", "users.id", "=", "share_queues.user_id")
-      ->select("share_queues.*", "users.username as username");
-    $total += $share->count();
-    $share = $share->whereNested(function ($q) use ($search) {
-      $q->orWhere("username", "LIKE", "%" . $search . "%");
-    });
-    $filtered += $share->count();
-    $share = $share->get()->map(function ($item) {
-      $item->income = $item->debit / 10 ** 8;
-      $item->desc = $item->description;
-      return $item;
-    });
-    // MERGING ===============================================
-    $data = $camel->merge($share)->sortBy("created_at")->splice($start, $start + $length);
-    Log::info(is_a($data->all(), \Illuminate\Support\Collection::class));
-    return [
-      "recordsTotal" => $total,
-      "recordsFiltered" => $filtered,
-      "data" => $data->toArray()
-    ];
+    try {
+      // SENT ==================================================
+      $camel = $this->camel
+        ->join("users", "users.id", "=", "camels.user_id")
+        ->select("camels.*", "users.username as username");
+      $total = $camel->count();
+      $camel = $camel->whereNested(function ($q) use ($search) {
+        $q->orWhere("username", "LIKE", "%" . $search . "%")
+          ->orWhere("description", "LIKE", "%" . $search . "%");
+      });
+      $filtered = $camel->count();
+      $camel = $camel->get()->map(function ($item) {
+        $item->income = $item->debit / 10 ** 8;
+        $item->desc = $item->description;
+        return $item;
+      });
+      // NOT SENT ==============================================
+      $share = $this->share
+        ->where('status', false)
+        ->join("users", "users.id", "=", "share_queues.user_id")
+        ->select("share_queues.*", "users.username as username");
+      $total += $share->count();
+      $share = $share->whereNested(function ($q) use ($search) {
+        $q->orWhere("username", "LIKE", "%" . $search . "%");
+      });
+      $filtered += $share->count();
+      $share = $share->get()->map(function ($item) {
+        $item->income = $item->debit / 10 ** 8;
+        $item->desc = $item->description;
+        return $item;
+      });
+      // MERGING ===============================================
+      $data = $camel->merge($share)->sortBy("created_at")->splice($start, $start + $length);
+      return [
+        "recordsTotal" => $total,
+        "recordsFiltered" => $filtered,
+        "data" => $data->toArray()
+      ];
+    } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
+      return [
+        "recordsTotal" => 0,
+        "recordsFiltered" => 0,
+        "data" => [],
+        "error" => "Something happen when fetching the data"
+      ];
+    }
   }
 
   private function sentSource($start, $length, $search)
   {
-    $camel = $this->camel
-      ->join("users", "users.id", "=", "camels.user_id")
-      ->select("camels.*", "users.username as username");
-    $total = $camel->count();
-    $camel = $camel->whereNested(function ($q) use ($search) {
-      $q->orWhere("username", "LIKE", "%" . $search . "%")
-        ->orWhere("description", "LIKE", "%" . $search . "%");
-    });
-    $filtered = $camel->count();
-    $camel = $camel->skip($start)->take($length);
-    return [
-      "recordsTotal" => $total,
-      "recordsFiltered" => $filtered,
-      "data" => $camel->get()->map(function ($item) {
-        $item->income = $item->debit / 10 ** 8;
-        $item->desc = $item->description;
-        return $item;
-      })
-    ];
+    try {
+      $camel = $this->camel
+        ->join("users", "users.id", "=", "camels.user_id")
+        ->select("camels.*", "users.username as username");
+      $total = $camel->count();
+      $camel = $camel->whereNested(function ($q) use ($search) {
+        $q->orWhere("username", "LIKE", "%" . $search . "%")
+          ->orWhere("description", "LIKE", "%" . $search . "%");
+      });
+      $filtered = $camel->count();
+      $camel = $camel->skip($start)->take($length);
+      return [
+        "recordsTotal" => $total,
+        "recordsFiltered" => $filtered,
+        "data" => $camel->get()->map(function ($item) {
+          $item->income = $item->debit / 10 ** 8;
+          $item->desc = $item->description;
+          return $item;
+        })
+      ];
+    } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
+      return [
+        "recordsTotal" => 0,
+        "recordsFiltered" => 0,
+        "data" => [],
+        "error" => "Something happen when fetching the data"
+      ];
+    }
   }
 
   private function notSentSource($start, $length, $search)
   {
-    $share = $this->share
-      ->where('status', false)
-      ->join("users", "users.id", "=", "share_queues.user_id")
-      ->select("share_queues.*", "users.username as username");
-    $total = $share->count();
-    $share = $share->whereNested(function ($q) use ($search) {
-      $q->orWhere("username", "LIKE", "%" . $search . "%");
-    });
-    $filtered = $share->count();
-    $share = $share->skip($start)->take($length);
-    return [
-      "recordsTotal" => $total,
-      "recordsFiltered" => $filtered,
-      "data" => $share->get()->map(function ($item) {
-        $item->income = $item->value;
-        $item->desc = "Waiting to be send to " . $item->username;
-        return $item;
-      })
-    ];
+    try {
+      $share = $this->share
+        ->where('status', false)
+        ->join("users", "users.id", "=", "share_queues.user_id")
+        ->select("share_queues.*", "users.username as username");
+      $total = $share->count();
+      $share = $share->whereNested(function ($q) use ($search) {
+        $q->orWhere("username", "LIKE", "%" . $search . "%");
+      });
+      $filtered = $share->count();
+      $share = $share->skip($start)->take($length);
+      return [
+        "recordsTotal" => $total,
+        "recordsFiltered" => $filtered,
+        "data" => $share->get()->map(function ($item) {
+          $item->income = $item->value;
+          $item->desc = "Waiting to be send to " . $item->username;
+          return $item;
+        })
+      ];
+    } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
+      return [
+        "recordsTotal" => 0,
+        "recordsFiltered" => 0,
+        "data" => [],
+        "error" => "Something happen when fetching the data"
+      ];
+    }
   }
 }
 
