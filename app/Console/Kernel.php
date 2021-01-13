@@ -18,6 +18,8 @@ class Kernel extends ConsoleKernel
   {
     $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
 
+    $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
+
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
