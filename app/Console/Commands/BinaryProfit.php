@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Binary;
+use App\Models\Upgrade;
 use Illuminate\Console\Command;
 
 class BinaryProfit extends Command
@@ -21,22 +23,27 @@ class BinaryProfit extends Command
   protected $description = 'Command description';
 
   /**
-   * Create a new command instance.
-   *
-   * @return void
-   */
-  public function __construct()
-  {
-    parent::__construct();
-  }
-
-  /**
    * Execute the console command.
    *
-   * @return int
    */
   public function handle()
   {
-    return 0;
+    $upgrade = Upgrade::where('status', false)->where('description', 'like', '%did an upgrade%')->first();
+    if ($upgrade) {
+      $this->binaryHandler($upgrade->from, $upgrade->debit / 3);
+      $upgrade->status = true;
+      $upgrade->save();
+    }
+  }
+
+  private function binaryHandler($user, $value)
+  {
+    $binary = Binary::where('down_line', $user)->first();
+    if ($binary) {
+      $binary->profit += $value;
+      $binary->save();
+
+      $this->binaryHandler($binary->up_line, $value);
+    }
   }
 }

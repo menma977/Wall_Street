@@ -31,7 +31,9 @@
               <li>
                 <a href="#" id="caret-{{ $item->down_line }}" class="fa fa-plus-circle" onclick="addCaret('{{ $item->down_line }}')" style="min-width: 200px">
                   @if ($item->userDownLine)
-                    {{ $item->userDownLine->username }} <i class="text-danger" style="font-size: 10px;"> {{ $item->userDownLine->level }} </i>
+                    <i class="text-danger" style="font-size: 10px;">
+                      {{ $item->userDownLine->level }} + {{ $item->userDownLine->profit }} = {{ $item->userDownLine->total }}
+                    </i>
                   @endif
                 </a>
                 <div id="{{ $item->down_line }}"></div>
@@ -112,6 +114,10 @@
                 + element.userDownLine.username
                 + '<i class="text-danger" style="font-size: 10px;"> '
                 + element.userDownLine.level
+                + ' + '
+                + element.userDownLine.profit
+                + ' = '
+                + element.userDownLine.total
                 + ' </i>'
                 + '</a> <div id="'
                 + element.down_line + '"></div>'
