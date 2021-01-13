@@ -53,8 +53,8 @@ class HomeController extends Controller
 
     $turnover = $upgradeIn->sum('debit') / 3;
     $turnover_today = $upgradeIn->filter(function ($item) {
-        return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
-      })->sum('debit') / 3;
+      return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
+    })->sum('debit') / 3;
 
     $total_random_share = number_format(($share->where('status', false)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
     $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8);
@@ -103,6 +103,7 @@ class HomeController extends Controller
       'chartUpgradeTotal' => $chartUpgradeTotal,
       'chartCamel' => $chartCamel,
     ];
+    dd($data);
 
     return view('dashboard', $data);
   }

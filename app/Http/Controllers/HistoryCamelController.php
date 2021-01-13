@@ -2,84 +2,192 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camel;
 use App\Models\HistoryCamel;
+use App\Models\ShareQueue;
+use App\Models\UpgradeList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class HistoryCamelController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
+  public function __construct()
+  {
+    $this->camelPrice = UpgradeList::find(1)->camel;
+    $this->camelPrice = UpgradeList::find(1)->camel;
+    $this->share = ShareQueue::whereNotBetween('user_id', [1, 16]);
+    $this->camel = Camel::where('description', 'like', 'Random Share%')
+      ->whereNotBetween('user_id', [1, 16]);
+    $total_random_share = number_format(($this->share->where('status', false)->sum('value') * $this->camelPrice) + ($this->camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share_send = number_format(($this->camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share_not_send = number_format($this->share->where('status', false)->sum('value') * $this->camelPrice, 8);
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    $this->common = [
+      "total_random_share" => $total_random_share,
+      "total_random_share_send" => $total_random_share_send,
+      "total_random_share_not_send" => $total_random_share_not_send,
+      "columnDef" => []
+    ];
+    $this->defaultColumns = [
+      new Columns("Username", "username"),
+      new Columns("Description", "desc"),
+      new Columns("Income", "income"),
+    ];
+  }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+  public function all()
+  {
+    Log::debug(array_merge($this->common, [
+      "pageName" => "Combined",
+      "columns" => $this->defaultColumns
+    ]));
+    return view("history.camel", array_merge($this->common, [
+      "pageName" => "Combined",
+      "columns" => $this->defaultColumns
+    ]));
+  }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\HistoryCamel  $historyCamel
-     * @return \Illuminate\Http\Response
-     */
-    public function show(HistoryCamel $historyCamel)
-    {
-        //
-    }
+  public function sent()
+  {
+    return view("history.camel", array_merge($this->common, [
+      "pageName" => "Sent",
+      "columns" => $this->defaultColumns
+    ]));
+  }
+  public function pending()
+  {
+    return view("history.camel", array_merge($this->common, [
+      "pageName" => "Not Sent",
+      "columns" => $this->defaultColumns
+    ]));
+  }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\HistoryCamel  $historyCamel
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(HistoryCamel $historyCamel)
-    {
-        //
+  public function sources(Request $request, $type)
+  {
+    $start = $request->start;
+    $length = $request->length;
+    $search = $request->search["value"] ?: "";
+    switch ($type) {
+      case "combined":
+        return response()->json(array_merge(
+          ["draw" => (int)$request->draw],
+          $this->allSource($start, $length, $search)
+        ));
+        break;
+      case "sent":
+        return response()->json(array_merge(
+          ["draw" => (int)$request->draw],
+          $this->sentSource($start, $length, $search)
+        ));
+        break;
+      case "not-sent":
+        return response()->json(array_merge(
+          ["draw" => (int)$request->draw],
+          $this->notSentSource($start, $length, $search)
+        ));
+        break;
+      default:
+        abort(404);
     }
+  }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\HistoryCamel  $historyCamel
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, HistoryCamel $historyCamel)
-    {
-        //
-    }
+  private function allSource($start, $length, $search)
+  {
+    // SENT ==================================================
+    $camel = $this->camel
+      ->join("users", "users.id", "=", "camels.user_id")
+      ->select("camels.*", "users.username as username");
+    $total = $camel->count();
+    $camel = $camel->whereNested(function ($q) use ($search) {
+      $q->orWhere("username", "LIKE", "%" . $search . "%")
+        ->orWhere("description", "LIKE", "%" . $search . "%");
+    });
+    $filtered = $camel->count();
+    $camel = $camel->get()->map(function ($item) {
+      $item->income = $item->debit / 10 ** 8;
+      $item->desc = $item->description;
+      return $item;
+    });
+    // NOT SENT ==============================================
+    $share = $this->share
+      ->where('status', false)
+      ->join("users", "users.id", "=", "share_queues.user_id")
+      ->select("share_queues.*", "users.username as username");
+    $total += $share->count();
+    $share = $share->whereNested(function ($q) use ($search) {
+      $q->orWhere("username", "LIKE", "%" . $search . "%");
+    });
+    $filtered += $share->count();
+    $share = $share->get()->map(function ($item) {
+      $item->income = $item->debit / 10 ** 8;
+      $item->desc = $item->description;
+      return $item;
+    });
+    // MERGING ===============================================
+    $data = $camel->merge($share)->sortBy("created_at")->splice($start, $start + $length);
+    Log::info(is_a($data->all(), \Illuminate\Support\Collection::class));
+    return [
+      "recordsTotal" => $total,
+      "recordsFiltered" => $filtered,
+      "data" => $data->toArray()
+    ];
+  }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\HistoryCamel  $historyCamel
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(HistoryCamel $historyCamel)
-    {
-        //
-    }
+  private function sentSource($start, $length, $search)
+  {
+    $camel = $this->camel
+      ->join("users", "users.id", "=", "camels.user_id")
+      ->select("camels.*", "users.username as username");
+    $total = $camel->count();
+    $camel = $camel->whereNested(function ($q) use ($search) {
+      $q->orWhere("username", "LIKE", "%" . $search . "%")
+        ->orWhere("description", "LIKE", "%" . $search . "%");
+    });
+    $filtered = $camel->count();
+    $camel = $camel->skip($start)->take($length);
+    return [
+      "recordsTotal" => $total,
+      "recordsFiltered" => $filtered,
+      "data" => $camel->get()->map(function ($item) {
+        $item->income = $item->debit / 10 ** 8;
+        $item->desc = $item->description;
+        return $item;
+      })
+    ];
+  }
+
+  private function notSentSource($start, $length, $search)
+  {
+    $share = $this->share
+      ->where('status', false)
+      ->join("users", "users.id", "=", "share_queues.user_id")
+      ->select("share_queues.*", "users.username as username");
+    $total = $share->count();
+    $share = $share->whereNested(function ($q) use ($search) {
+      $q->orWhere("username", "LIKE", "%" . $search . "%");
+    });
+    $filtered = $share->count();
+    $share = $share->skip($start)->take($length);
+    return [
+      "recordsTotal" => $total,
+      "recordsFiltered" => $filtered,
+      "data" => $share->get()->map(function ($item) {
+        $item->income = $item->value;
+        $item->desc = "Waiting to be send to " . $item->username;
+        return $item;
+      })
+    ];
+  }
+}
+
+class Columns
+{
+  public $th;
+  public $label;
+
+  function __construct($th, $label)
+  {
+    $this->th = $th;
+    $this->label = $label;
+  }
 }
