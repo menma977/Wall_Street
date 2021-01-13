@@ -43,9 +43,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("queue/share", [HomeController::class, 'shareQueue'])->name('queue.share');
   });
 
-  Route::get("/stats/{route}", [StatsController::class, 'index'])->name("stats");
-  Route::get("/stats/{route}/source", [StatsController::class, 'source'])->name("stats.source");
-
   Route::group(['prefix' => 'history', 'as' => 'history.'], function () {
     Route::group(['prefix' => 'camel', 'as' => 'camel.'], function () {
       Route::get("", [HistoryCamelController::class, 'all'])->name("combined");
@@ -56,6 +53,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         [HistoryCamelController::class, 'sources']
       )->name("source");
     });
+    Route::get("/{route}", [StatsController::class, 'index'])->name("stats");
+    Route::get("/{route}/source", [StatsController::class, 'source'])->name("stats.source");
   });
 
   Route::group(['prefix' => 'queue', 'as' => 'queue.'], function () {
