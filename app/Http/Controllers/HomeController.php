@@ -42,8 +42,6 @@ class HomeController extends Controller
     $verifiedUser = $this->user->count();
     $verifiedProgress = $this->user->whereNotNull('email_verified_at')->count();
 
-    $camelPrice = UpgradeList::find(1)->camel;
-
     $camel = $this->camel->whereNotBetween('user_id', [1, 16]);
     $upgradeIn = $this->upgrade->whereNotBetween('to', [1, 16]);
     $share = $this->share->whereNotBetween('user_id', [1, 16]);
@@ -56,9 +54,9 @@ class HomeController extends Controller
       return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
     })->sum('debit') / 3;
 
-    $total_random_share = number_format(($share->where('status', false)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_not_send = number_format($share->where('status', false)->sum('value') * $camelPrice, 8);
+    $total_random_share = number_format(($share->where('status', false)->sum('value')) + ($camel->sum('debit') / 10 ** 8), 8, '.', '');
+    $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8, '.', '');
+    $total_random_share_not_send = number_format($share->where('status', false)->sum('value'), 8, '.', '');
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
       return Carbon::parse($item->email_verified_at)->format("y-m-d");
@@ -103,7 +101,6 @@ class HomeController extends Controller
       'chartUpgradeTotal' => $chartUpgradeTotal,
       'chartCamel' => $chartCamel,
     ];
-    dd($data);
 
     return view('dashboard', $data);
   }

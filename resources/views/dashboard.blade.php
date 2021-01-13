@@ -63,7 +63,11 @@
             <div class="description-block border-right">
               <span class="description-percentage {{ $total_member_today > 0 ? "text-success" : "text-info" }}">
                 <i class="fas {{ $total_member_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
-                {{ number_format(($total_member_today / $total_member) * 100, 2) }}%
+                @if($total_member_today > 0)
+                  {{ number_format(($total_member_today / $total_member) * 100, 2) }}%
+                @else
+                  0%
+                @endif
               </span>
               <h5 class="description-header">{{ $total_member_today }}</h5>
               <span class="description-text">Member Today</span>
@@ -93,7 +97,11 @@
             <div class="description-block">
               <span class="description-percentage {{ $turnover_today > 0 ? "text-success" : "text-info" }}">
                 <i class="fas {{ $turnover_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
-                {{ number_format(($turnover_today / $turnover) * 100, 2) }}%
+                @if($turnover_today > 0)
+                  {{ number_format(($turnover_today / $turnover) * 100, 2) }}%
+                @else
+                  0%
+                @endif
               </span>
               <h5 class="description-header">${{ $turnover_today }}</h5>
               <span class="description-text">Turnover Today</span>
@@ -110,7 +118,7 @@
       </div>
       <div class="card-footer">
         <div class="row">
-          <div class="col-sm-4 col-6">
+          <div class="col-sm-4 col-12">
             <div class="description-block border-right">
               <span class="description-percentage">
                 <i class="fas fa-balance-scale"></i>
@@ -123,7 +131,11 @@
             <div class="description-block border-right">
               <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
                 <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
-                {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
+                @if($total_random_share_send > 0 && $total_random_share > 0)
+                  {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
+                @else
+                  0%
+                @endif
               </span>
               <h5 class="description-header">{{ $total_random_share_send }} CAMEL</h5>
               <span class="description-text">camel sent</span>
@@ -133,7 +145,11 @@
             <div class="description-block">
               <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
                 <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
-                {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
+                @if($total_random_share_not_send > 0 && $total_random_share > 0)
+                  {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
+                @else
+                  0%
+                @endif
               </span>
               <h5 class="description-header">{{ $total_random_share_not_send }} CAMEL</h5>
               <span class="description-text">Camel Waiting</span>
@@ -158,7 +174,7 @@
       setInterval(function () {
         getQueue();
         getShareQueue();
-      }, 10000);
+      }, 20000);
     });
 
     function getQueue() {

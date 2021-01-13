@@ -22,7 +22,7 @@
         <div class="fa fa-minus-circle" style="min-width: 200px">
           {{ Auth::user()->username }}
           <span class="text-danger">{{ $packageUser }}</span>
-          <span class="text-dark" style="font-size: 10px;"> | OMSET : {{ $profit }}</span>
+          <span class="text-dark" style="font-size: 10px;"> | Turnover : {{ $profit }}</span>
         </div>
         <ul class="nested">
           @foreach ($binary as $item)
@@ -32,7 +32,6 @@
                   @if ($item->userDownLine)
                     {{ $item->userDownLine->username }}
                     <span class="text-danger">{{ $item->userDownLine->level }}</span>
-                    <span class="text-dark" style="font-size: 10px;"> | OMSET : {{ $item->userDownLine->profit }}</span>
                   @endif
                 </a>
                 <div id="{{ $item->down_line }}"></div>
@@ -112,7 +111,6 @@
                 + '" class="fa fa-plus-circle" onclick="addCaret(`%data%`)" style="min-width: 200px"> '
                 + element.userDownLine.username
                 + '<span class="text-danger"> ' + element.userDownLine.level + '</span>'
-                + '<span class="text-dark" style="font-size: 10px;"> | OMSET : ' + element.userDownLine.profit + '</span>'
                 + '</a> <div id="' + element.down_line + '"></div>'
                 + '</li>';
               user = user.replace('%data%', element.down_line);

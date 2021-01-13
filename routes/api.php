@@ -46,6 +46,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], function () {
     Route::get('', [UpgradeController::class, 'index']);
+    Route::get('/price', [UpgradeController::class, 'priceList']);
     Route::get('/show', [UpgradeController::class, 'show']);
     Route::get('/create', [UpgradeController::class, 'create']);
     Route::post('/store', [UpgradeController::class, 'store'])->middleware(['throttle:1,1']);

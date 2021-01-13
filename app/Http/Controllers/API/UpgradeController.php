@@ -54,6 +54,35 @@ class UpgradeController extends Controller
   /**
    * @return JsonResponse
    */
+  public function priceList()
+  {
+    $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
+    if (str_contains($tronResponse->body(), 'price_trx')) {
+      $price = UpgradeList::first();
+      $doge = $price->doge / 15000;
+      $btc = $price->btc / 15000;
+      $eth = $price->eth / 15000;
+      $ltc = $price->ltc / 15000;
+      $camel = $price->camel;
+
+      return response()->json([
+        'doge' => $doge,
+        'btc' => $btc,
+        'eth' => $eth,
+        'ltc' => $ltc,
+        'camel' => $camel,
+        'tron' => $tronResponse->json()["price_trx"]
+      ]);
+    }
+
+    return response()->json([
+      'message' => "Camel not response",
+    ], 500);
+  }
+
+  /**
+   * @return JsonResponse
+   */
   public function show()
   {
     $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->simplePaginate(20);

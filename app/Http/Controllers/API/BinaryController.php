@@ -22,8 +22,6 @@ class BinaryController extends Controller
       $item->userDownLine = User::find($item->down_line);
       $dollar = Upgrade::where('to', $item->userDownLine->id)->where('from', $item->userDownLine->id)->sum('debit');
       $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
-      $profit = Binary::where('up_line', $item->userDownLine->id)->sum('profit');
-      $item->userDownLine->profit = "$" . number_format($profit, 2, ',', '.');
 
       return $item;
     });
@@ -45,8 +43,6 @@ class BinaryController extends Controller
       $item->userDownLine = User::find($item->down_line);
       $dollar = Upgrade::where('to', $item->userDownLine->id)->where('from', $item->userDownLine->id)->sum('debit');
       $item->userDownLine->level = "$" . number_format($dollar / 3, 2, ',', '.');
-      $profit = Binary::where('up_line', $item->userDownLine->id)->sum('profit');
-      $item->userDownLine->profit = "$" . number_format($profit, 2, ',', '.');
 
       return $item;
     });

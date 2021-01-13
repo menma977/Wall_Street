@@ -100,6 +100,16 @@ class LoginController extends Controller
               $tronBalance = $camelResponse->json()["balance"];
             }
 
+            $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');
+            if (!$profit) {
+              $profit = 0;
+            }
+
+            $profitDollar = Upgrade::where('to', $user->id)->where('description', 'like', "Random Share%")->sum('credit');
+            if (!$profitDollar) {
+              $profitDollar = 0;
+            }
+
             $totalMember = User::whereNotNull('email_verified_at')->count();
             $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
             $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
@@ -134,7 +144,9 @@ class LoginController extends Controller
               'fake_camel_balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit'),
               'totalMember' => $totalMember,
               'totalDollar' => $totalDollar,
-              'topSponsor' => $topSponsor
+              'topSponsor' => $topSponsor,
+              'profit' => $profit,
+              'profitDollar' => $profitDollar,
             ]);
           }
 

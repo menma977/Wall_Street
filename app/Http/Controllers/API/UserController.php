@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Camel;
 use App\Models\Queue;
+use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -24,6 +26,16 @@ class UserController extends Controller
   public function self()
   {
     $user = User::find(Auth::id());
+
+    $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');
+    if (!$profit) {
+      $profit = 0;
+    }
+
+    $profitDollar = Upgrade::where('to', $user->id)->where('description', 'like', "Random Share%")->sum('credit');
+    if (!$profitDollar) {
+      $profitDollar = 0;
+    }
 
     if ($user->id == 1) {
       $dollar = 10000;
@@ -50,6 +62,8 @@ class UserController extends Controller
       'hex_camel' => $user->hex_camel,
       'level' => $dollar,
       'on_queue' => Queue::where('user_id', Auth::id())->count(),
+      'profit' => $profit,
+      'profitDollar' => $profitDollar,
     ]);
   }
 
@@ -99,16 +113,20 @@ class UserController extends Controller
         ]);
         $user->password = Hash::make($request->input('password'));
         $user->password_junk = $request->input('password');
-      } else {
-        $this->validate($request, [
-          'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
-        ]);
-        $user->secondary_password = Hash::make($request->input('secondary_password'));
-        $user->secondary_password_junk = $request->input('secondary_password');
       }
       $user->save();
 
       return response()->json(['message' => 'success update data']);
+    }
+
+    if ($request->has('confirmation_secondary_password')) {
+      $user = User::find(Auth::id());
+      $this->validate($request, [
+        'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
+      ]);
+      $user->secondary_password = Hash::make($request->input('secondary_password'));
+      $user->secondary_password_junk = $request->input('secondary_password');
+      $user->save();
     }
 
     return response()->json(['message' => 'wrong secondary password'], 500);
