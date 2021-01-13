@@ -19,6 +19,7 @@ class CreateBinariesTable extends Migration
       $table->bigInteger('up_line');
       $table->bigInteger('down_line');
       $table->boolean('active')->default(false);
+      $table->string('profit')->default(0);
       $table->timestamps();
       $table->softDeletes();
     });

@@ -16,40 +16,42 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
-    $schedule->command('upgradeList')->everyFiveMinutes()->withoutOverlapping();
+//    $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
 
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+    $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
 
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-
-    $camelSetting = CamelSetting::find(1)->share_time;
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//
+//    $camelSetting = CamelSetting::find(1)->share_time;
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
   }
 
   /**

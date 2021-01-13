@@ -5,6 +5,7 @@ use App\Http\Controllers\BankAccountController;
 use App\Http\Controllers\BinaryController;
 use App\Http\Controllers\CamelSettingController;
 use App\Http\Controllers\DiceController;
+use App\Http\Controllers\HistoryCamelController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UpgradeListController;
@@ -44,6 +45,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
   Route::get("/stats/{route}", [StatsController::class, 'index'])->name("stats");
   Route::get("/stats/{route}/source", [StatsController::class, 'source'])->name("stats.source");
+
+  Route::group(['prefix' => 'history', 'as' => 'history.'], function () {
+    Route::group(['prefix' => 'camel', 'as' => 'camel.'], function () {
+      Route::get("", [HistoryCamelController::class, 'all'])->name("combined");
+      Route::get("/sent", [HistoryCamelController::class, 'sent'])->name("sent");
+      Route::get("/not-sent", [HistoryCamelController::class, 'pending'])->name("notSent");
+      Route::get(
+        "/{route}/source",
+        [HistoryCamelController::class, 'sources']
+      )->name("source");
+    });
+  });
 
   Route::group(['prefix' => 'queue', 'as' => 'queue.'], function () {
     Route::get("", [QueueController::class, 'index'])->name('index');

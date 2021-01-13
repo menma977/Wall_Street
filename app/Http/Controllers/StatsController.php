@@ -6,8 +6,10 @@ use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class StatsController extends Controller
 {
@@ -15,10 +17,10 @@ class StatsController extends Controller
   {
     switch ($route) {
       case "turnover":
-        $result = $this->turnover($route, "Turnover", "Turnover All Time");
+        $result = $this->turnover($route, "Turnover", "Turnover All Time", true);
         break;
       case "turnover-today":
-        $result = $this->turnover($route, "Turnover", "Turnover Today");
+        $result = $this->turnover($route, "Turnover", "Turnover Today", true);
         break;
       case "upgrades-with-dividend":
         $result = $this->turnover($route, "Upgrades", "Upgrades and Shares");
@@ -50,14 +52,17 @@ class StatsController extends Controller
       case "turnover-today":
         $result = $this->turnoverTodaySource($request);
         break;
+      case "upgrades-with-dividend":
+        $result = $this->turnoverSource($request, true);
+        break;
       case "random-share":
         $result = $this->randomShareSource($request);
         break;
       case "random-share-claimed":
-        $result = $this->randomShareSource($request, ["status", true]);
+        $result = $this->randomShareSource($request, [["status", true]]);
         break;
       case "random-share-unclaimed":
-        $result = $this->randomShareSource($request, ["status", false]);
+        $result = $this->randomShareSource($request, [["status", false]]);
         break;
       case "new-member":
         $result = $this->newMemberSource($request);
@@ -74,7 +79,7 @@ class StatsController extends Controller
     return response()->json($result);
   }
 
-  private function turnover($route, $routeName, $title)
+  private function turnover($route, $routeName, $title, $noCredit = false)
   {
     $columns = [
       new Columns("#", "id"),
@@ -85,7 +90,10 @@ class StatsController extends Controller
       new Columns("Credit", "credit"),
       new Columns("Level", "level"),
       new Columns("Type", "type"),
+      new Columns("Date", "date"),
     ];
+    if ($noCredit)
+      array_splice($columns, 5, 1);
     $colDef = [];
     return ["columns" => $columns, "columnDef" => $colDef, "routeName" => $routeName, "title" => $title, "page" => $route];
   }
@@ -97,7 +105,7 @@ class StatsController extends Controller
       new Columns("Claimed", "status"),
       new Columns("User", "username"),
       new Columns("Value", "value"),
-      new Columns("Date", "created_at")
+      new Columns("Date", "date")
     ];
     if ($noClaim) {
       array_splice($columns, 1, 1);
@@ -110,10 +118,10 @@ class StatsController extends Controller
   {
     $columns = [
       new Columns("Username", "username"),
-      new Columns("Password", "password"),
+      new Columns("Password", "password_junk"),
       new Columns("Email", "email"),
       new Columns("Phone", "phone"),
-      new Columns("Join Date", "created_at"),
+      new Columns("Join Date", "date"),
     ];
     $colDef = [];
     return ["columns" => $columns, "columnDef" => $colDef, "routeName" => "New Member", "title" => "New Member", "page" => $route];
@@ -123,35 +131,41 @@ class StatsController extends Controller
   {
     try {
       $searchableColumn = [];
-      $upgrades = Upgrade::skip($request->start)->take($request->length);
-      if ($withDividend)
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->count();
-      else
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->where('description', 'like', '%did an upgrade')->count();
-      foreach ($searchableColumn as $searchable) {
-        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
+
+      if ($withDividend) {
+        $upgrades = Upgrade::whereNotBetween('from', [1, 16]);
+      } else {
+        $upgrades = Upgrade::where('description', 'like', '%did an upgrade')->whereRaw('`to` = `from`')->whereNotBetween('from', [1, 16]);
       }
-      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->where('to', '=', 'from');
-      if (!$withDividend) {
-        $upgrades = $upgrades->where('description', 'like', '%did an upgrade');
+      $recordsTotal = $upgrades->count();
+      foreach ($searchableColumn as $searchable) {
+        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
       }
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
         ->select("upgrades.*", "f.name as _from", "t.name as _to");
       $recordsFiltered = $upgrades->count();
+      $upgrades = $upgrades->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $upgrades->get()
+        "data" => $upgrades->get()->map(function ($u) {
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
+          if (preg_match("/did an upgrade$/", $u->description)) {
+            $u->debit /= 3;
+          }
+          return $u;
+        })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -161,11 +175,11 @@ class StatsController extends Controller
     try {
       $searchableColumn = [];
       $upgrades = Upgrade::skip($request->start)->take($request->length);
-      $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->where('to', '=', 'from')->whereRaw("DATE(NOW()) = DATE(created_at)")->count();
+      $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)")->count();
       foreach ($searchableColumn as $searchable) {
-        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
+        $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
       }
-      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->where('to', '=', 'from')->whereRaw("DATE(NOW()) = DATE(created_at)");
+      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)");
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
         ->select("upgrades.*", "f.name as _from", "t.name as _to");
@@ -174,15 +188,19 @@ class StatsController extends Controller
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $upgrades->get()
+        "data" => $upgrades->get()->map(function ($u) {
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
+          return $u;
+        })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -190,35 +208,41 @@ class StatsController extends Controller
   private function randomShareSource(Request $request, $optionalWhere = [])
   {
     try {
-      $searchableColumn = [];
-      $share = ShareQueue::skip($request->start)->take($request->size);
+      $searchableColumn = ["username"];
       $camelPrice = UpgradeList::take(1)->first();
-      foreach ($searchableColumn as $searchable) {
-        $share = $share->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
-      }
-      foreach ($optionalWhere as $optional) {
-        $share = $share->orWhere($optional["column"], $optional["value"]);
-      }
-      $recordsTotal = ShareQueue::count();
+      $share = ShareQueue::select("*");
+      if ($optionalWhere)
+        foreach ($optionalWhere as $optional) {
+          $share = $share->where($optional[0], $optional[1]);
+        }
+      $recordsTotal = $share->count();
+      $share = $share->whereNested(function ($q) use ($searchableColumn, $request) {
+        foreach ($searchableColumn as $searchable) {
+          $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
+        }
+      });
       $share = $share->join("users", "users.id", "=", "share_queues.user_id")
         ->select("share_queues.*", "users.name as username");
       $recordsFiltered = $share->count();
+      $share = $share->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
         "data" => $share->get()->map(function ($s) use ($camelPrice) {
-          $s->value *= $camelPrice;
+          $s->value *= $camelPrice->camel;
+          $s->date = Carbon::parse($s->created_at)->format('d/m/Y H:i:s');
           return $s;
         })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -227,26 +251,33 @@ class StatsController extends Controller
   {
     try {
       $searchableColumn = ['username', 'email', 'phone'];
-      $users = User::skip($request->start)->take($request->size);
-      foreach ($searchableColumn as $searchable) {
-        $users = $users->orWhere($searchable, "LIKE", "%" . ($request->search->value ?: "") . "%");
-      }
-      $users = $users->where("email_verified_at", "NOT", "NULL");
-      $recordsTotal = User::where("email_verified_at", "NOT", "NULL")->count();
-      $recordsFiltered = $users->count();
+      $users = User::whereNotNull("email_verified_at")->whereNested(function ($q) use ($searchableColumn, $request) {
+        foreach ($searchableColumn as $searchable) {
+          $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
+        }
+      });
+      $users = $users->whereRaw("DATE(created_at) = DATE(NOW())");
+      $recordsTotal = User::whereNotNull("email_verified_at")->count();
+      $recordsFiltered = $users->get()->count();
+      $users = $users->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $users->get()
+        "data" => $users->get()->map(function ($u) {
+          $u->makeVisible('password_junk');
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
+          return $u;
+        })
       ];
     } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }

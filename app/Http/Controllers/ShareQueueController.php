@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ShareQueue;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
@@ -22,6 +23,7 @@ class ShareQueueController extends Controller
     $shareQueue = ShareQueue::orderBy('id', 'desc')->paginate(20);
     $shareQueue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
+      $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
       return $item;
     });
@@ -49,6 +51,7 @@ class ShareQueueController extends Controller
     }
     $queue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
+      $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
       return $item;
     });

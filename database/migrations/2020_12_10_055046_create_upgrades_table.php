@@ -22,6 +22,7 @@ class CreateUpgradesTable extends Migration
       $table->string('credit')->default(0);
       $table->string('level');
       $table->string('type');
+      $table->boolean('status')->default(false);
       $table->timestamps();
       $table->softDeletes();
     });

@@ -53,15 +53,21 @@ class HomeController extends Controller
 
     $turnover = $upgradeIn->sum('debit') / 3;
     $turnover_today = $upgradeIn->filter(function ($item) {
-        return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
-      })->sum('debit') / 3;
+      return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
+    })->sum('debit') / 3;
 
-    $total_random_share = number_format(($share->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_send = number_format(($share->where('status', true)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share = number_format(($share->where('status', false)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8);
     $total_random_share_not_send = number_format($share->where('status', false)->sum('value') * $camelPrice, 8);
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
       return Carbon::parse($item->email_verified_at)->format("y-m-d");
+    });
+
+    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "Random Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
+      return Carbon::parse($item->created_at)->format("y-m-d");
+    })->map(function ($item) {
+      return (float)number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
     });
 
     $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
@@ -95,7 +101,9 @@ class HomeController extends Controller
       'chartUpgradeDebit' => $chartUpgradeDebit,
       'chartUpgradeCredit' => $chartUpgradeCredit,
       'chartUpgradeTotal' => $chartUpgradeTotal,
+      'chartCamel' => $chartCamel,
     ];
+    dd($data);
 
     return view('dashboard', $data);
   }

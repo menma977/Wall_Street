@@ -1,8 +1,7 @@
 <aside class="main-sidebar sidebar-light-primary elevation-4">
   <!-- Brand Logo -->
   <a href="#" class="brand-link">
-    <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-1"
-         style="opacity: .8">
+    <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-1" style="opacity: .8">
     <div class="brand-text font-weight-light"><strong>SEO</strong> <small>Catalog</small></div>
   </a>
 
@@ -17,7 +16,7 @@
     </div>
 
     <nav class="mt-2">
-      <ul class="nav nav-pills nav-sidebar flex-column nav-child-indent" data-widget="treeview" role="menu"
+      <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
           data-accordion="false">
         <li class="nav-item">
           <a href="{{ route('dashboard.index') }}" class="nav-link {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -60,6 +59,67 @@
           </a>
         </li>
 
+        {{--History--}}
+        <li class="nav-item has-treeview {{ request()->is(['stats', 'stats/*']) ? 'menu-open' : '' }}">
+          <a href="#" class="nav-link {{ request()->is(['stats', 'stats/*']) ? 'active' : '' }}">
+            <i class="nav-icon fas fa-scroll"></i>
+            <p>
+              History
+            </p>
+            <i class="right fas fa-angle-left"></i>
+          </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="{{ route('stats', ['turnover']) }}" class="nav-link {{ request()->is(['stats/turnover', 'stats/turnover/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>turnover</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['turnover-today']) }}"
+                 class="nav-link {{ request()->is(['stats/turnover-today', 'stats/turnover-today/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>turnover today</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['upgrades-with-dividend']) }}"
+                 class="nav-link {{ request()->is(['stats/upgrades-with-dividend']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>upgrades with dividend</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['random-share']) }}"
+                 class="nav-link {{ request()->is(['stats/random-share', 'stats/random-share/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>random share</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['random-share-claimed']) }}"
+                 class="nav-link {{ request()->is(['stats/random-share-claimed', 'stats/random-share-claimed/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>random share claimed</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['random-share-unclaimed']) }}"
+                 class="nav-link {{ request()->is(['stats/random-share-unclaimed', 'stats/random-share-unclaimed/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>random share unclaimed</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="{{ route('stats', ['new-member']) }}"
+                 class="nav-link {{ request()->is(['stats/new-member', 'stats/new-member/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>new member</p>
+              </a>
+            </li>
+          </ul>
+        </li>
+
         {{--List Queue--}}
         <li class="nav-item has-treeview {{ request()->is(['queue', 'queue/*']) ? 'menu-open' : '' }}">
           <a href="#" class="nav-link {{ request()->is(['queue', 'queue/*']) ? 'active' : '' }}">
@@ -78,7 +138,7 @@
             </li>
             <li class="nav-item">
               <a href="{{ route('queue.share.index') }}"
-                 class="nav-link {{ request()->is(['queue/share/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['queue/share' , 'queue/share/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Share</p>
               </a>

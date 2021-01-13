@@ -121,8 +121,8 @@
           </div>
           <div class="col-sm-4 col-6">
             <div class="description-block border-right">
-              <span class="description-percentage {{ $total_random_share_send > 0 ? "text-success" : "text-info" }}">
-                <i class="fas {{ $total_random_share_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+              <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
                 {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
               </span>
               <h5 class="description-header">{{ $total_random_share_send }} CAMEL</h5>
@@ -131,8 +131,8 @@
           </div>
           <div class="col-sm-4 col-6">
             <div class="description-block">
-              <span class="description-percentage {{ $turnover_today > 0 ? "text-success" : "text-info" }}">
-                <i class="fas {{ $turnover_today > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+              <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+                <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
                 {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
               </span>
               <h5 class="description-header">{{ $total_random_share_not_send }} CAMEL</h5>
@@ -151,13 +151,14 @@
     $(function () {
       chartUser();
       chartProfit();
+      chartCamel();
       getQueue();
       getShareQueue();
 
       setInterval(function () {
         getQueue();
         getShareQueue();
-      }, 1000);
+      }, 10000);
     });
 
     function getQueue() {
@@ -277,6 +278,41 @@
 
       new Chart(chart, {
         type: 'bar',
+        data: chartData,
+        options: option
+      })
+    }
+
+    function chartCamel() {
+      let data = {
+        labels: @json($chartCamel->keys()),
+        datasets: [
+          {
+            label: 'Camel',
+            backgroundColor: 'transparent',
+            borderColor: '#17a2b8',
+            pointRadius: 3,
+            pointHoverRadius: 2,
+            pointColor: '#17a2b8',
+            pointStrokeColor: '#17a2b8',
+            pointHighlightFill: '#17a2b8',
+            pointHighlightStroke: '#17a2b8',
+            data: @json($chartCamel->flatten())
+          },
+        ]
+      }
+
+      let option = {
+        responsive: true,
+        maintainAspectRatio: false,
+        datasetFill: false
+      };
+
+      let chart = $('#camelChart').get(0).getContext('2d')
+      let chartData = jQuery.extend(true, {}, data)
+
+      new Chart(chart, {
+        type: 'line',
         data: chartData,
         options: option
       })

@@ -3,15 +3,15 @@
 @section('title')
 <div class="row mb-2">
   <div class="col-sm-6">
-    <h1>Statistics</h1>
+    <h1>History Camel</h1>
   </div>
   <div class="col-sm-6">
     <ol class="breadcrumb float-sm-right">
       <li class="breadcrumb-item active">
-        Stats
+        History Camel
       </li>
       <li class="breadcrumb-item active">
-        {{ $routeName }}
+        {{ $pageName }}
       </li>
     </ol>
   </div>
@@ -20,9 +20,40 @@
 
 @section('content')
 <div class="container-fluid">
+  <div class="row">
+    <div class="col-sm-4 col-6">
+      <div class="description-block border-right">
+        <span class="description-percentage">
+          <i class="fas fa-balance-scale"></i>
+        </span>
+        <h5 class="description-header">{{ $total_random_share }} CAMEL</h5>
+        <span class="description-text">Total Share</span>
+      </div>
+    </div>
+    <div class="col-sm-4 col-6">
+      <div class="description-block border-right">
+        <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+          <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+          {{ number_format(($total_random_share_send / $total_random_share) * 100, 2) }}%
+        </span>
+        <h5 class="description-header">{{ $total_random_share_send }} CAMEL</h5>
+        <span class="description-text">camel sent</span>
+      </div>
+    </div>
+    <div class="col-sm-4 col-6">
+      <div class="description-block">
+        <span class="description-percentage {{ $total_random_share_not_send > 0 ? "text-success" : "text-info" }}">
+          <i class="fas {{ $total_random_share_not_send > 0 ? "fa-caret-up" : "fa-caret-left" }}"></i>
+          {{ number_format(($total_random_share_not_send / $total_random_share) * 100, 2) }}%
+        </span>
+        <h5 class="description-header">{{ $total_random_share_not_send }} CAMEL</h5>
+        <span class="description-text">Camel Waiting</span>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="card-header">
-      <div class="card-title">{{ $title }}</div>
+      <div class="card-title"></div>
     </div>
     <div class="card-body">
       <table id="the-table" class="table table-striped" style="overflow-x: auto; min-width: 100%">
@@ -64,7 +95,7 @@
     columnDefs: @json($columnDef, JSON_PRETTY_PRINT),
     processing: true,
     serverSide: true,
-    ajax: "{{ route('stats.source', [$page]) }}",
+    ajax: "{{ route('history.camel.source', [str_replace([' '],'-',strtolower($pageName))]) }}",
     columns: [
       @foreach ($columns as $column)
       { data: "{{ $column->label }}" },
