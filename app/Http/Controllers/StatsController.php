@@ -6,6 +6,7 @@ use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -16,10 +17,10 @@ class StatsController extends Controller
   {
     switch ($route) {
       case "turnover":
-        $result = $this->turnover($route, "Turnover", "Turnover All Time");
+        $result = $this->turnover($route, "Turnover", "Turnover All Time", true);
         break;
       case "turnover-today":
-        $result = $this->turnover($route, "Turnover", "Turnover Today");
+        $result = $this->turnover($route, "Turnover", "Turnover Today", true);
         break;
       case "upgrades-with-dividend":
         $result = $this->turnover($route, "Upgrades", "Upgrades and Shares");
@@ -78,7 +79,7 @@ class StatsController extends Controller
     return response()->json($result);
   }
 
-  private function turnover($route, $routeName, $title)
+  private function turnover($route, $routeName, $title, $noCredit = false)
   {
     $columns = [
       new Columns("#", "id"),
@@ -89,7 +90,10 @@ class StatsController extends Controller
       new Columns("Credit", "credit"),
       new Columns("Level", "level"),
       new Columns("Type", "type"),
+      new Columns("Date", "date"),
     ];
+    if ($noCredit)
+      array_splice($columns, 5, 1);
     $colDef = [];
     return ["columns" => $columns, "columnDef" => $colDef, "routeName" => $routeName, "title" => $title, "page" => $route];
   }
@@ -101,7 +105,7 @@ class StatsController extends Controller
       new Columns("Claimed", "status"),
       new Columns("User", "username"),
       new Columns("Value", "value"),
-      new Columns("Date", "created_at")
+      new Columns("Date", "date")
     ];
     if ($noClaim) {
       array_splice($columns, 1, 1);
@@ -117,7 +121,7 @@ class StatsController extends Controller
       new Columns("Password", "password_junk"),
       new Columns("Email", "email"),
       new Columns("Phone", "phone"),
-      new Columns("Join Date", "created_at"),
+      new Columns("Join Date", "date"),
     ];
     $colDef = [];
     return ["columns" => $columns, "columnDef" => $colDef, "routeName" => "New Member", "title" => "New Member", "page" => $route];
@@ -127,32 +131,32 @@ class StatsController extends Controller
   {
     try {
       $searchableColumn = [];
-      $upgrades = Upgrade::skip($request->start)->take($request->length);
 
       if ($withDividend) {
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->count();
+        $upgrades = Upgrade::whereNotBetween('from', [1, 16]);
+      } else {
+        $upgrades = Upgrade::where('description', 'like', '%did an upgrade')->whereRaw('`to` = `from`')->whereNotBetween('from', [1, 16]);
       }
-      else {
-        $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->where('description', 'like', '%did an upgrade')->count();
-      }
-
-      Log::debug(Upgrade::whereNotBetween('from', [1, 16])->where('to', 'from')->count());
+      $recordsTotal = $upgrades->count();
       foreach ($searchableColumn as $searchable) {
         $upgrades = $upgrades->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
-      }
-      $upgrades = $upgrades->whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`');
-      if (!$withDividend) {
-        $upgrades = $upgrades->where('description', 'like', '%did an upgrade');
       }
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
         ->select("upgrades.*", "f.name as _from", "t.name as _to");
       $recordsFiltered = $upgrades->count();
+      $upgrades = $upgrades->skip($request->start)->take($request->length);
       return [
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $upgrades->get()
+        "data" => $upgrades->get()->map(function ($u) {
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
+          if (preg_match("/did an upgrade$/", $u->description)) {
+            $u->debit /= 3;
+          }
+          return $u;
+        })
       ];
     } catch (Exception $e) {
       Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
@@ -161,7 +165,7 @@ class StatsController extends Controller
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -184,7 +188,10 @@ class StatsController extends Controller
         "draw" => (int)$request->draw,
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
-        "data" => $upgrades->get()
+        "data" => $upgrades->get()->map(function ($u) {
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
+          return $u;
+        })
       ];
     } catch (Exception $e) {
       Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
@@ -193,7 +200,7 @@ class StatsController extends Controller
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -224,6 +231,7 @@ class StatsController extends Controller
         "recordsFiltered" => $recordsFiltered,
         "data" => $share->get()->map(function ($s) use ($camelPrice) {
           $s->value *= $camelPrice->camel;
+          $s->date = Carbon::parse($s->created_at)->format('d/m/Y H:i:s');
           return $s;
         })
       ];
@@ -234,7 +242,7 @@ class StatsController extends Controller
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
@@ -243,12 +251,12 @@ class StatsController extends Controller
   {
     try {
       $searchableColumn = ['username', 'email', 'phone'];
-      $users = User::whereNotNull("email_verified_at");
       $users = User::whereNotNull("email_verified_at")->whereNested(function ($q) use ($searchableColumn, $request) {
         foreach ($searchableColumn as $searchable) {
           $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
         }
       });
+      $users = $users->whereRaw("DATE(created_at) = DATE(NOW())");
       $recordsTotal = User::whereNotNull("email_verified_at")->count();
       $recordsFiltered = $users->get()->count();
       $users = $users->skip($request->start)->take($request->length);
@@ -258,6 +266,7 @@ class StatsController extends Controller
         "recordsFiltered" => $recordsFiltered,
         "data" => $users->get()->map(function ($u) {
           $u->makeVisible('password_junk');
+          $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
           return $u;
         })
       ];
@@ -268,7 +277,7 @@ class StatsController extends Controller
         "recordsTotal" => 0,
         "recordsFiltered" => 0,
         "data" => [],
-        "error" => $e
+        "error" => "Something happen when fetching the data"
       ];
     }
   }
