@@ -57,7 +57,7 @@ class HomeController extends Controller
       })->sum('debit') / 3;
 
     $total_random_share = number_format(($share->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
-    $total_random_share_send = number_format(($share->where('status', true)->sum('value') * $camelPrice) + ($camel->sum('debit') / 10 ** 8), 8);
+    $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8);
     $total_random_share_not_send = number_format($share->where('status', false)->sum('value') * $camelPrice, 8);
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
