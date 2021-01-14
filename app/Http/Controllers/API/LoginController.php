@@ -103,6 +103,8 @@ class LoginController extends Controller
             $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');
             if (!$profit) {
               $profit = 0;
+            } else {
+              $profit *= 2;
             }
 
             $profitDollar = Upgrade::where('to', $user->id)->where('description', 'like', "Random Share%")->sum('credit');
