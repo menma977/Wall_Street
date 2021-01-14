@@ -6,7 +6,6 @@ use App\Models\Camel;
 use App\Models\Queue;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
-use App\Models\UpgradeList;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
