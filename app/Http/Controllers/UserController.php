@@ -126,7 +126,12 @@ class UserController extends Controller
    */
   private function coin($account): Response
   {
-    return Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    //https://corsdoge.herokuapp.com/doge
+    //https://www.999doge.com/api/web.aspx
+    return Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'GetBalances',
       's' => $account->cookie
     ]);

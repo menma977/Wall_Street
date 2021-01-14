@@ -61,7 +61,11 @@ class SettingController extends Controller
    */
   private function coin($account): Response
   {
-    return Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    //https://www.999doge.com/api/web.aspx
+    return Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'Login',
       'key' => 'ec01af0702f3467a808ba52679e1ee61',
       'username' => $account->username,
