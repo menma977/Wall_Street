@@ -208,7 +208,12 @@ class RegisterController extends Controller
    */
   public function createAccount()
   {
-    $doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    //https://corsdoge.herokuapp.com/doge
+    //https://www.999doge.com/api/web.aspx
+    $doge = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'CreateAccount',
       'Key' => 'ec01af0702f3467a808ba52679e1ee61',
     ]);
@@ -238,25 +243,39 @@ class RegisterController extends Controller
    */
   public function getWallet($cookie)
   {
-    $btc = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    //https://corsdoge.herokuapp.com/doge
+    //https://www.999doge.com/api/web.aspx
+    $btc = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "btc"
     ]);
 
-    $doge = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    $doge = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "doge"
     ]);
 
-    $ltc = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    $ltc = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "ltc"
     ]);
 
-    $eth = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    $eth = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "eth"
@@ -280,7 +299,12 @@ class RegisterController extends Controller
 
   public function addUser($cookie, $username, $password)
   {
-    $createUser = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    //https://corsdoge.herokuapp.com/doge
+    //https://www.999doge.com/api/web.aspx
+    $createUser = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post('https://corsdoge.herokuapp.com/doge', [
       'a' => 'CreateUser',
       's' => $cookie,
       'Username' => $username,

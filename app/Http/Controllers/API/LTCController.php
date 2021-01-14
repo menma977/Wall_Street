@@ -83,7 +83,7 @@ class LTCController extends Controller
     if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
       return response()->json(['message' => 'your are on queue'], 500);
     }
-    
+
     Log::info("LTC value : " . $request->input('value') . " - fake : " . $request->input('fake') . " - wallet : " . $request->input('wallet'));
 
     if (Hash::check($request->secondary_password, Auth::user()->secondary_password)) {
@@ -115,7 +115,11 @@ class LTCController extends Controller
         return response()->json(['message' => 'success transfer LTC Wall']);
       }
 
-      $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+      //https://www.999doge.com/api/web.aspx
+      $withdraw = Http::asForm()->withHeaders([
+        'referer' => 'https://bugnode.info/',
+        'origin' => 'https://bugnode.info/'
+      ])->post('https://corsdoge.herokuapp.com/doge', [
         'a' => 'Withdraw',
         's' => Auth::user()->cookie,
         'Amount' => $request->input('value'),
