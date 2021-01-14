@@ -74,7 +74,7 @@ class LoginController extends Controller
 
           Log::info("Login : " . $doge999->body());
 
-          if ($doge999->ok() && $doge999->successful() && str_contains($doge999->body(), 'LoginInvalid') === false) {
+          if ($doge999->ok() && $doge999->successful() && str_contains($doge999->body(), 'LoginInvalid') === false && str_contains($doge999->body(), 'blocked for 2 minutes.') === false) {
             $user->cookie = $doge999->json()['SessionCookie'];
             $user->save();
 
@@ -152,7 +152,7 @@ class LoginController extends Controller
             ]);
           }
 
-          return response()->json(['message' => 'CODE:401 - user is invalid.'], 401);
+          return response()->json(['message' => 'CODE:401 - user is invalid or IP block.'], 401);
         }
 
         return response()->json(['message' => 'CODE:401 - user is invalid.'], 401);
