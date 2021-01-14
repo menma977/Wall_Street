@@ -35,7 +35,7 @@ class UpgradeController extends Controller
     $target = Upgrade::where('to', Auth::id())->where('from', Auth::id())->sum('debit');
 
     $totalMember = User::whereNotNull('email_verified_at')->count();
-    $totalDollar = "$ " . number_format(Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->sum('debit') - Upgrade:: whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->sum('credit'), 3);
+    $totalDollar = "$ " . number_format(Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->where('description', 'like', '%did an upgrade%')->sum('debit') / 3, 3);
     $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
     $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
 
@@ -56,14 +56,15 @@ class UpgradeController extends Controller
    */
   public function priceList()
   {
-    $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
-    if (str_contains($tronResponse->body(), 'price_trx')) {
+    $get = Http::get("https://indodax.com/api/summaries");
+    if ($get->ok() && $get->status() === 200 && str_contains($get->body(), 'ticker')) {
       $price = UpgradeList::first();
       $doge = $price->doge / 15000;
       $btc = $price->btc / 15000;
       $eth = $price->eth / 15000;
       $ltc = $price->ltc / 15000;
       $camel = $price->camel;
+      $tron = $get->json()['tickers']["trx_idr"]["buy"] / 15000;
 
       return response()->json([
         'doge' => $doge,
@@ -71,7 +72,7 @@ class UpgradeController extends Controller
         'eth' => $eth,
         'ltc' => $ltc,
         'camel' => $camel,
-        'tron' => $tronResponse->json()["price_trx"]
+        'tron' => $tron
       ]);
     }
 
