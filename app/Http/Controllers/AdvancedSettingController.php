@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class AdvancedSettingController extends Controller
@@ -22,6 +23,7 @@ class AdvancedSettingController extends Controller
     $setting = Setting::find("1");
     $setting->version = $request->version;
     $setting->save();
+    DB::delete("delete from oauth_access_tokens");
     return redirect()->back()->with("message", "Version changed to " . $setting->version);
   }
 
@@ -31,6 +33,7 @@ class AdvancedSettingController extends Controller
     $setting->maintenance = !$setting->maintenance;
     $setting->save();
     $statusText = $setting->maintenance ? "true" : "false";
+    DB::delete("delete from oauth_access_tokens");
     return response()->json(["message" => "Status Maintenance set to $statusText", "isMaintenance" => $setting->maintenance]);
   }
 }
