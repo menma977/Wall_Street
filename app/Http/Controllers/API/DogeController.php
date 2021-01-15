@@ -119,7 +119,7 @@ class DogeController extends Controller
       $withdraw = Http::asForm()->withHeaders([
         'referer' => 'https://bugnode.info/',
         'origin' => 'https://bugnode.info/'
-      ])->post('https://www.999doge.com/api/web.aspx', [
+      ])->post('https://corsdoge.herokuapp.com/doge', [
         'a' => 'Withdraw',
         's' => Auth::user()->cookie,
         'Amount' => $request->input('value'),
