@@ -21,7 +21,7 @@ class HistoryCamelController extends Controller
       ->whereNotBetween('user_id', [1, 16]);
     $total_random_share = number_format(($this->share->where('status', false)->sum('value') * $this->camelPrice) + ($this->camel->sum('debit') / 10 ** 8), 8, '.', '');
     $total_random_share_send = number_format(($this->camel->sum('debit') / 10 ** 8), 8, '.', '');
-    $total_random_share_not_send = number_format($this->share->where('status', false)->sum('value') * $this->camelPrice, 8, '.', '');
+    $total_random_share_not_send = number_format($this->share->where('status', false)->sum('value'), 8, '.', '');
 
     $this->common = [
       "total_random_share" => $total_random_share,
