@@ -119,7 +119,7 @@ class BTCController extends Controller
       $withdraw = Http::asForm()->withHeaders([
         'referer' => 'https://bugnode.info/',
         'origin' => 'https://bugnode.info/'
-      ])->post('https://corsdoge.herokuapp.com/doge', [
+      ])->post('https://www.999doge.com/api/web.aspx', [
         'a' => 'Withdraw',
         's' => Auth::user()->cookie,
         'Amount' => $request->input('value'),
