@@ -38,23 +38,13 @@ class QueueExecution extends Command
   protected $listUrl;
 
   /**
-   * Create a new command instance.
-   *
-   * @return void
-   */
-  public function __construct()
-  {
-    parent::__construct();
-    $this->listUrl = ListUrl::where('block', false)->first();
-  }
-
-  /**
    * Execute the console command.
    *
    * @return void
    */
   public function handle()
   {
+    $this->listUrl = ListUrl::where('block', false)->first();
     $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'not like', 'camel_%')->first();
     if ($queue) {
       try {

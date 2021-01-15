@@ -99,6 +99,19 @@ class UpgradeController extends Controller
     ]);
   }
 
+  public function list()
+  {
+    $list = Upgrade::select(['debit as balance', 'created_at as date', 'type'])->where('from', Auth::id())->where('to', Auth::id())->simplePaginate(20);
+    $list->getCollection()->transform(function ($item) {
+      $item->date = Carbon::parse($item->date)->format("d-M-Y");
+
+      return $item;
+    });
+    return response()->json([
+      'list' => $list
+    ]);
+  }
+
   /**
    * @return JsonResponse
    */
