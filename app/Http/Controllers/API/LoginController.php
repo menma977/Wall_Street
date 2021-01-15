@@ -71,7 +71,7 @@ class LoginController extends Controller
           }
 
           if (Setting::find(1)->maintenance) {
-            return response()->json(['message' => 'Under Maintenance.fix the address line for application access.'], 500);
+            return response()->json(['message' => 'Under Maintenance.'], 500);
           }
 
           if (!$user->cookie) {
@@ -117,6 +117,8 @@ class LoginController extends Controller
             $dollar = 10000;
           } elseif ($user->level > 0) {
             $dollar = UpgradeList::find($user->level)->dollar;
+          } else if ($user->level == 50) {
+
           } else {
             $dollar = 0;
           }

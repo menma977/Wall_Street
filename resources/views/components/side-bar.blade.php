@@ -2,7 +2,7 @@
   <!-- Brand Logo -->
   <a href="#" class="brand-link">
     <img src="{{ asset('logo.png') }}" alt="AdminLTE Logo" class="brand-image img-circle elevation-1"
-      style="opacity: .8">
+         style="opacity: .8">
     <div class="brand-text font-weight-light"><strong>SEO</strong> <small>Catalog</small></div>
   </a>
 
@@ -30,7 +30,7 @@
         {{--user--}}
         <li class="nav-item">
           <a href="{{ route('users.index') }}"
-            class="nav-link {{ request()->is(['users', 'users/*']) ? 'active' : '' }}">
+             class="nav-link {{ request()->is(['users', 'users/*']) ? 'active' : '' }}">
             <i class="nav-icon fa fa-users"></i>
             <p>
               users
@@ -70,70 +70,70 @@
           <ul class="nav nav-treeview">
             <li class="nav-item">
               <a href="{{ route('history.stats', ['turnover']) }}"
-                class="nav-link {{ request()->is(['history/turnover', 'history/turnover/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/turnover', 'history/turnover/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>turnover</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['turnover-today']) }}"
-                class="nav-link {{ request()->is(['history/turnover-today', 'history/turnover-today/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/turnover-today', 'history/turnover-today/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>turnover today</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['upgrades-with-dividend']) }}"
-                class="nav-link {{ request()->is(['history/upgrades-with-dividend']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/upgrades-with-dividend']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>upgrades with dividend</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['random-share']) }}"
-                class="nav-link {{ request()->is(['history/random-share', 'history/random-share/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/random-share', 'history/random-share/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>random share</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['random-share-claimed']) }}"
-                class="nav-link {{ request()->is(['history/random-share-claimed', 'history/random-share-claimed/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/random-share-claimed', 'history/random-share-claimed/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>random share claimed</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['random-share-unclaimed']) }}"
-                class="nav-link {{ request()->is(['history/random-share-unclaimed', 'history/random-share-unclaimed/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/random-share-unclaimed', 'history/random-share-unclaimed/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>random share unclaimed</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.stats', ['new-member']) }}"
-                class="nav-link {{ request()->is(['history/new-member', 'history/new-member/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/new-member', 'history/new-member/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>new member</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.camel.combined') }}"
-                class="nav-link {{ request()->is(['history/camel']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/camel']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>camel</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.camel.sent') }}"
-                class="nav-link {{ request()->is(['history/camel/sent']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/camel/sent']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>sent camel</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('history.camel.notSent') }}"
-                class="nav-link {{ request()->is(['history/camel/not-sent']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['history/camel/not-sent']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>unsent camel</p>
               </a>
@@ -159,7 +159,7 @@
             </li>
             <li class="nav-item">
               <a href="{{ route('queue.share.index') }}"
-                class="nav-link {{ request()->is(['queue/share' , 'queue/share/*']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['queue/share' , 'queue/share/*']) ? 'active' : '' }}">
                 <i class="far fa-circle nav-icon"></i>
                 <p>Share</p>
               </a>
@@ -179,35 +179,35 @@
           <ul class="nav nav-treeview">
             <li class="nav-item">
               <a href="{{ route('setting.camel.index') }}"
-                class="nav-link {{ request()->is(['setting/camel']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['setting/camel']) ? 'active' : '' }}">
                 <i class="fas fa-coins nav-icon"></i>
                 <p>BANK Settings</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('setting.upgrade-list.index') }}"
-                class="nav-link {{ request()->is(['setting/upgrade-list']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['setting/upgrade-list']) ? 'active' : '' }}">
                 <i class="fas fa-money-bill-wave nav-icon"></i>
                 <p>Upgrades Setting</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('setting.share-level.index') }}"
-                class="nav-link {{ request()->is(['setting/share-level']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['setting/share-level']) ? 'active' : '' }}">
                 <i class="fas fa-cubes nav-icon"></i>
                 <p>Share Level Settings</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('setting.wallet-admin.index') }}"
-                class="nav-link {{ request()->is(['setting/wallet-admin']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['setting/wallet-admin']) ? 'active' : '' }}">
                 <i class="fas fa-wallet nav-icon"></i>
                 <p>Wallet Admin</p>
               </a>
             </li>
             <li class="nav-item">
               <a href="{{ route('setting.advanced.index') }}"
-                class="nav-link {{ request()->is(['setting/advanced']) ? 'active' : '' }}">
+                 class="nav-link {{ request()->is(['setting/advanced']) ? 'active' : '' }}">
                 <i class="fas fa-tools nav-icon"></i>
                 <p>Advanced Settings</p>
               </a>
@@ -215,9 +215,19 @@
           </ul>
         </li>
 
+        {{--binary--}}
+        <li class="nav-item">
+          <a href="{{ route('url.index') }}" class="nav-link {{ request()->is('url') ? 'active' : '' }}">
+            <i class="nav-icon fas fa-clipboard-list"></i>
+            <p>
+              URL Engine
+            </p>
+          </a>
+        </li>
+
         <li class="nav-item">
           <a href="{{ route('logout') }}"
-            onclick="event.preventDefault();document.getElementById('logout-form').submit();" class="nav-link">
+             onclick="event.preventDefault();document.getElementById('logout-form').submit();" class="nav-link">
             <i class="nav-icon fas fa-power-off"></i>
             <p>
               Logout

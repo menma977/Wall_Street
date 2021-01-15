@@ -7,6 +7,7 @@ use App\Http\Controllers\CamelSettingController;
 use App\Http\Controllers\DiceController;
 use App\Http\Controllers\HistoryCamelController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\ListUrlController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UpgradeListController;
 use App\Http\Controllers\UserController;
@@ -48,10 +49,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
       Route::get("", [HistoryCamelController::class, 'all'])->name("combined");
       Route::get("/sent", [HistoryCamelController::class, 'sent'])->name("sent");
       Route::get("/not-sent", [HistoryCamelController::class, 'pending'])->name("notSent");
-      Route::get(
-        "/{route}/source",
-        [HistoryCamelController::class, 'sources']
-      )->name("source");
+      Route::get("/{route}/source", [HistoryCamelController::class, 'sources'])->name("source");
     });
     Route::get("/{route}", [StatsController::class, 'index'])->name("stats");
     Route::get("/{route}/source", [StatsController::class, 'source'])->name("stats.source");
@@ -125,6 +123,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("", [DiceController::class, "index"])->name("index");
     Route::get("filter", [DiceController::class, "show"])->name("show");
     Route::post("update", [DiceController::class, "update"])->name("update");
+  });
+
+  Route::group(['prefix' => 'url', 'as' => 'url.'], function () {
+    Route::get("", [ListUrlController::class, "index"])->name("index");
   });
 });
 

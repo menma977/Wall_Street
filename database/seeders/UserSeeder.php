@@ -18,11 +18,11 @@ class UserSeeder extends Seeder
     $user = new User();
     $user->role = 1;
     $user->name = 'ADMIN';
-    $user->username = 'admin';
+    $user->username = 'Boboom168';
     $user->email = 'wall@street.info';
     $user->phone = '081200000000';
-    $user->password = Hash::make('wall12345678');
-    $user->password_junk = 'wall12345678';
+    $user->password = Hash::make('Surabaya2510');
+    $user->password_junk = 'Surabaya2510';
     $user->secondary_password = Hash::make('123456');
     $user->secondary_password_junk = '123456';
     $user->username_doge = 'wallstreet.info';

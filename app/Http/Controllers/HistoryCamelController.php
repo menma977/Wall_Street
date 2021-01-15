@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Camel;
-use App\Models\HistoryCamel;
 use App\Models\ShareQueue;
 use App\Models\UpgradeList;
 use Exception;
@@ -14,7 +13,6 @@ class HistoryCamelController extends Controller
 {
   public function __construct()
   {
-    $this->camelPrice = UpgradeList::find(1)->camel;
     $this->camelPrice = UpgradeList::find(1)->camel;
     $this->share = ShareQueue::whereNotBetween('user_id', [1, 16]);
     $this->camel = Camel::where('description', 'like', 'Random Share%')
@@ -74,19 +72,16 @@ class HistoryCamelController extends Controller
           ["draw" => (int)$request->draw],
           $this->allSource($start, $length, $search)
         ));
-        break;
       case "sent":
         return response()->json(array_merge(
           ["draw" => (int)$request->draw],
           $this->sentSource($start, $length, $search)
         ));
-        break;
       case "not-sent":
         return response()->json(array_merge(
           ["draw" => (int)$request->draw],
           $this->notSentSource($start, $length, $search)
         ));
-        break;
       default:
         abort(404);
     }

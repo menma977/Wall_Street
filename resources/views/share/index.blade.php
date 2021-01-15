@@ -55,6 +55,7 @@
             <th style="width: 10px">Status</th>
             <th>User</th>
             <th>Type</th>
+            <th>Send Date</th>
           </tr>
           </thead>
           <tbody>
