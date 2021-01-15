@@ -103,6 +103,7 @@ class UpgradeController extends Controller
   {
     $list = Upgrade::select(['debit as balance', 'created_at as date', 'type'])->where('from', Auth::id())->where('to', Auth::id())->simplePaginate(20);
     $list->getCollection()->transform(function ($item) {
+      $item->balance /= 3;
       $item->date = Carbon::parse($item->date)->format("d-M-Y");
 
       return $item;

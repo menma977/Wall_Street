@@ -20,7 +20,7 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
 
-    $schedule->command('urlUpdate')->everyTenMinutes()->withoutOverlapping();
+    $schedule->command('urlUpdate')->everyFiveMinutes()->withoutOverlapping();
 
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
 

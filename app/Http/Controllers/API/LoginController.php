@@ -72,7 +72,7 @@ class LoginController extends Controller
           }
 
           if (Setting::find(1)->maintenance) {
-            return response()->json(['message' => 'Under Maintenance.'], 500);
+            return response()->json(['message' => 'Under Maintenance.If there is a loss of assets, it is not the systems responsibility.'], 500);
           }
 
           if (!$user->cookie) {
@@ -118,7 +118,6 @@ class LoginController extends Controller
             $dollar = 10000;
           } elseif ($user->level > 0) {
             $dollar = UpgradeList::find($user->level)->dollar;
-          } else if ($user->level == 50) {
           } else {
             $dollar = 0;
           }
