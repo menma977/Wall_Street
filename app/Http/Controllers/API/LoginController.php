@@ -117,8 +117,6 @@ class LoginController extends Controller
             $dollar = 10000;
           } elseif ($user->level > 0) {
             $dollar = UpgradeList::find($user->level)->dollar;
-          } else if ($user->level == 50) {
-
           } else {
             $dollar = 0;
           }
