@@ -10,6 +10,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class CamelSettingController extends Controller
 {
@@ -48,9 +49,13 @@ class CamelSettingController extends Controller
       $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
         'privkey' => CamelSetting::find(1)->private_key,
         'to' => $request->input('wallet'),
-        'amount' => $request->input('value'),
+        'amount' => $request->input('amount'),
       ]);
     }
+
+    Log::info("admin transfer===============================================");
+    Log::info($withdraw);
+    Log::info("admin transfer----------------------------------------------");
 
     if ($withdraw->ok() && str_contains($withdraw->body(), 'success') === true) {
       return redirect()->back()->with(['message' => "camel/tron has been send"]);
