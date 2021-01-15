@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Doge;
+use App\Models\ListUrl;
 use App\Models\Queue;
 use App\Models\UpgradeList;
 use App\Models\User;
@@ -18,6 +19,13 @@ use Illuminate\Validation\ValidationException;
 
 class DogeController extends Controller
 {
+  protected $listUrl;
+
+  public function __construct()
+  {
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
+
   /**
    * @return JsonResponse
    */
@@ -119,7 +127,7 @@ class DogeController extends Controller
       $withdraw = Http::asForm()->withHeaders([
         'referer' => 'https://bugnode.info/',
         'origin' => 'https://bugnode.info/'
-      ])->post('https://corsdoge.herokuapp.com/doge', [
+      ])->post($this->listUrl->url, [
         'a' => 'Withdraw',
         's' => Auth::user()->cookie,
         'Amount' => $request->input('value'),
@@ -130,6 +138,12 @@ class DogeController extends Controller
 
       if ($withdraw->successful() && str_contains($withdraw->body(), 'Pending') === true) {
         return response()->json(['message' => 'success transfer Doge']);
+      }
+
+      if (str_contains($withdraw->body(), 'blocked for 2 minutes.') === true) {
+        $this->listUrl->block = true;
+        $this->listUrl->save();
+        return response()->json(['message' => 'connection block wait 10 minute'], 500);
       }
 
       return response()->json(['message' => 'connection has a problem or value to small'], 500);

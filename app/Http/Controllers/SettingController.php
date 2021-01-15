@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\BankAccount;
 use App\Models\CamelSetting;
 use App\Models\Dice;
+use App\Models\ListUrl;
 use App\Models\ShareQueue;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
@@ -12,6 +13,13 @@ use Illuminate\Support\Facades\Http;
 
 class SettingController extends Controller
 {
+  protected $listUrl;
+
+  public function __construct()
+  {
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
+
   public function deleteDice($id)
   {
     Dice::where('user_id', $id)->delete();
@@ -44,6 +52,9 @@ class SettingController extends Controller
       ]);
     }
 
+    $this->listUrl->block = true;
+    $this->listUrl->save();
+
     return response()->json([
       'message' => 'response failed',
       'camel' => number_format(0, 8),
@@ -65,7 +76,7 @@ class SettingController extends Controller
     return Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'Login',
       'key' => 'ec01af0702f3467a808ba52679e1ee61',
       'username' => $account->username,

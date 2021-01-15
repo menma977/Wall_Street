@@ -6,6 +6,7 @@ use App\Models\BTC;
 use App\Models\Camel;
 use App\Models\Doge;
 use App\Models\ETH;
+use App\Models\ListUrl;
 use App\Models\LTC;
 use App\Models\Upgrade;
 use App\Models\User;
@@ -19,6 +20,13 @@ use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
+  protected $listUrl;
+
+  public function __construct()
+  {
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
+
   /**
    * @return Application|Factory|View
    */
@@ -109,6 +117,9 @@ class UserController extends Controller
       ]);
     }
 
+    $this->listUrl->block = true;
+    $this->listUrl->save();
+
     return response()->json([
       'message' => 'response failed',
       'camel' => number_format(0, 8),
@@ -131,7 +142,7 @@ class UserController extends Controller
     return Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetBalances',
       's' => $account->cookie
     ]);

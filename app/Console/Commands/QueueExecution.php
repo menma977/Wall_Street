@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\BankAccount;
 use App\Models\CamelSetting;
 use App\Models\Dice;
+use App\Models\ListUrl;
 use App\Models\Queue;
 use App\Models\ShareIt;
 use App\Models\ShareQueue;
@@ -33,6 +34,19 @@ class QueueExecution extends Command
    * @var string
    */
   protected $description = 'Execute Queue';
+
+  protected $listUrl;
+
+  /**
+   * Create a new command instance.
+   *
+   * @return void
+   */
+  public function __construct()
+  {
+    parent::__construct();
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
 
   /**
    * Execute the console command.
@@ -64,6 +78,8 @@ class QueueExecution extends Command
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $this->listUrl->block = true;
+            $this->listUrl->save();
             $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -73,6 +89,8 @@ class QueueExecution extends Command
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $this->listUrl->block = true;
+            $this->listUrl->save();
             $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -82,6 +100,8 @@ class QueueExecution extends Command
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $this->listUrl->block = true;
+            $this->listUrl->save();
             $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -93,6 +113,8 @@ class QueueExecution extends Command
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+            $this->listUrl->block = true;
+            $this->listUrl->save();
           }
           $queue->save();
         }
@@ -216,7 +238,10 @@ class QueueExecution extends Command
       return true;
     }
 
-    $withdraw = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    $withdraw = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post($this->listUrl->url, [
       'a' => 'Withdraw',
       's' => $cookie,
       'Amount' => $value,
@@ -237,7 +262,10 @@ class QueueExecution extends Command
    */
   private function getUserCookie($usernameDoge, $passwordDoge)
   {
-    $getCookie = Http::asForm()->post('https://www.999doge.com/api/web.aspx', [
+    $getCookie = Http::asForm()->withHeaders([
+      'referer' => 'https://bugnode.info/',
+      'origin' => 'https://bugnode.info/'
+    ])->post($this->listUrl->url, [
       'a' => 'Login',
       'Key' => 'ec01af0702f3467a808ba52679e1ee61',
       'username' => $usernameDoge,
@@ -245,6 +273,11 @@ class QueueExecution extends Command
       'Totp' => ''
     ]);
     Log::info($getCookie->body());
+
+    if (str_contains($getCookie->body(), 'blocked for 2 minutes.') === true) {
+      $this->listUrl->block = true;
+      $this->listUrl->save();
+    }
 
     return $getCookie->json()['SessionCookie'];
   }

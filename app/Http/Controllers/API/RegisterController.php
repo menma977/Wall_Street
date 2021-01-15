@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
+use App\Models\ListUrl;
 use App\Models\User;
 use App\Notifications\AddUser;
 use http\Exception;
@@ -17,6 +18,13 @@ use Illuminate\Validation\ValidationException;
 
 class RegisterController extends Controller
 {
+  protected $listUrl;
+
+  public function __construct()
+  {
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
+
   /**
    * @param Request $request
    * @return JsonResponse
@@ -213,7 +221,7 @@ class RegisterController extends Controller
     $doge = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'CreateAccount',
       'Key' => 'ec01af0702f3467a808ba52679e1ee61',
     ]);
@@ -230,6 +238,9 @@ class RegisterController extends Controller
         'hexCamel' => $camel->json()['address']['hex'],
       ];
     }
+
+    $this->listUrl->block = true;
+    $this->listUrl->save();
 
     return [
       'code' => 500,
@@ -248,7 +259,7 @@ class RegisterController extends Controller
     $btc = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "btc"
@@ -257,7 +268,7 @@ class RegisterController extends Controller
     $doge = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "doge"
@@ -266,7 +277,7 @@ class RegisterController extends Controller
     $ltc = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "ltc"
@@ -275,7 +286,7 @@ class RegisterController extends Controller
     $eth = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetDepositAddress',
       's' => $cookie,
       'Currency' => "eth"
@@ -291,6 +302,9 @@ class RegisterController extends Controller
       ];
     }
 
+    $this->listUrl->block = true;
+    $this->listUrl->save();
+
     return [
       'code' => 500,
       'message' => "failed to get wallet",
@@ -304,7 +318,7 @@ class RegisterController extends Controller
     $createUser = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'CreateUser',
       's' => $cookie,
       'Username' => $username,
@@ -318,6 +332,9 @@ class RegisterController extends Controller
         'password' => $password,
       ];
     }
+
+    $this->listUrl->block = true;
+    $this->listUrl->save();
 
     return [
       'code' => 500,

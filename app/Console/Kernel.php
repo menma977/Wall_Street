@@ -20,30 +20,10 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
 
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+    $schedule->command('urlUpdate')->everyTenMinutes()->withoutOverlapping();
+
     $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
 
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
     $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
 
     $camelSetting = CamelSetting::find(1)->share_time;

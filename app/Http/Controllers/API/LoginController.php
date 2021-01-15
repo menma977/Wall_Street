@@ -8,6 +8,7 @@ use App\Models\BTC;
 use App\Models\Camel;
 use App\Models\Doge;
 use App\Models\ETH;
+use App\Models\ListUrl;
 use App\Models\LTC;
 use App\Models\Queue;
 use App\Models\Setting;
@@ -25,6 +26,13 @@ use Illuminate\Validation\ValidationException;
 
 class LoginController extends Controller
 {
+  protected $listUrl;
+
+  public function __construct()
+  {
+    $this->listUrl = ListUrl::where('block', false)->first();
+  }
+
   /**
    * @param Request $request
    * @return JsonResponse
@@ -63,7 +71,7 @@ class LoginController extends Controller
           }
 
           if (Setting::find(1)->maintenance) {
-            return response()->json(['message' => 'Under Maintenance.'], 500);
+            return response()->json(['message' => 'Under Maintenance.fix the address line for application access.'], 500);
           }
 
           if (!$user->cookie) {
@@ -72,7 +80,7 @@ class LoginController extends Controller
             $doge999 = Http::asForm()->withHeaders([
               'referer' => 'https://bugnode.info/',
               'Origin' => 'https://bugnode.info/'
-            ])->post('https://corsdoge.herokuapp.com/doge', [
+            ])->post($this->listUrl->url, [
               'a' => 'Login',
               'key' => 'ec01af0702f3467a808ba52679e1ee61',
               'username' => $user->username_doge,
@@ -85,6 +93,8 @@ class LoginController extends Controller
               $user->cookie = $doge999->json()['SessionCookie'];
               $user->save();
             } else {
+              $this->listUrl->block = true;
+              $this->listUrl->save();
               return response()->json(['message' => 'CODE:401 - user is invalid or IP block.'], 500);
             }
           }
@@ -96,6 +106,8 @@ class LoginController extends Controller
           Log::info("get Balance : " . $coin->body());
 
           if (str_contains($coin->body(), ' IP are blocked for 2 minutes.') === true) {
+            $this->listUrl->block = true;
+            $this->listUrl->save();
             return response()->json(['message' => 'CODE:401 - user is invalid or IP block.'], 500);
           }
 
@@ -136,7 +148,11 @@ class LoginController extends Controller
           $totalMember = User::whereNotNull('email_verified_at')->count();
           $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
           $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
-          $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+          if ($getTopBinary) {
+            $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+          } else {
+            $topSponsor = "-";
+          }
 
           return response()->json([
             'token' => $user->token,
@@ -197,7 +213,7 @@ class LoginController extends Controller
     return Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
       'origin' => 'https://bugnode.info/'
-    ])->post('https://corsdoge.herokuapp.com/doge', [
+    ])->post($this->listUrl->url, [
       'a' => 'GetBalances',
       's' => $account->cookie
     ]);

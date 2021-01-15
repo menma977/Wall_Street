@@ -19,5 +19,6 @@ class DatabaseSeeder extends Seeder
     $this->call(UserSeeder::class);
     $this->call(WalletAdminSeeder::class);
     $this->call(ShareItSeeder::class);
+    $this->call(ListUrlSeeder::class);
   }
 }
