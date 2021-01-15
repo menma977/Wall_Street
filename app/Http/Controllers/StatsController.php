@@ -130,7 +130,7 @@ class StatsController extends Controller
   private function turnoverSource(Request $request, $withDividend = false)
   {
     try {
-      $searchableColumn = [];
+      $searchableColumn = ["f.username", "t.username"];
 
       if ($withDividend) {
         $upgrades = Upgrade::whereNotBetween('from', [1, 16]);
@@ -143,7 +143,7 @@ class StatsController extends Controller
       }
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
-        ->select("upgrades.*", "f.name as _from", "t.name as _to");
+        ->select("upgrades.*", "f.username as _from", "t.username as _to");
       $recordsFiltered = $upgrades->count();
       $upgrades = $upgrades->skip($request->start)->take($request->length);
       return [
@@ -173,7 +173,7 @@ class StatsController extends Controller
   private function turnoverTodaySource(Request $request)
   {
     try {
-      $searchableColumn = [];
+      $searchableColumn = ["f.username", "t.username"];
       $upgrades = Upgrade::skip($request->start)->take($request->length);
       $recordsTotal = Upgrade::whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)")->count();
       foreach ($searchableColumn as $searchable) {
@@ -182,7 +182,7 @@ class StatsController extends Controller
       $upgrades = $upgrades->whereNotBetween('from', [1, 16])->whereRaw('`to` = `from`')->whereRaw("DATE(NOW()) = DATE(upgrades.created_at)");
       $upgrades = $upgrades->join("users as f", "f.id", "=", "upgrades.from")
         ->join("users as t", "t.id", "=", "upgrades.to")
-        ->select("upgrades.*", "f.name as _from", "t.name as _to");
+        ->select("upgrades.*", "f.username as _from", "t.username as _to");
       $recordsFiltered = $upgrades->count();
       return [
         "draw" => (int)$request->draw,
