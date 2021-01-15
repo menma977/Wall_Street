@@ -19,6 +19,7 @@ use http\Exception;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -118,7 +119,6 @@ class LoginController extends Controller
           } elseif ($user->level > 0) {
             $dollar = UpgradeList::find($user->level)->dollar;
           } else if ($user->level == 50) {
-
           } else {
             $dollar = 0;
           }
@@ -155,6 +155,9 @@ class LoginController extends Controller
           } else {
             $topSponsor = "-";
           }
+          $u = Upgrade::select(["created_at", "debit"])->where("from", "=", Auth::id())->whereRaw("`from` = `to`")->orderBy("created_at", "ASC")->take(1)->first();
+          $firstUpgradeDate = Carbon::parse($u->created_at)->format("d/m/Y h:m");
+          $firstUpgradeValue = $u->debit / 3;
 
           return response()->json([
             'token' => $user->token,
@@ -188,6 +191,8 @@ class LoginController extends Controller
             'topSponsor' => $topSponsor,
             'profit' => $profit,
             'profitDollar' => $profitDollar,
+            'first_upgrade_date' => $firstUpgradeDate,
+            'first_upgrade_value' => $firstUpgradeValue
           ]);
         }
 
