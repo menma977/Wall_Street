@@ -60,7 +60,7 @@ class RouteServiceProvider extends ServiceProvider
       //return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
       //return Limit::perMinute(30);
       return Limit::perMinute(20)->response(function () {
-        return response('please slow down', 500);
+        return response()->json(['message' => 'please slow down.'], 500);
       });
     });
   }
