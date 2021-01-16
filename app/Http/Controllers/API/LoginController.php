@@ -155,8 +155,8 @@ class LoginController extends Controller
             $topSponsor = "-";
           }
           $u = Upgrade::select(["created_at", "debit"])->where("from", "=", Auth::id())->whereRaw("`from` = `to`")->orderBy("created_at", "ASC")->take(1)->first();
-          $firstUpgradeDate = Carbon::parse($u->created_at)->format("d/m/Y h:m");
-          $firstUpgradeValue = $u->debit / 3;
+          $firstUpgradeDate = $u ? Carbon::parse($u->created_at)->format("d/m/Y h:m") : "0";
+          $firstUpgradeValue = $u ? $u->debit / 3 : "-";
 
           return response()->json([
             'token' => $user->token,
