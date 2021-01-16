@@ -76,8 +76,6 @@ class LoginController extends Controller
           }
 
           if (!$user->cookie) {
-            //https://corsdoge.herokuapp.com/doge
-            //https://www.999doge.com/api/web.aspx
             $doge999 = Http::asForm()->withHeaders([
               'referer' => 'https://bugnode.info/',
               'Origin' => 'https://bugnode.info/'
@@ -93,6 +91,12 @@ class LoginController extends Controller
             if ($doge999->ok() && $doge999->successful() && str_contains($doge999->body(), 'LoginInvalid') === false && str_contains($doge999->body(), 'blocked for 2 minutes.') === false) {
               $user->cookie = $doge999->json()['SessionCookie'];
               $user->save();
+            } else if ($doge999->failed()) {
+              return response()->json(['message' => 'CODE:400 - server failed to load.'], 400);
+            } else if ($doge999->clientError()) {
+              return response()->json(['message' => 'CODE:400 - client error.'], 400);
+            } else if ($doge999->serverError()) {
+              return response()->json(['message' => 'CODE:500 - target server error.'], 500);
             } else {
               $this->listUrl->block = true;
               $this->listUrl->save();
@@ -109,7 +113,19 @@ class LoginController extends Controller
           if (str_contains($coin->body(), ' IP are blocked for 2 minutes.') === true) {
             $this->listUrl->block = true;
             $this->listUrl->save();
-            return response()->json(['message' => 'CODE:401 - user is invalid or IP block.'], 500);
+            return response()->json(['message' => 'CODE:500 - user is invalid or IP block.'], 500);
+          }
+
+          if ($coin->failed()) {
+            return response()->json(['message' => 'CODE:400 - server failed to load.'], 400);
+          }
+
+          if ($coin->clientError()) {
+            return response()->json(['message' => 'CODE:400 - client error.'], 400);
+          }
+
+          if ($coin->serverError()) {
+            return response()->json(['message' => 'CODE:500 - target server error.'], 500);
           }
 
           $coin = collect($coin->json("Balances"));
