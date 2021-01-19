@@ -99,6 +99,17 @@ class UserController extends Controller
    */
   public function update(Request $request)
   {
+    if ($request->has('confirmation_secondary_password')) {
+      $user = User::find(Auth::id());
+      $this->validate($request, [
+        'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
+      ]);
+      $user->secondary_password = Hash::make($request->input('secondary_password'));
+      $user->secondary_password_junk = $request->input('secondary_password');
+      $user->save();
+      return response()->json(['message' => 'success update data']);
+    }
+
     $this->validate($request, [
       'secondary_password' => 'required|digits:6'
     ]);
@@ -119,16 +130,6 @@ class UserController extends Controller
       $user->save();
 
       return response()->json(['message' => 'success update data']);
-    }
-
-    if ($request->has('confirmation_secondary_password')) {
-      $user = User::find(Auth::id());
-      $this->validate($request, [
-        'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
-      ]);
-      $user->secondary_password = Hash::make($request->input('secondary_password'));
-      $user->secondary_password_junk = $request->input('secondary_password');
-      $user->save();
     }
 
     return response()->json(['message' => 'wrong secondary password'], 500);
