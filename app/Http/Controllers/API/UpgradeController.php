@@ -281,7 +281,7 @@ class UpgradeController extends Controller
       $user->level = $request->upgrade_list;
       $user->save();
 
-      if ($upgradeList->dollar >= 10 || $upgradeList->dollar <= 50) {
+      if ($upgradeList->dollar <= 50) {
         for ($i = 0; $i < (100 / 10); $i++) {
           $setDice = new Dice();
           $setDice->user_id = Auth::id();
