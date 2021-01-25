@@ -8,6 +8,8 @@ use App\Http\Controllers\DiceController;
 use App\Http\Controllers\HistoryCamelController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ListUrlController;
+use App\Http\Controllers\QueueDailyController;
+use App\Http\Controllers\QueueDailySettingController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\UpgradeListController;
 use App\Http\Controllers\UserController;
@@ -62,6 +64,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::group(['prefix' => 'share', 'as' => 'share.'], function () {
       Route::get("", [ShareQueueController::class, 'index'])->name('index');
       Route::get("filter", [ShareQueueController::class, 'show'])->name('show');
+    });
+
+    Route::group(['prefix' => 'pool', 'as' => 'pool.'], function () {
+      Route::get("", [QueueDailyController::class, 'index'])->name('index');
+      Route::get("filter", [QueueDailyController::class, 'show'])->name('show');
+      Route::get("update/setting/{status}", [QueueDailySettingController::class, 'update'])->name('update');
     });
   });
 

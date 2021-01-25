@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\ListUrl;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class ListUrlController extends Controller
 {

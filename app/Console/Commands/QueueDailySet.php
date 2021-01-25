@@ -28,7 +28,7 @@ class QueueDailySet extends Command
    */
   public function handle()
   {
-    $users = User::all();
+    $users = User::where('level', '>', 0)->get();
     foreach ($users as $user) {
       $getUser = QueueDaily::where('user_id', $user->id)->where('send', false)->count();
       if (!$getUser) {

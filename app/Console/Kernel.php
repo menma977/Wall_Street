@@ -17,25 +17,25 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
-    $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
+//    $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
+//
+//    $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
+//
+//    $schedule->command('urlUpdate')->everyFiveMinutes()->withoutOverlapping();
+//
+//    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
+//
+//    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
+//
+//    $camelSetting = CamelSetting::find(1)->share_time;
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
 
-    $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
-
-    $schedule->command('urlUpdate')->everyFiveMinutes()->withoutOverlapping();
-
-    $schedule->command('queueExecution')->everyMinute()->withoutOverlapping();
-
-    $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
-
-    $camelSetting = CamelSetting::find(1)->share_time;
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-
-    $schedule->command('upgradeList')->daily()->withoutOverlapping();
-
+    $schedule->command('queueDailySet')->daily()->withoutOverlapping();
+    $schedule->command('queueDailySet')->everyMinute()->withoutOverlapping();
     if (QueueDailySetting::find(1)->is_on) {
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();

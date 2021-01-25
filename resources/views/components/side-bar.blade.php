@@ -164,6 +164,13 @@
                 <p>Share</p>
               </a>
             </li>
+            <li class="nav-item">
+              <a href="{{ route('queue.pool.index') }}"
+                 class="nav-link {{ request()->is(['queue/pool', 'queue/pool/*']) ? 'active' : '' }}">
+                <i class="far fa-circle nav-icon"></i>
+                <p>Pool</p>
+              </a>
+            </li>
           </ul>
         </li>
 

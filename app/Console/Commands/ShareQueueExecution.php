@@ -42,7 +42,7 @@ class ShareQueueExecution extends Command
       try {
         $user = User::find($shareQueue->user_id);
         $sumUpLineValue = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') - Upgrade::where('to', $user->id)->sum('credit');
-        if ($shareQueue && $sumUpLineValue > 0) {
+        if ($sumUpLineValue > 0) {
           $shareValue = CamelSetting::find(1)->share_value;
           $camelValue = ($shareValue * UpgradeList::find(1)->camel) * 2;
 
@@ -66,8 +66,6 @@ class ShareQueueExecution extends Command
 
             $shareQueue->status = true;
 
-          } else {
-            $shareQueue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
           $shareQueue->save();
         } else {
@@ -75,8 +73,8 @@ class ShareQueueExecution extends Command
         }
       } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Share Line : ' . $e->getLine());
-        $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
-        $shareQueue->save();
+        // $shareQueue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');Z
+        // $shareQueue->save();
       }
     }
   }
