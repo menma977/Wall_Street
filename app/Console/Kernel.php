@@ -3,6 +3,7 @@
 namespace App\Console;
 
 use App\Models\CamelSetting;
+use App\Models\QueueDailySetting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -32,6 +33,16 @@ class Kernel extends ConsoleKernel
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+
+    $schedule->command('upgradeList')->daily()->withoutOverlapping();
+
+    if (QueueDailySetting::find(1)->is_on) {
+      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+    }
   }
 
   /**
