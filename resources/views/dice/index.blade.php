@@ -65,7 +65,7 @@
           </div>
           <div class="card-header">
             @if($dice->hasPages())
-              <div class="float-right">
+              <div class="float-right table-responsive">
                 {{ $dice->links() }}
               </div>
             @endif

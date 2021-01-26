@@ -42,7 +42,7 @@
                   <td>$ {{ $item->max }}</td>
                   <td>{{ $item->value }}</td>
                   <td>
-                    <button type="button" class="btn btn-block btn-warning btn-xs">EDIT</button>
+                    <a href="{{ route('queue.pool.edit.limit', $item->id) }}" class="btn btn-block btn-warning btn-xs">EDIT</a>
                   </td>
                 </tr>
               @endforeach
@@ -56,32 +56,34 @@
           <div class="card-header">
             <h3 class="card-title">BANK</h3>
           </div>
-          <div class="card-body p-0 table-responsive">
-            <table class="table text-center">
-              <thead>
-              <tr>
-                <th style="width: 10px">#</th>
-                <th>MIN</th>
-                <th>MAX</th>
-                <th>VALUE</th>
-                <th>EDIT</th>
-              </tr>
-              </thead>
-              <tbody>
-              @foreach($valueList as $key => $item)
-                <tr>
-                  <td>{{ $loop->index + 1 }}.</td>
-                  <td>$ {{ $item->min }}</td>
-                  <td>$ {{ $item->max }}</td>
-                  <td>{{ $item->value }}</td>
-                  <td>
-                    <button type="button" class="btn btn-block btn-warning btn-xs">EDIT</button>
-                  </td>
-                </tr>
-              @endforeach
-              </tbody>
-            </table>
-          </div>
+          <form method="post" action="{{ route('queue.pool.update.bank') }}">
+            @csrf
+            <div class="card-body">
+              <div class="form-group">
+                <label for="_private_key">Private Key</label>
+                <input type="text" class="form-control @error('private_key') is-invalid @enderror" id="_private_key" name="private_key" placeholder="Enter Private Key"
+                       value="{{ old('private_key') ? : $bank->private_key }}">
+              </div>
+              <div class="form-group">
+                <label for="_public_key">Public Key</label>
+                <input type="text" class="form-control @error('public_key') is-invalid @enderror" id="_public_key" name="public_key" placeholder="Enter Public Key"
+                       value="{{ old('public_key') ? : $bank->public_key }}">
+              </div>
+              <div class="form-group">
+                <label for="_wallet_camel">Wallet Camel</label>
+                <input type="text" class="form-control @error('wallet_camel') is-invalid @enderror" id="_wallet_camel" name="wallet_camel" placeholder="Enter Wallet Camel"
+                       value="{{ old('wallet_camel') ? : $bank->wallet_camel }}">
+              </div>
+              <div class="form-group">
+                <label for="_wallet_tron">Wallet Tron</label>
+                <input type="text" class="form-control @error('wallet_tron') is-invalid @enderror" id="_wallet_tron" name="wallet_tron" placeholder="Enter Wallet tron"
+                       value="{{ old('wallet_tron') ? : $bank->hex_camel }}">
+              </div>
+            </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-success">Update</button>
+            </div>
+          </form>
         </div>
       </div>
       <div class="col-md-12">
@@ -117,10 +119,10 @@
           </div>
           <div class="card-header">
             <div class="btn-group btn-group-toggle" data-toggle="buttons">
-              <a href="{{ route('queue.pool.update', 1) }}" class="btn btn-outline-success {{ $queueDailySetting->is_on ? 'active' : '' }}">
+              <a href="{{ route('queue.pool.update.setting', 1) }}" class="btn btn-outline-success {{ $queueDailySetting->is_on ? 'active' : '' }}">
                 <input type="radio" name="options" id="option_a1" autocomplete="off" {{ $queueDailySetting->is_on ? 'checked' : '' }}> ON
               </a>
-              <a href="{{ route('queue.pool.update', 0) }}" class="btn btn-outline-danger {{ $queueDailySetting->is_on ? '' : 'active' }}">
+              <a href="{{ route('queue.pool.update.setting', 0) }}" class="btn btn-outline-danger {{ $queueDailySetting->is_on ? '' : 'active' }}">
                 <input type="radio" name="options" id="option_a3" autocomplete="off" {{ $queueDailySetting->is_on ? '' : 'checked' }}> OFF
               </a>
             </div>

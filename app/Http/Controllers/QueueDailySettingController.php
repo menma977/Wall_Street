@@ -3,9 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\QueueDailySetting;
+use Illuminate\Http\RedirectResponse;
 
 class QueueDailySettingController extends Controller
 {
+  /**
+   * @param $status
+   * @return RedirectResponse
+   */
   public function update($status)
   {
     $data = QueueDailySetting::find(1);

@@ -222,7 +222,7 @@
             pointStrokeColor: '#007bff',
             pointHighlightFill: '#007bff',
             pointHighlightStroke: '#007bff',
-            data: @json($chartUser->flatten())
+            data: @json($chartUser->flatten()),
           },
         ]
       }
@@ -278,7 +278,8 @@
             pointStrokeColor: '#007bff',
             pointHighlightFill: '#007bff',
             pointHighlightStroke: '#007bff',
-            data: @json($chartUpgradeTotal->flatten())
+            data: @json($chartUpgradeTotal->flatten()),
+            type: 'bar'
           },
         ]
       }
@@ -305,7 +306,7 @@
         datasets: [
           {
             label: 'Camel',
-            backgroundColor: 'transparent',
+            backgroundColor: '#17a2b84f',
             borderColor: '#17a2b8',
             pointRadius: 3,
             pointHoverRadius: 2,

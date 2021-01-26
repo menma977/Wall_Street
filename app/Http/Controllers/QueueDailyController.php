@@ -18,6 +18,10 @@ use Illuminate\Validation\ValidationException;
 
 class QueueDailyController extends Controller
 {
+  /**
+   * @param null $queue
+   * @return Application|Factory|View
+   */
   public function index($queue = null)
   {
     if (!$queue) {
@@ -27,10 +31,10 @@ class QueueDailyController extends Controller
       $item->user = User::find($item->user_id);
 
       $sumUpgrade = Upgrade::where('from', $item->user->id)->where('to', $item->user->id)->sum('debit') / 3;
-      $shareValue = QueueDailyLimiterList::where('min', '<=', $sumUpgrade)->where('max', '>=', $sumUpgrade)->first();
+      $shareValue = QueueDailyLimiterList::where('min', '<=', (integer)$sumUpgrade)->where('max', '>=', (integer)$sumUpgrade)->first();
 
       $item->totalUpgrade = $sumUpgrade;
-      $item->shareUsd = ($shareValue->value * UpgradeList::find(1)->camel) * 2;
+      $item->shareUsd = number_format(($shareValue->value * UpgradeList::find(1)->camel) * 2, 8, '.', '');
       $item->shareValue = $shareValue->value;
       $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
@@ -74,10 +78,10 @@ class QueueDailyController extends Controller
       $item->user = User::find($item->user_id);
 
       $sumUpgrade = Upgrade::where('from', $item->user->id)->where('to', $item->user->id)->sum('debit') / 3;
-      $shareValue = QueueDailyLimiterList::where('min', '<=', $sumUpgrade)->where('max', '>=', $sumUpgrade)->first();
+      $shareValue = QueueDailyLimiterList::where('min', '<=', (integer)$sumUpgrade)->where('max', '>=', (integer)$sumUpgrade)->first();
 
       $item->totalUpgrade = $sumUpgrade;
-      $item->shareUsd = ($shareValue->value * UpgradeList::find(1)->camel) * 2;
+      $item->shareUsd = number_format(($shareValue->value * UpgradeList::find(1)->camel) * 2, 8, '.', '');
       $item->shareValue = $shareValue->value;
       $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
@@ -90,10 +94,13 @@ class QueueDailyController extends Controller
 
     $valueList = QueueDailyLimiterList::all();
 
+    $bank = QueueDailyBank::find(1);
+
     $data = [
       'queue' => $queue,
       'queueDailySetting' => $queueDailySetting,
       'valueList' => $valueList,
+      'bank' => $bank,
     ];
 
     return view('sharePool.index', $data);

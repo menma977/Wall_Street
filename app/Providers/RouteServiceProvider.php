@@ -63,5 +63,11 @@ class RouteServiceProvider extends ServiceProvider
         return response()->json(['message' => 'please slow down.'], 500);
       });
     });
+
+    RateLimiter::for('upgrade.store', function (Request $request) {
+      return Limit::perMinute(1)->by(optional($request->user())->id ?: $request->ip())->response(function () {
+        return response()->json(['message' => 'please slow down.'], 500);
+      });
+    });
   }
 }

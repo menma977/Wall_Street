@@ -64,7 +64,7 @@ class QueueExecution extends Command
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'buyWall') {
@@ -73,7 +73,7 @@ class QueueExecution extends Command
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'it') {
@@ -82,7 +82,7 @@ class QueueExecution extends Command
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else {
@@ -92,13 +92,13 @@ class QueueExecution extends Command
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
           } else {
-            $queue->created_at = Carbon::now()->addMinutes(5)->format('Y-m-d H:i:s');
+            $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         }
       } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Line : ' . $e->getLine());
-        $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
+        $queue->created_at = Carbon::now()->addMinutes(20)->format('Y-m-d H:i:s');
         $queue->save();
       }
     }

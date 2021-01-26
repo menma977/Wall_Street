@@ -30,7 +30,7 @@
       </div>
       <div class="card-header">
         @if($queue->hasPages())
-          <div class="float-right">
+          <div class="float-right table-responsive">
             {{ $queue->links() }}
           </div>
         @endif

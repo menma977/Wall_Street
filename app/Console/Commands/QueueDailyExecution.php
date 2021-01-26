@@ -43,7 +43,7 @@ class QueueDailyExecution extends Command
         $sumUpLineValue = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') - Upgrade::where('to', $user->id)->sum('credit');
         if ($sumUpLineValue > 0) {
           $sumUpgrade = Upgrade::where('from', $user->id)->where('to', $user->id)->sum('debit') / 3;
-          $shareValue = QueueDailyLimiterList::where('min', '<=', $sumUpgrade)->where('max', '>=', $sumUpgrade)->first();
+          $shareValue = QueueDailyLimiterList::where('min', '<=', (integer)$sumUpgrade)->where('max', '>=', (integer)$sumUpgrade)->first();
           if ($shareValue) {
             $shareToUsd = ($shareValue->value * UpgradeList::find(1)->camel) * 2;
             if (self::withdraw($bank->private_key, $user->wallet_camel, $shareValue->value)) {
