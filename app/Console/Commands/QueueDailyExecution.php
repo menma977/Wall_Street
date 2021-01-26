@@ -64,8 +64,7 @@ class QueueDailyExecution extends Command
               $camel->description = 'Share Pool ' . $user->username;
               $camel->save();
 
-              $queueDaily->status = true;
-              $queueDaily->save();
+              QueueDaily::where('created_at', $queueDaily->created_at)->where('user_id', $queueDaily->user_id)->first()->update(['send' => true]);
             }
           } else {
             Log::error("===" . $shareValue . "===");
@@ -74,7 +73,7 @@ class QueueDailyExecution extends Command
           Log::error("===" . $sumUpLineValue . "===");
           QueueDaily::where('user_id', $user->id)->delete();
         }
-      } catch (Exception $e) {
+      } catch (\Exception $e) {
         Log::error($e->getMessage() . ' | Queue Share POOL Line : ' . $e->getLine());
       }
     }

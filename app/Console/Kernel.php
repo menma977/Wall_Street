@@ -34,7 +34,7 @@ class Kernel extends ConsoleKernel
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
 
-    $schedule->command('queueDailySet')->everyMinute()->withoutOverlapping();
+    $schedule->command('queueDailySet')->daily()->withoutOverlapping();
     if (QueueDailySetting::find(1)->is_on) {
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();

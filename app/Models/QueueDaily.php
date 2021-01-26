@@ -9,14 +9,16 @@ use phpDocumentor\Reflection\Types\Boolean;
 /**
  * Class QueueDaily
  * @package App\Models
- * @property date created_at
- * @property date updated_at
+ * @property string created_at
+ * @property string updated_at
  * @property integer user_id
  * @property Boolean send
  */
 class QueueDaily extends Model
 {
   use HasFactory;
+
+  protected $primaryKey = "user_id";
 
   /**
    * The attributes that are mass assignable.

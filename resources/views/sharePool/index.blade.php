@@ -19,6 +19,26 @@
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-6">
+        <div class="info-box shadow">
+          <span class="info-box-icon bg-warning"><i class="fas fa-money-bill"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">CAMEL</span>
+            <span class="info-box-number">{{ $camel }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="info-box shadow">
+          <span class="info-box-icon bg-danger"><i class="fas fa-money-bill"></i></span>
+
+          <div class="info-box-content">
+            <span class="info-box-text">TRON</span>
+            <span class="info-box-number">{{ $tron }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
         <div class="card">
           <div class="card-header">
             <h3 class="card-title">List Share</h3>
@@ -145,7 +165,7 @@
                 <tr>
                   <td>{{ ($queue->currentpage() - 1) * $queue->perpage() + $loop->index + 1 }}.</td>
                   <td>
-                    @if($item->status)
+                    @if($item->send)
                       <span class="badge bg-success">DONE</span>
                     @else
                       <span class="badge bg-warning">WAITING</span>
