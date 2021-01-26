@@ -71,7 +71,7 @@ class LoginController extends Controller
             return response()->json(['message' => 'your account is not active. please active your account.'], 500);
           }
 
-          if (Setting::find(1)->maintenance) {
+          if (Setting::find(1)->maintenance && $user->id !== 1) {
             return response()->json(['message' => 'Under Maintenance.If there is a loss of assets, it is not the systems responsibility.'], 500);
           }
 
