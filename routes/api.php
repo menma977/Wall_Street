@@ -42,6 +42,7 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('/show', [UserController::class, 'self']);
     Route::post('/registered', [RegisterController::class, 'in'])->middleware(['throttle:3,1']);
     Route::post('/update', [UserController::class, 'update'])->middleware(['throttle:1,1']);
+    Route::post('/update/secondary', [UserController::class, 'updateSecondary'])->middleware(['throttle:1,1']);
   });
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], function () {
