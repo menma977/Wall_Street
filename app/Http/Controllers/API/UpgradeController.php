@@ -56,20 +56,30 @@ class UpgradeController extends Controller
    */
   public function priceList()
   {
-    $price = UpgradeList::first();
-    $doge = $price->doge / 15000;
-    $btc = $price->btc / 15000;
-    $eth = $price->eth / 15000;
-    $ltc = $price->ltc / 15000;
-    $camel = $price->camel;
     try {
       $get = Http::get("https://indodax.com/api/summaries");
+      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
       if ($get->ok() && $get->status() === 200 && str_contains($get->body(), 'ticker')) {
+        $doge = $get->json()['tickers']["doge_idr"]["buy"] / 15000;
+        $btc = $get->json()['tickers']["btc_idr"]["buy"] / 15000;
+        $eth = $get->json()['tickers']["eth_idr"]["buy"] / 15000;
+        $ltc = $get->json()['tickers']["ltc_idr"]["buy"] / 15000;
         $tron = $get->json()['tickers']["trx_idr"]["buy"] / 15000;
+        $camel = $camelResponse->json()["price_usd"];
       } else {
+        $doge = 0;
+        $btc = 0;
+        $eth = 0;
+        $ltc = 0;
+        $camel = 0;
         $tron = 0;
       }
     } catch (\Exception $e) {
+      $doge = 0;
+      $btc = 0;
+      $eth = 0;
+      $ltc = 0;
+      $camel = 0;
       $tron = 0;
     }
 
