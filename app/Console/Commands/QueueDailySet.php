@@ -28,6 +28,7 @@ class QueueDailySet extends Command
    */
   public function handle()
   {
+    QueueDaily::where('send', true)->delete();
     $users = User::where('level', '>', 0)->whereNotBetween('id', [1, 16])->whereNotIn('id', [489])->get();
     foreach ($users as $user) {
       $getUser = QueueDaily::where('user_id', $user->id)->where('send', false)->count();
@@ -37,7 +38,5 @@ class QueueDailySet extends Command
         $queueDaily->save();
       }
     }
-
-    QueueDaily::where('send', true)->delete();
   }
 }
