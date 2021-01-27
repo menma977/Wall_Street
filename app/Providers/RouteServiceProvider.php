@@ -58,15 +58,20 @@ class RouteServiceProvider extends ServiceProvider
   {
     RateLimiter::for('api', function (Request $request) {
       //return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip());
-      //return Limit::perMinute(30);
       return Limit::perMinute(18)->by(optional($request->user())->id ?: $request->ip())->response(function () {
-        return response()->json(['message' => 'please slow down.'], 500);
+        return response()->json(['message' => 'you reach the maximum request wait 1 minute ahead.'], 500);
       });
     });
 
     RateLimiter::for('api.upgrade.store', function (Request $request) {
       return Limit::perMinute(1)->by(optional($request->user())->id ?: $request->ip())->response(function () {
         return response()->json(['message' => 'upgrades can only be done once per minute.'], 500);
+      });
+    });
+
+    RateLimiter::for('api.upgrade.priceList', function (Request $request) {
+      return Limit::perMinute(60)->by(optional($request->user())->id ?: $request->ip())->response(function () {
+        return response()->json(['message' => 'price list on queue.'], 500);
       });
     });
   }
