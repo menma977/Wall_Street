@@ -27,14 +27,14 @@ class UserController extends Controller
   {
     $user = User::find(Auth::id());
 
-    $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');
+    $profit = Camel::where('user_id', $user->id)->where('description', 'like', "%Share%")->sum('debit');
     if (!$profit) {
       $profit = 0;
     } else {
       $profit *= 2;
     }
 
-    $profitDollar = Upgrade::where('to', $user->id)->where('description', 'like', "Random Share%")->sum('credit');
+    $profitDollar = Upgrade::where('to', $user->id)->where('description', 'like', "%Share%")->sum('credit');
     if (!$profitDollar) {
       $profitDollar = 0;
     }
