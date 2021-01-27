@@ -168,7 +168,7 @@ class LoginController extends Controller
           $totalDollar = "$ " . number_format(Upgrade::sum('debit') - Upgrade::sum('credit'), 3);
           $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
           if ($getTopBinary) {
-            $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+            $topSponsor = User::find($getTopBinary->up_line)->username . ' - ' . $getTopBinary->total;
           } else {
             $topSponsor = "-";
           }
