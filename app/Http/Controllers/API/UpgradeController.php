@@ -37,7 +37,7 @@ class UpgradeController extends Controller
     $totalMember = User::whereNotNull('email_verified_at')->count();
     $totalDollar = "$ " . number_format(Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->where('description', 'like', '%did an upgrade%')->sum('debit') / 3, 3);
     $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
-    $topSponsor = User::find($getTopBinary->up_line)->name . ' - ' . $getTopBinary->total;
+    $topSponsor = User::find($getTopBinary->up_line)->username . ' - ' . $getTopBinary->total;
 
     $data = [
       'progress' => $progress > 0 && $target > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
