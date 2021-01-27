@@ -138,16 +138,18 @@ class LoginController extends Controller
             $dollar = 0;
           }
 
-          $camelBalance = 0;
-          $tronBalance = 0;
-          $tronResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
-          if ($tronResponse->ok() && $tronResponse->successful()) {
-            $camelBalance = $tronResponse->json()["balance"];
+          $camelResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
+          if ($camelResponse->ok() && $camelResponse->successful() && str_contains($camelResponse->body(), 'success') === true) {
+            $camelBalance = $camelResponse->json()["balance"];
+          } else {
+            $camelBalance = 0;
           }
 
-          $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $user->wallet_camel);
-          if ($camelResponse->ok() && $camelResponse->successful()) {
-            $tronBalance = $camelResponse->json()["balance"];
+          $tronResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $user->wallet_camel);
+          if ($tronResponse->ok() && $tronResponse->successful() && str_contains($tronResponse->body(), 'success') === true) {
+            $tronBalance = $tronResponse->json()["balance"];
+          } else {
+            $tronBalance = 0;
           }
 
           $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');

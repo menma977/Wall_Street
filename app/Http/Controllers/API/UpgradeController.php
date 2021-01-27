@@ -56,29 +56,31 @@ class UpgradeController extends Controller
    */
   public function priceList()
   {
-    $get = Http::get("https://indodax.com/api/summaries");
-    if ($get->ok() && $get->status() === 200 && str_contains($get->body(), 'ticker')) {
-      $price = UpgradeList::first();
-      $doge = $price->doge / 15000;
-      $btc = $price->btc / 15000;
-      $eth = $price->eth / 15000;
-      $ltc = $price->ltc / 15000;
-      $camel = $price->camel;
-      $tron = $get->json()['tickers']["trx_idr"]["buy"] / 15000;
-
-      return response()->json([
-        'doge' => $doge,
-        'btc' => $btc,
-        'eth' => $eth,
-        'ltc' => $ltc,
-        'camel' => $camel,
-        'tron' => $tron
-      ]);
+    $price = UpgradeList::first();
+    $doge = $price->doge / 15000;
+    $btc = $price->btc / 15000;
+    $eth = $price->eth / 15000;
+    $ltc = $price->ltc / 15000;
+    $camel = $price->camel;
+    try {
+      $get = Http::get("https://indodax.com/api/summaries");
+      if ($get->ok() && $get->status() === 200 && str_contains($get->body(), 'ticker')) {
+        $tron = $get->json()['tickers']["trx_idr"]["buy"] / 15000;
+      } else {
+        $tron = 0;
+      }
+    } catch (\Exception $e) {
+      $tron = 0;
     }
 
     return response()->json([
-      'message' => "Camel not response",
-    ], 500);
+      'doge' => $doge,
+      'btc' => $btc,
+      'eth' => $eth,
+      'ltc' => $ltc,
+      'camel' => $camel,
+      'tron' => $tron
+    ]);
   }
 
   /**
