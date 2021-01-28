@@ -59,12 +59,12 @@ class UpgradeList extends Command
         } else {
           Log::error($get);
         }
-
-        Queue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
-        ShareQueue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
       } catch (Exception $e) {
         Log::warning($e->getMessage() . " Update BTC LINE : " . $e->getLine());
       }
     }
+
+    Queue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
+    ShareQueue::where('status', true)->where('created_at', '<', Carbon::now()->addDays(-1))->delete();
   }
 }
