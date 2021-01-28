@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Camel;
 use App\Models\Queue;
+use App\Models\QueueDaily;
+use App\Models\QueueDailyLimiterList;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\User;
@@ -20,6 +22,7 @@ class HomeController extends Controller
   protected $upgrade;
   protected $queue;
   protected $share;
+  protected $shareDaily;
 
   /**
    * HomeController constructor.
@@ -27,10 +30,11 @@ class HomeController extends Controller
   public function __construct()
   {
     $this->user = User::all();
-    $this->camel = Camel::where('description', 'like', 'Random Share%')->get();
+    $this->camel = Camel::where('description', 'like', '%Share%')->get();
     $this->upgrade = Upgrade::where('description', 'like', '%did an upgrade%')->get();
     $this->queue = Queue::all();
     $this->share = ShareQueue::all();
+    $this->shareDaily = QueueDaily::all();
   }
 
   /**
@@ -43,7 +47,14 @@ class HomeController extends Controller
 
     $camel = $this->camel->whereNotBetween('user_id', [1, 16]);
     $upgradeIn = $this->upgrade->whereNotBetween('to', [1, 16]);
-    $share = $this->share->whereNotBetween('user_id', [1, 16]);
+    $share = $this->share->whereNotBetween('user_id', [1, 16])->where('status', false)->sum('value');
+    $shareDaily = $this->shareDaily->whereNotBetween('user_id', [1, 16])->whereNotIn('user_id', [489])->where('send', false);
+    $shareDaily->map(function ($item) {
+      $sumUpgrade = Upgrade::where('from', $item->user_id)->where('to', $item->user_id)->sum('debit') / 3;
+      $shareValue = QueueDailyLimiterList::where('min', '<=', (integer)$sumUpgrade)->where('max', '>=', (integer)$sumUpgrade)->first();
+      $item->value = $shareValue->value;
+      return $item;
+    });
 
     $total_member = User::count();
     $total_member_today = User::where('email_verified_at', 'like', Carbon::now()->format("Y-m-d") . '%')->count();
@@ -53,15 +64,15 @@ class HomeController extends Controller
         return Carbon::parse($item->created_at)->format("Y-m-d") === Carbon::now()->format("Y-m-d");
       })->sum('debit') / 3;
 
-    $total_random_share = number_format(($share->where('status', false)->sum('value')) + ($camel->sum('debit') / 10 ** 8), 8, '.', '');
+    $total_random_share = number_format($share + $shareDaily->sum('value') + ($camel->sum('debit') / 10 ** 8), 8, '.', '');
     $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8, '.', '');
-    $total_random_share_not_send = number_format($share->where('status', false)->sum('value'), 8, '.', '');
+    $total_random_share_not_send = number_format($share + $shareDaily->sum('value'), 8, '.', '');
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
       return Carbon::parse($item->email_verified_at)->format("d/m/Y");
     });
 
-    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "Random Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
+    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "%Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
       return Carbon::parse($item->created_at)->format("d/m/Y");
     })->map(function ($item) {
       return number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
