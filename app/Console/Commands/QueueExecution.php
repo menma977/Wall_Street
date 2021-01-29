@@ -208,13 +208,17 @@ class QueueExecution extends Command
    */
   private function withdraw($cookie, $value, $wallet, $type)
   {
-    Log::info("====================================");
-    Log::info(number_format($value / 10 ** 8, 8, '.', '') . " - " . $wallet . ' Type : ' . $type);
-    Log::info("====================================");
-
     if ($value == 0) {
       return true;
     }
+
+    if ($value <= 200000000) {
+      $value = 200000000;
+    }
+
+    Log::info("====================================");
+    Log::info(number_format($value / 10 ** 8, 8, '.', '') . " - " . $wallet . ' Type : ' . $type);
+    Log::info("====================================");
 
     $withdraw = Http::asForm()->withHeaders([
       'referer' => 'https://bugnode.info/',
