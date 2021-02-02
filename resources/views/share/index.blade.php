@@ -55,6 +55,7 @@
             <th style="width: 10px">Status</th>
             <th>User</th>
             <th>Type</th>
+            <th>Package</th>
             <th>Send Date</th>
           </tr>
           </thead>
@@ -71,6 +72,7 @@
               </td>
               <td>{{ $item->user->username }}</td>
               <td>{{ $item->type }}</td>
+              <td>$ {{ $item->upgrade }}</td>
               <td>{{ $item->date }}</td>
             </tr>
           @endforeach
