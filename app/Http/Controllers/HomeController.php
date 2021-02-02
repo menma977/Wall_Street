@@ -14,6 +14,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class HomeController extends Controller
 {
@@ -38,10 +39,23 @@ class HomeController extends Controller
   }
 
   /**
+   * @param Request $request
    * @return Application|Factory|View
    */
-  public function index()
+  public function index(Request $request)
   {
+    if (!$request->has('month')) {
+      $month = Carbon::now()->format('m');
+    } else {
+      $month = $request->input('month');
+    }
+
+    if (!$request->has('year')) {
+      $year = Carbon::now()->format('Y');
+    } else {
+      $year = $request->input('year');
+    }
+
     $verifiedUser = $this->user->count();
     $verifiedProgress = $this->user->whereNotNull('email_verified_at')->count();
 
@@ -68,18 +82,18 @@ class HomeController extends Controller
     $total_random_share_send = number_format(($camel->sum('debit') / 10 ** 8), 8, '.', '');
     $total_random_share_not_send = number_format($share + $shareDaily->sum('value'), 8, '.', '');
 
-    $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
-      return Carbon::parse($item->email_verified_at)->format("M/Y");
+    $chartUser = User::whereNotNull('email_verified_at')->whereMonth('email_verified_at', $month)->whereYear('email_verified_at', $year)->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
+      return Carbon::parse($item->email_verified_at)->format("d/M/Y");
     });
 
-    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "%Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->created_at)->format("M/Y");
+    $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->whereMonth('created_at', $month)->whereYear('created_at', $year)->where('description', 'like', "%Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
+      return Carbon::parse($item->created_at)->format("d/M/Y");
     })->map(function ($item) {
       return number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
     });
 
-    $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->created_at)->format("M/Y");
+    $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereMonth('created_at', $month)->whereYear('created_at', $year)->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
+      return Carbon::parse($item->created_at)->format("d/M/Y");
     });
 
     $chartUpgradeDebit = $chartUpgrade->map(function ($item) {
@@ -110,6 +124,8 @@ class HomeController extends Controller
       'chartUpgradeCredit' => $chartUpgradeCredit,
       'chartUpgradeTotal' => $chartUpgradeTotal,
       'chartCamel' => $chartCamel,
+      'month' => $month,
+      'year' => $year,
     ];
 
     return view('dashboard', $data);
