@@ -69,17 +69,17 @@ class HomeController extends Controller
     $total_random_share_not_send = number_format($share + $shareDaily->sum('value'), 8, '.', '');
 
     $chartUser = User::whereNotNull('email_verified_at')->orderBy('email_verified_at', 'asc')->get()->countBy(function ($item) {
-      return Carbon::parse($item->email_verified_at)->format("d/m/Y");
+      return Carbon::parse($item->email_verified_at)->format("M/Y");
     });
 
     $chartCamel = Camel::whereNotBetween('user_id', [1, 16])->where('description', 'like', "%Share%")->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->created_at)->format("d/m/Y");
+      return Carbon::parse($item->created_at)->format("M/Y");
     })->map(function ($item) {
       return number_format($item->sum('debit') / 10 ** 8, 8, '.', '');
     });
 
     $chartUpgrade = Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->orderBy('created_at', 'asc')->get()->groupBy(function ($item) {
-      return Carbon::parse($item->created_at)->format("d/m/Y");
+      return Carbon::parse($item->created_at)->format("M/Y");
     });
 
     $chartUpgradeDebit = $chartUpgrade->map(function ($item) {
