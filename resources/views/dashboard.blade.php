@@ -42,6 +42,38 @@
         </div>
       </div>
     </div>
+    <form action="{{ route('dashboard.index') }}" method="get">
+      <div class="card card-outline card-primary">
+        <div class="card-body row">
+          <div class="form-group col-md-5">
+            <select class="custom-select" name="month">
+              <option value="1" {{ 1 == $month ? 'selected' : '' }}>January</option>
+              <option value="2" {{ 2 == $month ? 'selected' : '' }}>February</option>
+              <option value="3" {{ 3 == $month ? 'selected' : '' }}>Mart</option>
+              <option value="4" {{ 4 == $month ? 'selected' : '' }}>April</option>
+              <option value="5" {{ 5 == $month ? 'selected' : '' }}>May</option>
+              <option value="6" {{ 6 == $month ? 'selected' : '' }}>June</option>
+              <option value="7" {{ 7 == $month ? 'selected' : '' }}>July</option>
+              <option value="8" {{ 8 == $month ? 'selected' : '' }}>Augustus</option>
+              <option value="9" {{ 9 == $month ? 'selected' : '' }}>September</option>
+              <option value="10" {{ 10 == $month ? 'selected' : '' }}>October</option>
+              <option value="11" {{ 11 == $month ? 'selected' : '' }}>November</option>
+              <option value="12" {{ 12 == $month ? 'selected' : '' }}>December</option>
+            </select>
+          </div>
+          <div class="form-group col-md-5">
+            <select class="custom-select" name="year">
+              @for ($i = \Carbon\Carbon::now()->addYears(-5)->format('Y'); $i <= \Carbon\Carbon::now()->addYears(5)->format('Y'); $i++)
+                <option value="{{ $i }}" {{ $i == $year ? 'selected' : '' }}>{{ $i }}</option>
+              @endfor
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-block btn-primary">Filter</button>
+          </div>
+        </div>
+      </div>
+    </form>
     <div class="card card-outline card-primary">
       <div class="card-body">
         <div class="chart">
