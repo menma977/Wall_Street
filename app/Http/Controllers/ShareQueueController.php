@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ShareQueue;
+use App\Models\Upgrade;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Contracts\Foundation\Application;
@@ -23,6 +24,8 @@ class ShareQueueController extends Controller
     $shareQueue = ShareQueue::orderBy('created_at', 'desc')->paginate(20);
     $shareQueue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
+      $sumUpgrade = Upgrade::where('from', $item->user->id)->where('to', $item->user->id)->sum('debit') / 3;
+      $item->upgrade = $sumUpgrade;
       $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
       return $item;
@@ -51,6 +54,8 @@ class ShareQueueController extends Controller
     }
     $queue->getCollection()->transform(function ($item) {
       $item->user = User::find($item->user_id);
+      $sumUpgrade = Upgrade::where('from', $item->user->id)->where('to', $item->user->id)->sum('debit') / 3;
+      $item->upgrade = $sumUpgrade;
       $item->date = Carbon::parse($item->created_at)->format('d/m/Y H:i:s');
 
       return $item;
