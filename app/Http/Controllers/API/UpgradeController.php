@@ -192,7 +192,11 @@ class UpgradeController extends Controller
       $level = ShareLevel::all();
       $current = Auth::id();
       $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
-      $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
+      if ($upgradeList->id == 1) {
+        $wallet_it = $upList * $level->firstWhere("level", "IT")->percent + 0.01;
+      } else {
+        $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
+      }
       $buy_wall = $upList * $level->firstWhere("level", "BuyWall")->percent;
 
       $c_level = 1;
@@ -241,6 +245,7 @@ class UpgradeController extends Controller
         }
       }
       Log::info("==================Upgrade--------------------------------");
+
 
       $balance_left -= $wallet_it;
       $it_queue = new Queue([
