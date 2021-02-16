@@ -129,6 +129,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("filter", [UserController::class, "filter"])->name("filter");
     Route::get("{id}/show", [UserController::class, "show"])->name("show");
     Route::get("{id}/balance", [UserController::class, "balance"])->name("balance");
+    Route::get("{id}/suspend", [UserController::class, "suspend"])->name("suspend");
+    Route::post("{id}/update", [UserController::class, "update"])->name("update");
   });
 
   Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {

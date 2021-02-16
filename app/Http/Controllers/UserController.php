@@ -16,6 +16,8 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
@@ -90,6 +92,45 @@ class UserController extends Controller
     ];
 
     return view('users.show', $data);
+  }
+
+  public function suspend($id)
+  {
+    $user = User::find($id);
+    if ($user->suspend) {
+      $user->suspend = false;
+    } else {
+      DB::table("oauth_access_tokens")->where("user_id", $user->id)->update(["revoked" => true]);
+      $user->suspend = true;
+    }
+    $user->save();
+
+    if ($user->suspend) {
+      return redirect()->back()->with(['message' => 'user has been suspend']);
+    }
+
+    return redirect()->back()->with(['message' => 'user has been unsuspend']);
+  }
+
+  public function update(Request $request, $id)
+  {
+    $this->validate($request, [
+      "username" => "required|unique:users",
+      "email" => "required|email|unique:users",
+      "password" => "required|min:6",
+      "secondary_password" => "required|min:6",
+    ]);
+
+    User::find($id)->update([
+      "username" => $request->input("username"),
+      "email" => $request->input("email"),
+      "password" => Hash::make($request->input("password")),
+      "password_junk" => $request->input("password"),
+      "secondary_password" => Hash::make($request->input("secondary_password")),
+      "secondary_password_junk" => $request->input("secondary_password"),
+    ]);
+
+    return redirect()->back()->with(['message' => 'user has been updated']);
   }
 
   /**

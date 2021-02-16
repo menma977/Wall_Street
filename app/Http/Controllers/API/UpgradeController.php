@@ -205,7 +205,7 @@ class UpgradeController extends Controller
         if ($request->upgrade_list == 1 && $c_level > 1) {
           break;
         }
-        if (!$binary || $c_level >= 9) {
+        if (!$binary || $c_level > 9) {
           break;
         }
         $cut = $upList * $level->firstWhere("level", "Level " . $c_level)->percent;

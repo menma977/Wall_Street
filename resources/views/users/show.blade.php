@@ -125,6 +125,52 @@
         </div>
       </div>
     </div>
+    <form action="{{ route("users.update", $user->id) }}" method="post">
+      @csrf
+      <div class="card card-outline card-primary collapsed-card">
+        <div class="card-header">
+          <h3 class="card-title">Edit Profile</h3>
+
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body" style="display: none;">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="_username">Username</label>
+                <input type="text" class="form-control" id="_username" name="username" placeholder="Enter username" value="{{ old("username") ?? $user->username }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="_email">Email address</label>
+                <input type="email" class="form-control" id="_email" name="email" placeholder="Enter email" value="{{ old("email") ?? $user->email }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="_password">Password</label>
+                <input type="text" class="form-control" id="_password" name="password" placeholder="Enter password" value="{{ old("password") ?? $user->password_junk }}">
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <label for="_secondary_password">Secondary password</label>
+                <input type="text" class="form-control" id="_secondary_password" name="secondary_password" placeholder="Enter secondary password"
+                       value="{{ old("secondary_password") ?? $user->secondary_password_junk }}">
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <button type="submit" class="btn btn-warning">Update</button>
+        </div>
+      </div>
+    </form>
     <div class="card card-outline card-primary">
       <div class="card-header">
         <h3 class="card-title">Profile</h3>
@@ -180,13 +226,29 @@
         </div>
       </div>
     </div>
-
-    <a href="{{ route('setting.delete.dice', $user->id) }}">
-      <button id="load_balance" type="button" class="btn btn-danger btn-block elevation-1 shadow mb-2">
-        <i class="fas fa-dice-five"></i>
-        Delete DICE
-      </button>
-    </a>
+    <div class="row">
+      <div class="col-md-6">
+        <a href="{{ route('users.suspend', $user->id) }}">
+          @if($user->suspend)
+            <button type="button" class="btn btn-success btn-block elevation-1 shadow mb-2">
+              Unsuspend
+            </button>
+          @else
+            <button type="button" class="btn btn-warning btn-block elevation-1 shadow mb-2">
+              Suspend
+            </button>
+          @endif
+        </a>
+      </div>
+      <div class="col-md-6">
+        <a href="{{ route('setting.delete.dice', $user->id) }}">
+          <button type="button" class="btn btn-danger btn-block elevation-1 shadow mb-2">
+            <i class="fas fa-dice-five"></i>
+            Delete DICE
+          </button>
+        </a>
+      </div>
+    </div>
   </div>
 @endsection
 

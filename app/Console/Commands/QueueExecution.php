@@ -64,6 +64,8 @@ class QueueExecution extends Command
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $queue->value -= 0.01;
+            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -73,6 +75,8 @@ class QueueExecution extends Command
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $queue->value -= 0.01;
+            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -82,6 +86,8 @@ class QueueExecution extends Command
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
+            $queue->value -= 0.01;
+            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();

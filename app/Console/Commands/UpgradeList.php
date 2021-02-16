@@ -33,7 +33,7 @@ class UpgradeList extends Command
    */
   public function handle()
   {
-    $queue = Queue::where('status', false)->count();
+    $queue = Queue::where('status', false)->where('type', 'not like', 'camel_%')->count();
     if (!$queue) {
       try {
         $get = Http::get("https://indodax.com/api/summaries");
