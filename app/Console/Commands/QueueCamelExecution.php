@@ -102,7 +102,7 @@ class QueueCamelExecution extends Command
       $upgrade->description = 'upgrade level ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
@@ -127,7 +127,7 @@ class QueueCamelExecution extends Command
       $upgrade->description = 'BUY WALL ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
@@ -151,7 +151,7 @@ class QueueCamelExecution extends Command
       $upgrade->description = 'FEE ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
