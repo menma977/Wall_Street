@@ -128,7 +128,7 @@ class QueueExecution extends Command
       $upgrade->description = 'upgrade level ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
@@ -155,7 +155,7 @@ class QueueExecution extends Command
       $upgrade->description = 'BUY WALL ' . $user->username;
       $upgrade->type = $type;
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
@@ -181,7 +181,7 @@ class QueueExecution extends Command
       $upgrade->description = 'FEE ' . $user->username;
       $upgrade->type = "camel";
       $upgrade->level = $user->level;
-      $upgrade->credit = $rawValue;
+      $upgrade->credit = $rawValue * 2;
       $upgrade->save();
 
       return true;
