@@ -216,36 +216,44 @@ class RegisterController extends Controller
    */
   public function createAccount()
   {
-    //https://corsdoge.herokuapp.com/doge
-    //https://www.999doge.com/api/web.aspx
-    $doge = Http::asForm()->withHeaders([
-      'referer' => 'https://bugnode.info/',
-      'origin' => 'https://bugnode.info/'
-    ])->post($this->listUrl->url, [
-      'a' => 'CreateAccount',
-      'Key' => 'ec01af0702f3467a808ba52679e1ee61',
-    ]);
+    try {
+      $doge = Http::asForm()->withHeaders([
+        'referer' => 'https://bugnode.info/',
+        'origin' => 'https://bugnode.info/'
+      ])->post($this->listUrl->url, [
+        'a' => 'CreateAccount',
+        'Key' => 'ec01af0702f3467a808ba52679e1ee61',
+      ]);
 
-    $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");
+      $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");
 
-    if ($doge->ok() && $doge->successful() && $camel->ok() && $camel->successful()) {
+      if ($doge->ok() && $doge->successful() && $camel->ok() && $camel->successful()) {
+        return [
+          'code' => 200,
+          'cookie' => $doge->json()['SessionCookie'],
+          'privateKey' => $camel->json()['privateKey'],
+          'publicKey' => $camel->json()['publicKey'],
+          'walletCamel' => $camel->json()['address']['base58'],
+          'hexCamel' => $camel->json()['address']['hex'],
+        ];
+      }
+
+      $this->listUrl->block = true;
+      $this->listUrl->save();
+
       return [
-        'code' => 200,
-        'cookie' => $doge->json()['SessionCookie'],
-        'privateKey' => $camel->json()['privateKey'],
-        'publicKey' => $camel->json()['publicKey'],
-        'walletCamel' => $camel->json()['address']['base58'],
-        'hexCamel' => $camel->json()['address']['hex'],
+        'code' => 500,
+        'message' => "failed create account",
+      ];
+    } catch (Exception $e) {
+      $this->listUrl->block = true;
+      $this->listUrl->save();
+
+      return [
+        'code' => 500,
+        'message' => "failed create account",
       ];
     }
-
-    $this->listUrl->block = true;
-    $this->listUrl->save();
-
-    return [
-      'code' => 500,
-      'message' => "failed create account",
-    ];
   }
 
   /**
