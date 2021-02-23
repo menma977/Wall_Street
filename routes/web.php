@@ -131,6 +131,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get("{id}/balance", [UserController::class, "balance"])->name("balance");
     Route::get("{id}/suspend", [UserController::class, "suspend"])->name("suspend");
     Route::post("{id}/update", [UserController::class, "update"])->name("update");
+    Route::get("{id}/send", [UserController::class, "resendEmail"])->name("email")->middleware(['throttle:1,1']);
   });
 
   Route::group(['prefix' => 'binary', 'as' => 'binary.'], function () {

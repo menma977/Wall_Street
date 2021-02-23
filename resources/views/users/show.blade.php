@@ -227,7 +227,7 @@
       </div>
     </div>
     <div class="row">
-      <div class="col-md-6">
+      <div class="col-md-4">
         <a href="{{ route('users.suspend', $user->id) }}">
           @if($user->suspend)
             <button type="button" class="btn btn-success btn-block elevation-1 shadow mb-2">
@@ -240,7 +240,15 @@
           @endif
         </a>
       </div>
-      <div class="col-md-6">
+      <div class="col-md-4">
+        <a href="{{ route('users.email', $user->id) }}">
+          <button type="button" class="btn btn-primary btn-block elevation-1 shadow mb-2">
+            <i class="fa fa-envelope"></i>
+            Resend email
+          </button>
+        </a>
+      </div>
+      <div class="col-md-4">
         <a href="{{ route('setting.delete.dice', $user->id) }}">
           <button type="button" class="btn btn-danger btn-block elevation-1 shadow mb-2">
             <i class="fas fa-dice-five"></i>

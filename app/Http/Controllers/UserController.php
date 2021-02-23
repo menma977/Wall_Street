@@ -10,11 +10,13 @@ use App\Models\ListUrl;
 use App\Models\LTC;
 use App\Models\Upgrade;
 use App\Models\User;
+use App\Notifications\AddUser;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Client\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -131,6 +133,24 @@ class UserController extends Controller
     ]);
 
     return redirect()->back()->with(['message' => 'user has been updated']);
+  }
+
+  /**
+   * @param $id
+   * @return RedirectResponse
+   */
+  public function resendEmail($id) {
+    $user = User::find($id);
+    if ($user) {
+      if ($user->hasVerifiedEmail()) {
+        return redirect()->back()->with(["message" => "your account is has been verified"]);
+      }
+
+      $user->notify(new AddUser());
+      return redirect()->back()->with(["message" => "verified link has been send"]);
+    }
+
+    return redirect()->back()->with(["message" => "your email does not exist"]);
   }
 
   /**
