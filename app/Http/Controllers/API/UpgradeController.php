@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\BillCamel;
 use App\Models\Binary;
 use App\Models\BTC;
 use App\Models\Camel;
@@ -188,6 +189,12 @@ class UpgradeController extends Controller
     Log::info("==================Upgrade--------------------------------");
     if ($result) {
       $upList = $upgradeList->dollar / 2;
+      (new BillCamel([
+        "user" => $request->id(),
+        "value" => $upList,
+        "last_try" => Carbon::now(),
+        "status" => "pending"
+      ]))->save();
       $balance_left = $upList;
       $level = ShareLevel::all();
       $current = Auth::id();

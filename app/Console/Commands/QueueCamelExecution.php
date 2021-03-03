@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\BillCamel;
 use App\Models\CamelSetting;
 use App\Models\Dice;
 use App\Models\HistoryCamel;
@@ -44,6 +45,13 @@ class QueueCamelExecution extends Command
     $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'like', 'camel_%')->first();
     if ($queue) {
       try {
+        // NOTE: Jika ada tagihan blm selesai, maka skip
+        $bill = BillCamel::where('user', $queue->user_id)->where('status', false)->count();
+        if ($bill > 0) {
+          $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
+          $queue->save();
+          return;
+        }
         $user = User::find($queue->user_id);
         $upgradeList = UpgradeList::find(1);
         $formatValue = number_format($queue->value / $upgradeList->camel, 6, '.', '');
