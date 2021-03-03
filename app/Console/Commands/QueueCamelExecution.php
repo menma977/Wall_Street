@@ -196,9 +196,13 @@ class QueueCamelExecution extends Command
       'amount' => $value,
     ]);
     Log::info($withdraw->body());
+    Log::info($withdraw->json()['txid']);
+    sleep(60);
+    $validate = Http::get("https://api.cameltoken.io/tronapi/gettxstatus/" . $withdraw->json()['txid']);
+    Log::info($validate->body());
     Log::info("====================================");
 
-    if ($withdraw->successful() && str_contains($withdraw->body(), 'failed') === false) {
+    if ($withdraw->successful() && str_contains($withdraw->body(), 'failed') === false && str_contains($validate->body(), 'failed') === false) {
       $history = new HistoryCamel();
       $history->user_id = $id;
       $history->wallet = $targetWallet;
