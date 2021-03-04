@@ -95,8 +95,12 @@ class ShareQueueExecution extends Command
     Log::info("=================SEND RANDOM===================");
     Log::info($value . " - " . $targetWallet);
     Log::info($withdraw->body());
+    Log::info($withdraw->json()['txid']);
+    sleep(60);
+    $validate = Http::get("https://api.cameltoken.io/tronapi/gettxstatus/" . $withdraw->json()['txid']);
+    Log::info($validate->body());
     Log::info("====================================");
 
-    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false;
+    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false && str_contains($validate->body(), 'failed') === false;
   }
 }
