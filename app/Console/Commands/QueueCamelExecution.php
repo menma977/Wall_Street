@@ -10,7 +10,6 @@ use App\Models\Queue;
 use App\Models\ShareIt;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
-use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
 use Carbon\Carbon;
@@ -53,31 +52,29 @@ class QueueCamelExecution extends Command
           return;
         }
         $user = User::find($queue->user_id);
-        $upgradeList = UpgradeList::find(1);
-        $formatValue = number_format($queue->value / $upgradeList->camel, 6, '.', '');
         if ($queue->type === 'camel_level') {
-          if ($this->level($user, User::find($queue->send), $formatValue, $queue->value)) {
+          if ($this->level($user, User::find($queue->send), $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($queue->type === 'camel_buyWall') {
-          if ($this->buyWall($user, WalletAdmin::find($queue->send), $formatValue, $queue->value)) {
+          if ($this->buyWall($user, WalletAdmin::find($queue->send), $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($queue->type === 'camel_it') {
-          if ($this->it($user, $formatValue, $queue->value)) {
+          if ($this->it($user, $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(2)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else {
-          if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $formatValue)) {
+          if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $queue->value)) {
 
             $this->share($queue->value);
             $queue->status = true;

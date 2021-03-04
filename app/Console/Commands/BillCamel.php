@@ -2,8 +2,6 @@
 
 namespace App\Console\Commands;
 
-use App\Models\Binary;
-use App\Models\Upgrade;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
@@ -31,7 +29,7 @@ class BillCamel extends Command
    */
   public function handle()
   {
-    $bill = BillCamel::where('status', false)->where('created_at', '<=', Carbon::now())->first();
+    $bill = \App\Models\BillCamel::where('status', false)->where('created_at', '<=', Carbon::now())->first();
     if ($bill) {
       $from = User::where("username", "topupcamel")->first()->private_key;
       $to = User::find($bill->user)->id;

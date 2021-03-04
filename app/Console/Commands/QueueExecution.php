@@ -9,7 +9,6 @@ use App\Models\Queue;
 use App\Models\ShareIt;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
-use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
 use Carbon\Carbon;
@@ -52,49 +51,38 @@ class QueueExecution extends Command
           $user->cookie = $this->getUserCookie($user->username_doge, $user->password_doge);
           $user->save();
         }
-        $upgradeList = UpgradeList::find(1);
-
-        $formatValue = number_format(($queue->value * $upgradeList->idr) / $upgradeList->$targetBalance, 8, '', '');
-        $value = $formatValue;
-        Log::info("{$queue->value} * {$upgradeList->idr} / {$upgradeList->$targetBalance} = $value");
 
         if ($typeBalance === 'level') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = User::find($queue->send)->$wallet;
-          if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
+          if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
-            $queue->value -= 0.01;
-            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'buyWall') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = WalletAdmin::find($queue->send)->$wallet;
-          if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
+          if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
-            $queue->value -= 0.01;
-            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else if ($typeBalance === 'it') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = ShareIt::find(1)->$wallet;
-          if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
+          if ($this->it($targetBalance, $user, $walletTarget, $queue->value, $queue->total)) {
             $queue->status = true;
           } else {
-            $queue->value -= 0.01;
-            $queue->total -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
         } else {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = BankAccount::find(1)->$wallet;
-          if ($this->withdraw($user->cookie, $value, $walletTarget, $targetBalance)) {
+          if ($this->withdraw($user->cookie, $queue->value, $walletTarget, $targetBalance)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
           } else {

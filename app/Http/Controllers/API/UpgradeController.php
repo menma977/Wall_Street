@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
+use Exception;
 
 class UpgradeController extends Controller
 {
@@ -75,7 +76,7 @@ class UpgradeController extends Controller
         $camel = 0;
         $tron = 0;
       }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       $doge = 0;
       $btc = 0;
       $eth = 0;
@@ -189,6 +190,7 @@ class UpgradeController extends Controller
     Log::info("==================Upgrade--------------------------------");
     if ($result) {
       $upList = $upgradeList->dollar / 2;
+      $satoshi = $this->dollarToSatoshi($upgradeList, $upList, $request->type);
       if ($request->type === 'camel') {
         (new BillCamel([
           "user" => $request->id(),
@@ -206,15 +208,19 @@ class UpgradeController extends Controller
         ]))->save();
       }
       $balance_left = $upList;
+      $satoshi_left = $satoshi;
       $level = ShareLevel::all();
       $current = Auth::id();
       $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
       if ($upgradeList->id == 1) {
         $wallet_it = $upList * $level->firstWhere("level", "IT")->percent + 0.01;
+        $wallet_it_satoshi = $satoshi * $level->firstWhere("level", "IT")->percent + 0.01;
       } else {
         $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
+        $wallet_it_satoshi = $satoshi * $level->firstWhere("level", "IT")->percent;
       }
       $buy_wall = $upList * $level->firstWhere("level", "BuyWall")->percent;
+      $buy_wall_satoshi = $satoshi * $level->firstWhere("level", "BuyWall")->percent;
 
       $c_level = 1;
       while (true) {
@@ -226,6 +232,7 @@ class UpgradeController extends Controller
           break;
         }
         $cut = $upList * $level->firstWhere("level", "Level " . $c_level)->percent;
+        $satoshi_cut = $satoshi * $level->firstWhere("level", "Level " . $c_level)->percent;
         $random_share_percent += $level->firstWhere("level", "Level " . $c_level)->percent;
         $userBinary = User::where("id", $binary->up_line)->first();
         $current = $userBinary->id ?? "";
@@ -234,25 +241,28 @@ class UpgradeController extends Controller
           if ($sumUpLineValue >= $cut) {
             Log::info("idU: {$userBinary->id} cut : $cut  | $sumUpLineValue");
             $balance_left -= $cut;
+            $satoshi_left -= $satoshi_cut;
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($cut, 8),
+              "value" => $this->toFixed($satoshi_cut, $request->type === "camel" ? 6 : 8),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 8),
+              "total" => $this->toFixed($cut, 8),
             ]);
             $q->save();
 
             $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
           } else {
+            $upLineSatoshi = $this->dollarToSatoshi($upgradeList, $sumUpLineValue, $request->type);
             $balance_left -= $sumUpLineValue;
+            $satoshi_left -= $upLineSatoshi;
             Log::info("idU: {$userBinary->id} sumUpLineValue : $sumUpLineValue | $sumUpLineValue");
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($sumUpLineValue, 8),
+              "value" => $this->toFixed($upLineSatoshi, $request->type === "camel" ? 6 : 8),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 8),
+              "total" => $this->toFixed($sumUpLineValue, 8),
             ]);
             $q->save();
 
@@ -265,35 +275,39 @@ class UpgradeController extends Controller
 
 
       $balance_left -= $wallet_it;
+      $satoshi_left -= $wallet_it_satoshi;
       $it_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 1,
-        "value" => $this->toFixed($wallet_it, 8),
+        "value" => $this->toFixed($wallet_it_satoshi, $request->type === "camel" ? 6 : 8),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 8),
+        "total" => $this->toFixed($wallet_it, 8),
       ]);
       $it_queue->save();
 
       $wallet_admin = WalletAdmin::inRandomOrder()->first();
 
       $balance_left -= $buy_wall;
+      $satoshi_left -= $buy_wall_satoshi;
       $buy_wall_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 8),
+        "value" => $this->toFixed($buy_wall_satoshi, $request->type === "camel" ? 6 : 8),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 8),
+        "total" => $this->toFixed($buy_wall, 8),
       ]);
       $buy_wall_queue->save();
 
       $total_random_share = $upList * (1 - $random_share_percent);
+      $total_random_share_satoshi = $satoshi * (1 - $random_share_percent);
       $balance_left -= $total_random_share;
+      $satoshi_left -= $total_random_share_satoshi;
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share + $balance_left, 8),
+        "value" => $this->toFixed($total_random_share_satoshi + $satoshi_left, $request->type === "camel" ? 6 : 8),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed(0, 8),
+        "total" => $this->toFixed($total_random_share + $balance_left, 8),
       ]);
       $share_queue->save();
 
@@ -461,5 +475,32 @@ class UpgradeController extends Controller
     }
 
     return false;
+  }
+
+  /**
+   * @param $package
+   * @param $value
+   * @param $type
+   * @return float
+   */
+  private function dollarToSatoshi($package, $value, $type)
+  {
+    if ($type === "doge") {
+      return round(($value * $package->idr) / $package->doge);
+    }
+
+    if ($type === "btc") {
+      return round(($value * $package->idr) / $package->btc);
+    }
+
+    if ($type === "ltc") {
+      return round(($value * $package->idr) / $package->ltc);
+    }
+
+    if ($type === "eth") {
+      return round(($value * $package->idr) / $package->eth);
+    }
+
+    return round($value / $package->doge);
   }
 }
