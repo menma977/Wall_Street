@@ -11,7 +11,7 @@ class BillCamel extends Model
   use HasFactory;
 
   protected $fillable = [
-    "user", "value", "last_try", "status"
+    "user", "type", "value", "last_try", "status"
   ];
 
   protected $dates = ["last_try" => "datetime:Y-m-d H:i:s"];

@@ -31,12 +31,11 @@ class BillCamel extends Command
    */
   public function handle()
   {
-    $bill = BillCamel::where('status', false)->where('created_at', '<=', Carbon::now());
-    // TODO: tampungan ngambil dmna?
-    $from = "";
-    $to = User::find($bill->user)->id;
+    $bill = BillCamel::where('status', false)->where('created_at', '<=', Carbon::now())->first();
     if ($bill) {
-      if ($this->withdraw($from, $to, $bill->value)) {
+      $from = User::where("username", "topupcamel")->first()->private_key;
+      $to = User::find($bill->user)->id;
+      if ($this->withdraw($from, $to, $bill->value, $bill->type)) {
         $bill->status = true;
         $bill->save();
       } else {
@@ -44,18 +43,12 @@ class BillCamel extends Command
         $bill->save();
       }
     }
-    // $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'like', 'camel_%')->first();
-    // if ($upgrade) {
-    //   $this->binaryHandler($upgrade->from, $upgrade->debit / 3);
-    //   $upgrade->status = true;
-    //   $upgrade->save();
-    // }
   }
 
-  private function withdraw($privateKey, $targetWallet, $value)
+  private function withdraw($privateKey, $targetWallet, $value, $type)
   {
     $withdraw = Http::asForm()->post(
-      'https://api.cameltoken.io/tronapi/sendtoken',
+      'https://api.cameltoken.io/tronapi/' . ($type === "tron" ? "sendtrx" : "sendtoken"),
       [
         'privkey' => $privateKey,
         'to' => $targetWallet,

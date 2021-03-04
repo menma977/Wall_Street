@@ -17,6 +17,7 @@ class CreateBillCamelsTable extends Migration
       $table->id();
       $table->bigInteger('user');
       $table->bigInteger('value');
+      $table->string('type');
       $table->datetime('last_try');
       $table->boolean('status')->default(false);
       $table->timestamps();

@@ -189,12 +189,22 @@ class UpgradeController extends Controller
     Log::info("==================Upgrade--------------------------------");
     if ($result) {
       $upList = $upgradeList->dollar / 2;
-      (new BillCamel([
-        "user" => $request->id(),
-        "value" => $upList,
-        "last_try" => Carbon::now(),
-        "status" => "pending"
-      ]))->save();
+      if ($request->type === 'camel') {
+        (new BillCamel([
+          "user" => $request->id(),
+          "value" => $upList * 1.05,
+          "type" => "camel",
+          "last_try" => Carbon::now(),
+          "status" => "pending"
+        ]))->save();
+        (new BillCamel([
+          "user" => $request->id(),
+          "value" => 10,
+          "type" => "tron",
+          "last_try" => Carbon::now(),
+          "status" => "pending"
+        ]))->save();
+      }
       $balance_left = $upList;
       $level = ShareLevel::all();
       $current = Auth::id();
