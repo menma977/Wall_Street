@@ -501,6 +501,6 @@ class UpgradeController extends Controller
       return round(($value * $package->idr) / $package->eth);
     }
 
-    return round($value / $package->doge);
+    return round($value / $package->camel, 6);
   }
 }
