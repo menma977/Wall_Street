@@ -209,7 +209,7 @@ class UpgradeController extends Controller
       if ($request->type === 'camel') {
         (new BillCamel([
           "user" => Auth::id(),
-          "value" => round($upList / $upgradeList->camel, 6) * 1.05,
+          "value" => $satoshi * 1.05,
           "type" => "camel",
           "last_try" => Carbon::now(),
           "status" => false
