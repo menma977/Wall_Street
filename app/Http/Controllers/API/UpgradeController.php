@@ -178,6 +178,20 @@ class UpgradeController extends Controller
     }
 
     $upgradeList = UpgradeList::where("id", $request->upgrade_list)->first();
+
+    if ($request->type === "camel") {
+      $camelResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . Auth::user()->wallet_camel);
+      if ($camelResponse->ok() && $camelResponse->successful()) {
+        $balance = $camelResponse->json()["balance"];
+        $minCamel = round((($upgradeList->dollar / 2) / $upgradeList->camel) * 1.05, 6);
+        if ($balance < $minCamel) {
+          return response()->json(["message" => "Insufficient Camel Balance"], 500);
+        }
+      } else {
+        return response()->json(["message" => "Failed load tron"], 500);
+      }
+    }
+
     $result = $this->converter($request->type, $request->balance, $request->balance_fake, $upgradeList);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
     Log::info("{$request->upgrade_list} - $upgradeList");
@@ -193,18 +207,18 @@ class UpgradeController extends Controller
       $satoshi = $this->dollarToSatoshi($upgradeList, $upList, $request->type);
       if ($request->type === 'camel') {
         (new BillCamel([
-          "user" => $request->id(),
-          "value" => $upList * 1.05,
+          "user" => Auth::id(),
+          "value" => round($upList / $upgradeList->camel, 6) * 1.05,
           "type" => "camel",
           "last_try" => Carbon::now(),
-          "status" => "pending"
+          "status" => false
         ]))->save();
         (new BillCamel([
-          "user" => $request->id(),
+          "user" => Auth::id(),
           "value" => 10,
           "type" => "tron",
           "last_try" => Carbon::now(),
-          "status" => "pending"
+          "status" => false
         ]))->save();
       }
       $balance_left = $upList;
@@ -501,6 +515,6 @@ class UpgradeController extends Controller
       return round(($value * $package->idr) / $package->eth);
     }
 
-    return round($value / $package->doge);
+    return round($value / $package->camel);
   }
 }
