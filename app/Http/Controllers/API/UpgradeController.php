@@ -298,20 +298,16 @@ class UpgradeController extends Controller
       ]);
       $buy_wall_queue->save();
 
-      $total_random_share = $upList * (1 - $random_share_percent);
-      $total_random_share_satoshi = $satoshi * (1 - $random_share_percent);
-      $balance_left -= $total_random_share;
-      $satoshi_left -= $total_random_share_satoshi;
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share_satoshi + $satoshi_left, $request->type === "camel" ? 6 : 8),
+        "value" => $this->toFixed($satoshi_left, $request->type === "camel" ? 6 : 8),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed($total_random_share + $balance_left, 8),
+        "total" => $this->toFixed($balance_left, 8),
       ]);
       $share_queue->save();
 
-      $this->cutFakeBalance($request->type, 1, "BUY WALL|FEE|SHARE", ($total_random_share + $balance_left + $buy_wall + $wallet_it), $upgradeList);
+      $this->cutFakeBalance($request->type, 1, "BUY WALL|FEE|SHARE", ($balance_left + $buy_wall + $wallet_it), $upgradeList);
 
       $upgrade = new Upgrade([
         'from' => Auth::id(),
