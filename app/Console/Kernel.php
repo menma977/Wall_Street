@@ -17,6 +17,8 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
+    $schedule->command('billCamel')->everyMinute()->withoutOverlapping();
+
     $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
 
     $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
