@@ -16,7 +16,7 @@ class CreateBillCamelsTable extends Migration
     Schema::create('bill_camels', function (Blueprint $table) {
       $table->id();
       $table->bigInteger('user');
-      $table->bigInteger('value');
+      $table->string('value');
       $table->string('type');
       $table->datetime('last_try');
       $table->boolean('status')->default(false);
