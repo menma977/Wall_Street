@@ -34,6 +34,7 @@ class UpgradeList extends Command
   public function handle()
   {
     $queue = Queue::where('status', false)->where('type', 'not like', 'camel_%')->count();
+    $queueCamel = Queue::where('status', false)->where('type', 'like', 'camel_%')->count();
     if (!$queue) {
       try {
         $get = Http::get("https://indodax.com/api/summaries");
@@ -50,10 +51,12 @@ class UpgradeList extends Command
             $item->eth_usd = number_format((($item->dollar * $item->idr) / $item->eth) / 2, 8, '', '');
             $item->ltc = $ticker['ltc_idr']['buy'];
             $item->ltc_usd = number_format((($item->dollar * $item->idr) / $item->ltc) / 2, 8, '', '');
-            if ($tronResponse->ok() && $tronResponse->successful()) {
-              $item->camel = $tronResponse->json()["price_usd"];
+            if (!$queueCamel) {
+              if (($tronResponse->ok() && $tronResponse->successful()) || str_contains($get->body(), 'failed') == false) {
+                $item->camel = $tronResponse->json()["price_usd"] ?? $item->camel;
+              }
+              $item->camel_usd = ($item->dollar / $item->camel) / 2;
             }
-            $item->camel_usd = ($item->dollar / $item->camel) / 2;
             $item->save();
           }
         } else {
