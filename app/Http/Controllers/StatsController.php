@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Camel;
 use App\Models\ShareQueue;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
@@ -24,6 +25,9 @@ class StatsController extends Controller
         break;
       case "upgrades-with-dividend":
         $result = $this->turnover($route, "Upgrades", "Upgrades and Shares");
+        break;
+      case "share-pool":
+        $result = $this->sharePool($route, "Share Pool", "All Share Pool");
         break;
       case "random-share":
         $result = $this->randomShare($route, "Random Share", "All Random Share");
@@ -54,6 +58,9 @@ class StatsController extends Controller
         break;
       case "upgrades-with-dividend":
         $result = $this->turnoverSource($request, true);
+        break;
+      case "share-pool":
+        $result = $this->sharePoolSource($request);
         break;
       case "random-share":
         $result = $this->randomShareSource($request);
@@ -94,6 +101,21 @@ class StatsController extends Controller
     ];
     if ($noCredit)
       array_splice($columns, 5, 1);
+    $colDef = [];
+    return ["columns" => $columns, "columnDef" => $colDef, "routeName" => $routeName, "title" => $title, "page" => $route];
+  }
+
+  private function sharePool($route, $routeName, $title, $noClaim = false)
+  {
+    $columns = [
+      new Columns("#", "id"),
+      new Columns("User", "username"),
+      new Columns("Value", "debit"),
+      new Columns("Date", "created_at")
+    ];
+    if ($noClaim) {
+      array_splice($columns, 1, 1);
+    }
     $colDef = [];
     return ["columns" => $columns, "columnDef" => $colDef, "routeName" => $routeName, "title" => $title, "page" => $route];
   }
@@ -191,6 +213,42 @@ class StatsController extends Controller
         "data" => $upgrades->get()->map(function ($u) {
           $u->date = Carbon::parse($u->created_at)->format('d/m/Y H:i:s');
           return $u;
+        })
+      ];
+    } catch (Exception $e) {
+      Log::error('[' . $e->getCode() . '] "' . $e->getMessage() . '" on line ' . $e->getTrace()[0]['line'] . ' of file ' . $e->getTrace()[0]['file']);
+      return [
+        "draw" => (int)$request->draw,
+        "recordsTotal" => 0,
+        "recordsFiltered" => 0,
+        "data" => [],
+        "error" => "Something happen when fetching the data"
+      ];
+    }
+  }
+
+  private function sharePoolSource(Request $request)
+  {
+    try {
+      $searchableColumn = ["username"];
+      $camel = Camel::select()->where('description', 'LIKE', 'Share Pool%');
+      $recordsTotal = $camel->count();
+      $camel = $camel->whereNested(function ($q) use ($searchableColumn, $request) {
+        foreach ($searchableColumn as $searchable) {
+          $q->orWhere($searchable, "LIKE", "%" . ($request->search["value"] ?: "") . "%");
+        }
+      });
+      $camel = $camel->join("users", "users.id", "=", "camels.user_id")
+        ->select("camels.*", "users.name as username");
+      $recordsFiltered = $camel->count();
+      $camel = $camel->skip($request->start)->take($request->length);
+      return [
+        "draw" => (int)$request->draw,
+        "recordsTotal" => $recordsTotal,
+        "recordsFiltered" => $recordsFiltered,
+        "data" => $camel->orderBy('created_at', 'DESC')->get()->map(function ($s) {
+          $s->created_at = Carbon::parse($s->created_at)->format('d/m/Y H:i:s');
+          return $s;
         })
       ];
     } catch (Exception $e) {
