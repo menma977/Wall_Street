@@ -111,7 +111,7 @@ class StatsController extends Controller
       new Columns("#", "id"),
       new Columns("User", "username"),
       new Columns("Value", "debit"),
-      new Columns("Date", "created_at")
+      new Columns("Date", "date")
     ];
     if ($noClaim) {
       array_splice($columns, 1, 1);
@@ -247,7 +247,8 @@ class StatsController extends Controller
         "recordsTotal" => $recordsTotal,
         "recordsFiltered" => $recordsFiltered,
         "data" => $camel->orderBy('created_at', 'DESC')->get()->map(function ($s) {
-          $s->created_at = Carbon::parse($s->created_at)->format('d/m/Y H:i:s');
+          $s->debit = round($s->debit / 10 ** 6, 6);
+          $s->date = Carbon::parse($s->created_at)->format('d/m/Y H:i:s');
           return $s;
         })
       ];
