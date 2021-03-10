@@ -17,6 +17,8 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
+    $schedule->command('queueDailySet')->daily()->withoutOverlapping();
+
     $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
 
     $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
@@ -34,7 +36,6 @@ class Kernel extends ConsoleKernel
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
     $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
 
-    $schedule->command('queueDailySet')->daily()->withoutOverlapping();
     if (QueueDailySetting::find(1)->is_on) {
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
