@@ -17,9 +17,7 @@ class Kernel extends ConsoleKernel
    */
   protected function schedule(Schedule $schedule)
   {
-    $schedule->command('queueDailySet')->daily()->withoutOverlapping();
-
-    $schedule->command('upgradeList')->everyMinute()->withoutOverlapping();
+    $schedule->command('upgradeList')->everyFiveMinutes()->withoutOverlapping();
 
     $schedule->command('binaryProfit')->everyMinute()->withoutOverlapping();
 
@@ -29,13 +27,16 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('queueCamelExecution')->everyMinute()->withoutOverlapping();
 
-    $camelSetting = CamelSetting::find(1)->share_time;
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
-    $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+//    $schedule->command('queueGoldExecution')->everyMinute()->withoutOverlapping();
 
+    $camelSetting = CamelSetting::find(1)->share_time;
+    // $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    // $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    // $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    // $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+    // $schedule->command('shareQueueExecution')->cron("*/$camelSetting * * * *")->withoutOverlapping();
+
+    $schedule->command('queueDailySet')->weekly()->withoutOverlapping();
     if (QueueDailySetting::find(1)->is_on) {
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
       $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();

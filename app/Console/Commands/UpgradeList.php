@@ -34,11 +34,9 @@ class UpgradeList extends Command
   public function handle()
   {
     $queue = Queue::where('status', false)->where('type', 'not like', 'camel_%')->count();
-    $queueCamel = Queue::where('status', false)->where('type', 'like', 'camel_%')->count();
     if (!$queue) {
       try {
         $get = Http::get("https://indodax.com/api/summaries");
-        $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
         if ($get->ok() || $get->status() === 200 || str_contains($get->body(), 'ticker')) {
           $ticker = $get->json()['tickers'];
           $upgradeList = upgrade_list::all();
@@ -51,11 +49,21 @@ class UpgradeList extends Command
             $item->eth_usd = number_format((($item->dollar * $item->idr) / $item->eth) / 2, 8, '', '');
             $item->ltc = $ticker['ltc_idr']['buy'];
             $item->ltc_usd = number_format((($item->dollar * $item->idr) / $item->ltc) / 2, 8, '', '');
+            $queueCamel = Queue::where('status', false)->where('type', 'like', 'camel_%')->count();
             if (!$queueCamel) {
+              $tronResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
               if (($tronResponse->ok() && $tronResponse->successful()) || str_contains($get->body(), 'failed') == false) {
                 $item->camel = $tronResponse->json()["price_usd"] ?? $item->camel;
               }
               $item->camel_usd = ($item->dollar / $item->camel) / 2;
+            }
+            $queueGold = Queue::where('status', false)->where('type', 'like', 'gold_%')->count();
+            if (!$queueGold) {
+              $tronResponse = Http::get("https://paseo.live/camelgold/tokenprice");
+              if (($tronResponse->ok() && $tronResponse->successful()) || str_contains($get->body(), 'failed') == false) {
+                $item->gold = $tronResponse->json()["price_usd"] ?? $item->gold;
+              }
+              $item->gold_usd = ($item->dollar / $item->gold) / 2;
             }
             $item->save();
           }

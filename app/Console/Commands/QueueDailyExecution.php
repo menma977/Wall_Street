@@ -9,6 +9,7 @@ use App\Models\QueueDailyLimiterList;
 use App\Models\Upgrade;
 use App\Models\UpgradeList;
 use App\Models\User;
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
@@ -46,12 +47,12 @@ class QueueDailyExecution extends Command
           $shareValue = QueueDailyLimiterList::where('min', '<=', (integer)$sumUpgrade)->where('max', '>=', (integer)$sumUpgrade)->first();
           if ($shareValue) {
             $shareToUsd = ($shareValue->value * UpgradeList::find(1)->camel) * 2;
-            if (self::withdraw($bank->private_key, $user->wallet_camel, $shareValue->value)) {
+            if (self::withdraw($bank, $user->wallet_camel, $shareValue->value)) {
               $upgrade = new Upgrade();
               $upgrade->from = 1;
               $upgrade->to = $user->id;
               $upgrade->description = 'Share Pool ' . $user->username;
-              $upgrade->type = "camel";
+              $upgrade->type = "gold";
               $upgrade->level = $user->level;
               $upgrade->credit = $shareToUsd;
               $upgrade->save();
@@ -62,6 +63,7 @@ class QueueDailyExecution extends Command
               $camel->user_id = $user->id;
               $camel->debit = $formatBalanceTrue;
               $camel->description = 'Share Pool ' . $user->username;
+
               $camel->save();
 
               QueueDaily::where('created_at', $queueDaily->created_at)->where('user_id', $queueDaily->user_id)->first()->update(['send' => true]);
@@ -73,24 +75,25 @@ class QueueDailyExecution extends Command
           Log::error("===" . $sumUpLineValue . "===");
           QueueDaily::where('user_id', $user->id)->delete();
         }
-      } catch (\Exception $e) {
+      } catch (Exception $e) {
         Log::error($e->getMessage() . ' | Queue Share POOL Line : ' . $e->getLine());
       }
     }
   }
 
   /**
-   * @param $privateKey
+   * @param $bank
    * @param $targetWallet
    * @param $value
    * @return bool
    */
-  private static function withdraw($privateKey, $targetWallet, $value)
+  private static function withdraw($bank, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
-      'privkey' => $privateKey,
-      'to' => $targetWallet,
-      'amount' => $value,
+    $withdraw = Http::asForm()->post('https://paseo.live/camelgold/SendToken', [
+      'senderAddress' => $bank->private_key,
+      'senderPrivateKey' => $bank->wallet_camel,
+      'receiverAddress' => $targetWallet,
+      'tokenAmount' => $value,
     ]);
     Log::info("=================SEND RANDOM POOL===================");
     Log::info($value . " - " . $targetWallet);

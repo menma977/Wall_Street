@@ -17,6 +17,7 @@ use App\Models\UpgradeList;
 use App\Models\User;
 use App\Models\WalletAdmin;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,7 +38,7 @@ class UpgradeController extends Controller
     $totalMember = User::whereNotNull('email_verified_at')->count();
     $totalDollar = "$ " . number_format(Upgrade::whereNotBetween('from', [1, 16])->whereNotBetween('to', [1, 16])->where('description', 'like', '%did an upgrade%')->sum('debit') / 3, 3);
     $getTopBinary = Binary::selectRaw("up_line, count(*) as total")->groupBy('up_line')->orderBy('total', 'desc')->first();
-    $topSponsor = User::find($getTopBinary->up_line)->username . ' - ' . $getTopBinary->total;
+    $topSponsor = User::find($getTopBinary->up_line)->username ?? Auth::user()->username . ' - ' . $getTopBinary->total;
 
     $data = [
       'progress' => $progress > 0 && $target > 0 ? number_format(($progress / $target) * 100, 0, ',', '') : 0,
@@ -59,6 +60,7 @@ class UpgradeController extends Controller
     try {
       $get = Http::get("https://indodax.com/api/summaries");
       $camelResponse = Http::get("https://api.cameltoken.io/tronapi/tokenprice");
+      $goldResponse = Http::get("https://paseo.live/camelgold/tokenprice");
       if ($get->ok() && $get->status() === 200 && str_contains($get->body(), 'ticker')) {
         $doge = $get->json()['tickers']["doge_idr"]["buy"] / 15000;
         $btc = $get->json()['tickers']["btc_idr"]["buy"] / 15000;
@@ -66,20 +68,23 @@ class UpgradeController extends Controller
         $ltc = $get->json()['tickers']["ltc_idr"]["buy"] / 15000;
         $tron = $get->json()['tickers']["trx_idr"]["buy"] / 15000;
         $camel = $camelResponse->json()["price_usd"];
+        $gold = $goldResponse->json()["price_usd"];
       } else {
         $doge = 0;
         $btc = 0;
         $eth = 0;
         $ltc = 0;
         $camel = 0;
+        $gold = 0;
         $tron = 0;
       }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       $doge = 0;
       $btc = 0;
       $eth = 0;
       $ltc = 0;
       $camel = 0;
+      $gold = 0;
       $tron = 0;
     }
 
@@ -89,6 +94,7 @@ class UpgradeController extends Controller
       'eth' => $eth,
       'ltc' => $ltc,
       'camel' => $camel,
+      'gold' => $gold,
       'tron' => $tron
     ]);
   }
@@ -100,9 +106,9 @@ class UpgradeController extends Controller
   {
     $list = Upgrade::where('from', Auth::id())->orWhere('to', Auth::id())->simplePaginate(20);
     $list->getCollection()->transform(function ($item) {
-      $item->balance = $item->debit != 0 ? $item->debit : $item->credit;
+      $item->balance = $item->debit !== 0 ? $item->debit : $item->credit;
       $item->date = Carbon::parse($item->created_at)->format("d-M-Y");
-      $item->color = $item->debit != 0 ? "in" : "out";
+      $item->color = $item->debit !== 0 ? "in" : "out";
 
       return $item;
     });
@@ -157,6 +163,10 @@ class UpgradeController extends Controller
       }],
     ]);
 
+    // if($request->input("type") == "camel") {
+    //     return response()->json(['message' => 'camel coin is going on metenect'], 500);
+    // }
+
     if (Queue::where('user_id', Auth::id())->where('status', false)->count()) {
       return response()->json(['message' => 'your are on queue'], 500);
     }
@@ -164,21 +174,21 @@ class UpgradeController extends Controller
     $camelResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . Auth::user()->wallet_camel);
     if ($camelResponse->ok() && $camelResponse->successful()) {
       $tronBalance = $camelResponse->json()["balance"];
-      if ($tronBalance == 0) {
+      if ($tronBalance === 0) {
         return response()->json(["message" => "Required minimum 10 tron"], 500);
       }
     } else {
       return response()->json(["message" => "Failed load tron"], 500);
     }
 
-    if ($request->type === "camel") {
+    if ($request->type === "camel" || $request->type === "gold") {
       $request->balance_fake = number_format($request->balance_fake / 10 ** 8, 8, '.', '');
     }
 
     $upgradeList = UpgradeList::where("id", $request->upgrade_list)->first();
     $result = $this->converter($request->type, $request->balance, $request->balance_fake, $upgradeList);
     Log::info("==================Upgrade+++++++++++++++++++++++++++");
-    Log::info("{$request->upgrade_list} - $upgradeList");
+    Log::info("$request->upgrade_list - $upgradeList");
     Log::info($request->type);
     Log::info($request->balance);
     Log::info($request->balance_fake);
@@ -192,7 +202,7 @@ class UpgradeController extends Controller
       $level = ShareLevel::all();
       $current = Auth::id();
       $random_share_percent = $level->firstWhere("level", "IT")->percent + $level->firstWhere("level", "BuyWall")->percent;
-      if ($upgradeList->id == 1) {
+      if ($upgradeList->id === 1) {
         $wallet_it = $upList * $level->firstWhere("level", "IT")->percent + 0.01;
       } else {
         $wallet_it = $upList * $level->firstWhere("level", "IT")->percent;
@@ -202,7 +212,7 @@ class UpgradeController extends Controller
       $c_level = 1;
       while (true) {
         $binary = Binary::where("down_line", $current)->first();
-        if ($request->upgrade_list == 1 && $c_level > 1) {
+        if ($request->upgrade_list === 1 && $c_level > 1) {
           break;
         }
         if (!$binary || $c_level > 9) {
@@ -215,27 +225,27 @@ class UpgradeController extends Controller
         $sumUpLineValue = Upgrade::where('from', $userBinary->id)->where('to', $userBinary->id)->sum('debit') - Upgrade::where('to', $userBinary->id)->sum('credit');
         if ($sumUpLineValue > 0 && $cut > 0) {
           if ($sumUpLineValue >= $cut) {
-            Log::info("idU: {$userBinary->id} cut : $cut  | $sumUpLineValue");
+            Log::info("idU: $userBinary->id cut : $cut  | $sumUpLineValue");
             $balance_left -= $cut;
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($cut, 8),
+              "value" => $this->toFixed($cut),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 8),
+              "total" => $this->toFixed($balance_left),
             ]);
             $q->save();
 
             $this->cutFakeBalance($request->type, $userBinary->id, "bonus Level " . $c_level, $cut, $upgradeList);
           } else {
             $balance_left -= $sumUpLineValue;
-            Log::info("idU: {$userBinary->id} sumUpLineValue : $sumUpLineValue | $sumUpLineValue");
+            Log::info("idU: $userBinary->id sumUpLineValue : $sumUpLineValue | $sumUpLineValue");
             $q = new Queue([
               "user_id" => Auth::id(),
               "send" => $userBinary->id,
-              "value" => $this->toFixed($sumUpLineValue, 8),
+              "value" => $this->toFixed($sumUpLineValue),
               "type" => $request->type . "_level",
-              "total" => $this->toFixed($balance_left, 8),
+              "total" => $this->toFixed($balance_left),
             ]);
             $q->save();
 
@@ -246,14 +256,13 @@ class UpgradeController extends Controller
       }
       Log::info("==================Upgrade--------------------------------");
 
-
       $balance_left -= $wallet_it;
       $it_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 1,
-        "value" => $this->toFixed($wallet_it, 8),
+        "value" => $this->toFixed($wallet_it),
         "type" => $request->type . "_it",
-        "total" => $this->toFixed($balance_left, 8),
+        "total" => $this->toFixed($balance_left),
       ]);
       $it_queue->save();
 
@@ -263,9 +272,9 @@ class UpgradeController extends Controller
       $buy_wall_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => $wallet_admin->id,
-        "value" => $this->toFixed($buy_wall, 8),
+        "value" => $this->toFixed($buy_wall),
         "type" => $request->type . "_buyWall",
-        "total" => $this->toFixed($balance_left, 8),
+        "total" => $this->toFixed($balance_left),
       ]);
       $buy_wall_queue->save();
 
@@ -274,9 +283,9 @@ class UpgradeController extends Controller
       $share_queue = new Queue([
         "user_id" => Auth::id(),
         "send" => 2,
-        "value" => $this->toFixed($total_random_share + $balance_left, 8),
+        "value" => $this->toFixed($total_random_share + $balance_left),
         "type" => $request->type . "_share",
-        "total" => $this->toFixed(0, 8),
+        "total" => $this->toFixed(0),
       ]);
       $share_queue->save();
 
@@ -347,9 +356,9 @@ class UpgradeController extends Controller
     return response()->json(["packages" => $packages]);
   }
 
-  private function toFixed($number, $precision, $separator = ".")
+  private function toFixed($number)
   {
-    return number_format($number, $precision, $separator, "");
+    return number_format($number, 8, ".", "");
   }
 
   private function cutFakeBalance($type, $upLine, $level, $cut, $package)
@@ -398,6 +407,19 @@ class UpgradeController extends Controller
         "description" => $level,
         "credit" => number_format(($cut * $package->idr) / $package->doge, 8, '', '')
       ]);
+    } else if ($type === "doge") {
+      $shareBalance = new Camel([
+        "user_id" => $upLine,
+        "description" => $level,
+        "debit" => number_format(($cut * $package->idr) / $package->gold, 8, '', ''),
+        "type" => "gold"
+      ]);
+      $cutBalance = new Camel([
+        "user_id" => Auth::id(),
+        "description" => $level,
+        "credit" => number_format(($cut * $package->idr) / $package->gold, 8, '', ''),
+        "type" => "gold"
+      ]);
     } else {
       $shareBalance = new Camel([
         "user_id" => $upLine,
@@ -429,6 +451,10 @@ class UpgradeController extends Controller
 
     if ($type === "camel") {
       return $package->camel_usd <= $balance && $package->camel_usd <= $fakeBalance;
+    }
+
+    if ($type === "camel") {
+      return $package->gold_usd <= $balance && $package->gold_usd <= $fakeBalance;
     }
 
     if ($type === "btc") {

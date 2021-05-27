@@ -47,11 +47,11 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
 
   Route::group(['prefix' => 'upgrade', 'as' => 'upgrade.'], function () {
     Route::get('', [UpgradeController::class, 'index']);
-    Route::get('/price', [UpgradeController::class, 'priceList'])->name('priceList');
+    Route::get('/price', [UpgradeController::class, 'priceList'])->name("priceList");
     Route::get('/list', [UpgradeController::class, 'list']);
     Route::get('/show', [UpgradeController::class, 'show']);
     Route::get('/create', [UpgradeController::class, 'create']);
-    Route::post('/store', [UpgradeController::class, 'store'])->name('store')->middleware(['throttle:1,1']);
+    Route::post('/store', [UpgradeController::class, 'store'])->name("store")->middleware(['throttle:1,1']);
   });
 
   Route::group(['prefix' => 'btc', 'as' => 'btc.'], function () {
@@ -87,6 +87,8 @@ Route::middleware(['auth:api', 'verified'])->group(function () {
     Route::get('/show', [CamelController::class, 'show']);
     Route::get('/create', [CamelController::class, 'create']);
     Route::post('/store', [CamelController::class, 'store'])->middleware(['throttle:2,1']);
+
+    Route::get('/balances', [CamelController::class, "balances"]);
 
     Route::group(['prefix' => 'history', 'as' => 'history.'], function () {
       Route::post('', [HistoryCamelController::class, 'index']);

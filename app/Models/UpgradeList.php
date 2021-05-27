@@ -13,11 +13,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string dollar
  * @property string idr
  * @property string camel
+ * @property string gold
  * @property string btc
  * @property string ltc
  * @property string doge
  * @property string eth
  * @property string camel_usd
+ * @property string gold_usd
  * @property string btc_usd
  * @property string ltc_usd
  * @property string doge_usd
@@ -36,11 +38,13 @@ class UpgradeList extends Model
     'dollar',
     'idr',
     'camel',
+    'gold',
     'btc',
     'ltc',
     'doge',
     'eth',
     'camel_usd',
+    'gold_usd',
     'btc_usd',
     'ltc_usd',
     'doge_usd',

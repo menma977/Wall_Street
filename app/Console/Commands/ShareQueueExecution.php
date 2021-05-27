@@ -46,7 +46,7 @@ class ShareQueueExecution extends Command
           $shareValue = CamelSetting::find(1)->share_value;
           $camelValue = ($shareValue * UpgradeList::find(1)->camel) * 2;
 
-          if ($this->withdraw(CamelSetting::find(1)->private_key, $user->wallet_camel, $shareValue)) {
+          if ($this->withdraw(CamelSetting::find(1), $user->wallet_camel, $shareValue)) {
             $upgrade = new Upgrade();
             $upgrade->from = 1;
             $upgrade->to = $user->id;
@@ -85,13 +85,15 @@ class ShareQueueExecution extends Command
    * @param $value
    * @return bool
    */
-  private function withdraw($privateKey, $targetWallet, $value)
+  private function withdraw($user, $targetWallet, $value)
   {
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
-      'privkey' => $privateKey,
-      'to' => $targetWallet,
-      'amount' => $value,
+    $withdraw = Http::asForm()->post('https://paseo.live/camelgold/SendToken', [
+      'senderPrivateKey' => $user->privateKey,
+      'senderAddress' => $user->wallet_camel,
+      'receiverAddress' => $targetWallet,
+      'tokenAmount' => $value,
     ]);
+
     Log::info("=================SEND RANDOM===================");
     Log::info($value . " - " . $targetWallet);
     Log::info($withdraw->body());

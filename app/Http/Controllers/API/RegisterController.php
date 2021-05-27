@@ -41,8 +41,8 @@ class RegisterController extends Controller
     $this->validate($request, [
       'sponsor' => 'required|string|exists:users,' . $type,
       'name' => 'required|string',
-      'username' => 'required|string|unique:users',
-      'email' => 'required|email|unique:users',
+      'username' => 'required|string|unique:users,username',
+      'email' => 'required|email|unique:users,email',
       'phone' => 'required|numeric|min:10',
       'password' => 'required|same:confirmation_password|min:6',
       'secondary_password' => 'required|same:confirmation_secondary_password|digits:6'
@@ -222,7 +222,7 @@ class RegisterController extends Controller
         'origin' => 'https://bugnode.info/'
       ])->post($this->listUrl->url, [
         'a' => 'CreateAccount',
-        'Key' => 'ec01af0702f3467a808ba52679e1ee61',
+        'Key' => '55fab71829584fa9b442e3367d127789',
       ]);
 
       $camel = Http::get("https://api.cameltoken.io/tronapi/createaccount");

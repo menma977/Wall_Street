@@ -18,21 +18,21 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use mysql_xdevapi\Exception;
 
-class QueueCamelExecution extends Command
+class QueueGoldExecution extends Command
 {
   /**
    * The name and signature of the console command.
    *
    * @var string
    */
-  protected $signature = 'queueCamelExecution';
+  protected $signature = 'queueGoldExecution';
 
   /**
    * The console command description.
    *
    * @var string
    */
-  protected $description = 'Execution Camel Only';
+  protected $description = 'Execution Camel gold Only';
 
   /**
    * Execute the console command.
@@ -41,27 +41,27 @@ class QueueCamelExecution extends Command
    */
   public function handle()
   {
-    $queue = Queue::where('status', false)->where('type', 'like', 'camel_%')->where('created_at', '<', Carbon::now())->first();
+    $queue = Queue::where('status', false)->where('type', 'like', 'gold_%')->where('created_at', '<', Carbon::now())->first();
     if ($queue) {
       try {
         $user = User::find($queue->user_id);
         $upgradeList = UpgradeList::find(1);
         $formatValue = number_format($queue->value / $upgradeList->camel, 6, '.', '');
-        if ($queue->type === 'camel_level') {
+        if ($queue->type === 'gold_level') {
           if ($this->level($user, User::find($queue->send), $formatValue, $queue->value)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(30)->format('Y-m-d H:i:s');
           }
           $queue->save();
-        } else if ($queue->type === 'camel_buyWall') {
+        } else if ($queue->type === 'gold_buyWall') {
           if ($this->buyWall($user, WalletAdmin::find($queue->send), $formatValue, $queue->value)) {
             $queue->status = true;
           } else {
             $queue->created_at = Carbon::now()->addMinutes(30)->format('Y-m-d H:i:s');
           }
           $queue->save();
-        } else if ($queue->type === 'camel_it') {
+        } else if ($queue->type === 'gold_it') {
           if ($this->it($user, $formatValue, $queue->value)) {
             $queue->status = true;
           } else {
@@ -69,7 +69,7 @@ class QueueCamelExecution extends Command
           }
           $queue->save();
         } else {
-          if ($this->withdraw($user->id, $user->private_key, CamelSetting::find(1)->wallet_camel, $formatValue)) {
+          if ($this->withdraw($user, CamelSetting::find(1)->wallet_camel, $formatValue)) {
 
             $this->share($queue->value);
             $queue->status = true;
@@ -95,12 +95,12 @@ class QueueCamelExecution extends Command
    */
   private function level($user, $targetUser, $value, $rawValue)
   {
-    if ($this->withdraw($user->id, $user->private_key, $targetUser->wallet_camel, $value)) {
+    if ($this->withdraw($user, $targetUser->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
       $upgrade->description = 'upgrade level ' . $user->username;
-      $upgrade->type = "camel";
+      $upgrade->type = "gold";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue * 2;
       $upgrade->save();
@@ -120,12 +120,12 @@ class QueueCamelExecution extends Command
    */
   private function buyWall($user, $targetUser, $value, $rawValue)
   {
-    if ($this->withdraw($user->id, $user->private_key, $targetUser->wallet_camel, $value)) {
+    if ($this->withdraw($user, $targetUser->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = $targetUser->id;
       $upgrade->description = 'BUY WALL ' . $user->username;
-      $upgrade->type = "camel";
+      $upgrade->type = "gold";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue * 2;
       $upgrade->save();
@@ -144,12 +144,12 @@ class QueueCamelExecution extends Command
    */
   private function it($user, $value, $rawValue)
   {
-    if ($this->withdraw($user->id, $user->private_key, ShareIt::find(1)->wallet_camel, $value)) {
+    if ($this->withdraw($user, ShareIt::find(1)->wallet_camel, $value)) {
       $upgrade = new Upgrade();
       $upgrade->from = $user->id;
       $upgrade->to = 1;
       $upgrade->description = 'FEE ' . $user->username;
-      $upgrade->type = "camel";
+      $upgrade->type = "gold";
       $upgrade->level = $user->level;
       $upgrade->credit = $rawValue * 2;
       $upgrade->save();
@@ -169,31 +169,31 @@ class QueueCamelExecution extends Command
       $shareQueue = new ShareQueue();
       $shareQueue->user_id = Dice::where('user_id', '!=', 2)->inRandomOrder()->first()->user_id;
       $shareQueue->value = CamelSetting::find(1)->share_value;
-      $shareQueue->type = "camel";
+      $shareQueue->type = "gold";
       $shareQueue->save();
     }
   }
 
   /**
-   * @param $id
-   * @param $privateKey
+   * @param $user
    * @param $targetWallet
    * @param $value
    * @return bool
    */
-  private function withdraw($id, $privateKey, $targetWallet, $value)
+  private function withdraw($user, $targetWallet, $value)
   {
-    Log::info("====================================Queue Camel");
+    Log::info("====================================Queue Camel gold");
     Log::info($value . " - " . $targetWallet);
 
     if ($value === 0) {
       return true;
     }
 
-    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
-      'privkey' => $privateKey,
-      'to' => $targetWallet,
-      'amount' => $value,
+    $withdraw = Http::asForm()->post('https://paseo.live/camelgold/SendToken', [
+      'senderPrivateKey' => $user->privateKey,
+      'senderAddress' => $user->wallet_camel,
+      'receiverAddress' => $targetWallet,
+      'tokenAmount' => $value,
     ]);
     Log::info($withdraw->body());
     Log::info($withdraw->json()['txid']);
@@ -204,7 +204,7 @@ class QueueCamelExecution extends Command
 
     if ($withdraw->successful() && str_contains($withdraw->body(), 'failed') === false && str_contains($validate->body(), 'failed') === false) {
       $history = new HistoryCamel();
-      $history->user_id = $id;
+      $history->user_id = $user->id;
       $history->wallet = $targetWallet;
       $history->value = $value;
       $history->code = $withdraw->json()['txid'];

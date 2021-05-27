@@ -19,6 +19,7 @@ class CreateCamelsTable extends Migration
       $table->text('description')->nullable();
       $table->string('debit')->default(0);
       $table->string('credit')->default(0);
+      $table->string('type')->default("camel");
       $table->timestamps();
       $table->softDeletes();
     });

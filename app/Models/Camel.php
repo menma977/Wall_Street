@@ -14,10 +14,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string description
  * @property integer debit
  * @property integer credit
+ * @property string type
  */
 class Camel extends Model
 {
-    use HasFactory,SoftDeletes;
+  use HasFactory, SoftDeletes;
 
   /**
    * The attributes that are mass assignable.
@@ -29,5 +30,6 @@ class Camel extends Model
     'description',
     'debit',
     'credit',
+    'type',
   ];
 }

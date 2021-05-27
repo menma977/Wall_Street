@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Http\Controllers\CamelController as CamelGet;
 use App\Http\Controllers\Controller;
 use App\Models\Binary;
 use App\Models\BTC;
@@ -57,7 +58,7 @@ class LoginController extends Controller
     try {
       if (Auth::attempt([$type => $request->input('username'), 'password' => $request->input('password')])) {
         Log::info('username: ' . $request->input('username') . ' | password: ' . $request->input('password') . ' | IP(' . $request->ip() . ')');
-        foreach (Auth::user()->tokens as $id => $item) {
+        foreach (Auth::user()->tokens as $item) {
           //$item->revoke();
           $item->delete();
         }
@@ -130,7 +131,7 @@ class LoginController extends Controller
 
           $coin = collect($coin->json("Balances"));
 
-          if ($user->id == 1) {
+          if ($user->id === 1) {
             $dollar = 10000;
           } elseif ($user->level > 0) {
             $dollar = UpgradeList::find($user->level)->dollar;
@@ -138,19 +139,11 @@ class LoginController extends Controller
             $dollar = 0;
           }
 
-          $camelResponse = Http::get("https://api.cameltoken.io/tronapi/gettokenbalance/" . $user->wallet_camel);
-          if ($camelResponse->ok() && $camelResponse->successful() && str_contains($camelResponse->body(), 'success') === true) {
-            $camelBalance = $camelResponse->json()["balance"];
-          } else {
-            $camelBalance = 0;
-          }
+          $wallet = Auth::user()->wallet_camel;
 
-          $tronResponse = Http::get("https://api.cameltoken.io/tronapi/getbalance/" . $user->wallet_camel);
-          if ($tronResponse->ok() && $tronResponse->successful() && str_contains($tronResponse->body(), 'success') === true) {
-            $tronBalance = $tronResponse->json()["balance"];
-          } else {
-            $tronBalance = 0;
-          }
+          $camelBalance = CamelGet::camelBalance($wallet);
+          $goldBalance = CamelGet::goldBalance($wallet);
+          $tronBalance = CamelGet::tronBalance($wallet);
 
           $profit = Camel::where('user_id', $user->id)->where('description', 'like', "Random Share%")->sum('debit');
           if (!$profit) {
@@ -196,13 +189,15 @@ class LoginController extends Controller
             'doge_balance' => $coin->where('Currency', 'doge')->first()['Balance'] ?? 0,
             'ltc_balance' => $coin->where('Currency', 'ltc')->first()['Balance'] ?? 0,
             'eth_balance' => $coin->where('Currency', 'eth')->first()['Balance'] ?? 0,
-            'camel_balance' => $camelBalance,
-            'tron_balance' => $tronBalance,
+            'camel_balance' => round($camelBalance / 10 ** 6, 6),
+            'gold_balance' => round($goldBalance / 10 ** 8, 8),
+            'tron_balance' => round($tronBalance / 10 ** 6, 6),
             'fake_doge_balance' => Doge::where('user_id', Auth::id())->sum('debit') - Doge::where('user_id', Auth::id())->sum('credit'),
             'fake_ltc_balance' => LTC::where('user_id', Auth::id())->sum('debit') - LTC::where('user_id', Auth::id())->sum('credit'),
             'fake_eth_balance' => ETH::where('user_id', Auth::id())->sum('debit') - ETH::where('user_id', Auth::id())->sum('credit'),
             'fake_btc_balance' => BTC::where('user_id', Auth::id())->sum('debit') - BTC::where('user_id', Auth::id())->sum('credit'),
-            'fake_camel_balance' => Camel::where('user_id', Auth::id())->sum('debit') - Camel::where('user_id', Auth::id())->sum('credit'),
+            'fake_camel_balance' => Camel::where('user_id', Auth::id())->where("type", "camel")->sum('debit') - Camel::where('user_id', Auth::id())->where("type", "camel")->sum('credit'),
+            'fake_gold_balance' => Camel::where('user_id', Auth::id())->where("type", "gold")->sum('debit') - Camel::where('user_id', Auth::id())->where("type", "gold")->sum('credit'),
             'totalMember' => $totalMember,
             'totalDollar' => $totalDollar,
             'topSponsor' => $topSponsor,

