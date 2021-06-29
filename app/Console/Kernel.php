@@ -38,11 +38,11 @@ class Kernel extends ConsoleKernel
 
     $schedule->command('queueDailySet')->weekly()->withoutOverlapping();
     if (QueueDailySetting::find(1)->is_on) {
-      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
-      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
-      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
-      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
-      $schedule->command('queueDailyExecution')->everyMinute()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyTwoHours()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyTwoHours()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyTwoHours()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyTwoHours()->withoutOverlapping();
+      $schedule->command('queueDailyExecution')->everyTwoHours()->withoutOverlapping();
     }
   }
 
