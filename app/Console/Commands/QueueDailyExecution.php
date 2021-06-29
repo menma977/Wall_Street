@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Models\Camel;
+use App\Models\HistoryCamel;
 use App\Models\QueueDaily;
 use App\Models\QueueDailyBank;
 use App\Models\QueueDailyLimiterList;
@@ -101,5 +102,28 @@ class QueueDailyExecution extends Command
     Log::info("====================================");
 
     return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false;
+  }
+
+  private function withdrawCamel($bank, $targetWallet, $value)
+  {
+    if ($value === 0) {
+      return true;
+    }
+
+    $withdraw = Http::asForm()->post('https://api.cameltoken.io/tronapi/sendtoken', [
+      'privkey' => $bank->private_key,
+      'to' => $targetWallet,
+      'amount' => $value,
+    ]);
+
+    sleep(60);
+    $validate = Http::get("https://api.cameltoken.io/tronapi/gettxstatus/" . $withdraw->json()['txid']);
+
+    Log::info("=================SEND RANDOM POOL===================");
+    Log::info($value . " - " . $targetWallet);
+    Log::info($withdraw->body());
+    Log::info("====================================");
+
+    return $withdraw->successful() && str_contains($withdraw->body(), 'failed') === false && str_contains($validate->body(), 'failed') === false;
   }
 }
